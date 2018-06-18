@@ -1,0 +1,32 @@
+{
+  "name": "whalesong",
+  "version": "0.1.0",
+  "description": "WhalesongJS is a scriptlet that could be used to manage any WebApp remotely, but currently it can manager only WhatsappWeb",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config ./config/webpack.prod.js --mode production --output ../whalesong/js/whalesong.js",
+    "beautify": "js-beautify ."
+  },
+  "author": "Alfred Santacatalina",
+  "license": "MIT",
+  "dependencies": {
+    "b64-to-blob": "^1.2.19",
+    "babel-runtime": "^6.26.0",
+    "glob-run": "^0.1.6"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-class-properties": "^7.0.0-beta.49",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "js-beautify": "^1.7.5",
+    "webpack": "^4.10.2",
+    "webpack-cli": "^3.0.1"
+  }
+}
