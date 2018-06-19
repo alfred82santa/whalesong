@@ -24,11 +24,6 @@ class StatusMonitor:
     def echo(self, txt):
         self._print_fn(txt)
 
-    async def init(self):
-        await self._driver.start_driver()
-        await self._driver.connect()
-        self.echo('Connected')
-
     async def check_stream(self):
         stream = await self._driver.stream.get_model()
         self.echo("Stream: {}".format(stream.stream))
