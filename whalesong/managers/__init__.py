@@ -62,7 +62,7 @@ class BaseModelManager(BaseManager):
         return self._execute_command('monitorModel',
                                      result_class=self.get_model_result_class())
 
-    def monitor_model_field(self, field):
+    def monitor_field(self, field):
         return self._execute_command('monitorField',
                                      {'field': field},
                                      result_class=MonitorResult)

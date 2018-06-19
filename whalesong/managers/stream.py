@@ -1,8 +1,10 @@
+from dirty_models import FastDynamicModel
+
 from . import BaseModelManager
-from ..models import BaseModel
+# from ..models import BaseModel
 
 
-class Stream(BaseModel):
+class Stream(FastDynamicModel):
     pass
 
 
