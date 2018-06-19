@@ -30,6 +30,8 @@ class Chat(BaseModel):
 
 class ChatManager(BaseModelManager):
 
+    MODEL_CLASS = Chat
+
     def get_messages(self):
         from .message import MessageCollectionManager
         return self._execute_command('getMessages',

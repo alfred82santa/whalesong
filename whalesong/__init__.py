@@ -24,9 +24,9 @@ class Whalesong(BaseManager):
         self._submanagers['storage'] = StorageManager(self._driver, manager_path='storage')
         self._submanagers['stream'] = StreamManager(self._driver, manager_path='stream')
         self._submanagers['conn'] = ConnManager(self._driver, manager_path='conn')
-        self._submanagers['contact'] = ContactCollectionManager(self._driver, manager_path='contact')
-        self._submanagers['chat'] = ChatCollectionManager(self._driver, manager_path='chat')
-        self._submanagers['message'] = MessageCollectionManager(self._driver, manager_path='message')
+        self._submanagers['contacts'] = ContactCollectionManager(self._driver, manager_path='contacts')
+        self._submanagers['chats'] = ChatCollectionManager(self._driver, manager_path='chats')
+        self._submanagers['messages'] = MessageCollectionManager(self._driver, manager_path='messages')
 
         self._fut_running = None
         self._fut_stopped = None
@@ -72,3 +72,9 @@ class Whalesong(BaseManager):
 
     async def qr(self):
         return await self._driver.screenshot_element('div[data-ref]')
+
+    def stop_monitor(self, monitor):
+        return self._driver.execute_command('stopMonitor', {'monitorId': monitor.result_id})
+
+    async def cancel_iterators(self):
+        return await self._driver.cancel_iterators()

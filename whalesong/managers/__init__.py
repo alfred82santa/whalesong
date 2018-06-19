@@ -76,7 +76,7 @@ class BaseCollectionManager(BaseManager):
 
     @classmethod
     def get_monitor_result_class(cls):
-        return partial(MonitorResult, fn_map=cls.MODEL_MANAGER_CLASS.map_model)
+        return partial(MonitorResult, fn_map=lambda evt: cls.MODEL_MANAGER_CLASS.map_model(evt['item']))
 
     @classmethod
     def get_iterator_result_class(cls):
@@ -102,7 +102,7 @@ class BaseCollectionManager(BaseManager):
     def monitor_field(self, field):
         return self._execute_command('monitorField',
                                      {'field': field},
-                                     result_class=self.get_monitor_result_class())
+                                     result_class=MonitorResult)
 
     async def create_model_manager(self, item_id):
         name = await self._execute_command('createModelManager', {'id': item_id})

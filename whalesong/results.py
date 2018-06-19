@@ -95,8 +95,8 @@ class IteratorResult(BaseIteratorResult):
 
 class MonitorResult(BaseIteratorResult):
 
-    def __init__(self, result_id):
-        super(MonitorResult, self).__init__(result_id)
+    def __init__(self, result_id, *, fn_map=None):
+        super(MonitorResult, self).__init__(result_id, fn_map=fn_map)
 
         self._callbacks = []
 

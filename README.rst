@@ -107,8 +107,8 @@ Raw driver examples
 ...................
 
 
-Status monitor
-==============
+State monitor
+=============
 
 It monitors Stream state, Connection state and localStorage.
 It prints any change on them. It takes a page screenshot on each stream state change.
@@ -160,8 +160,8 @@ Whatsapp driver examples
 ........................
 
 
-Status monitor
-==============
+State monitor
+=============
 
 It monitors Stream state, Connection state and localStorage.
 It prints any change on them. It takes a page screenshot on each stream state change.
@@ -175,3 +175,34 @@ It will save QR image each time it changes.
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/statemonitor.py
+
+Get contacts
+============
+
+It prints contact list.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getcontacts.py
+
+
+Get chats
+=========
+
+It prints chat list.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getchats.py
+
+
+Get messages
+============
+
+It prints message list and monitors it. So, if new messages are received it will print them.
+It monitors message acknowledgments and prints them, as well.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/    getmessages.py
+

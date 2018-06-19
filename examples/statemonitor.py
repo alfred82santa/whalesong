@@ -87,13 +87,13 @@ class StatusMonitor:
     async def start(self):
         await self._driver.start()
 
-        ensure_future(self.check_stream()),
-        ensure_future(self.check_conn()),
-        ensure_future(self.check_storage()),
-        ensure_future(self.monitor_stream()),
-        ensure_future(self.monitor_state()),
-        ensure_future(self.monitor_ref()),
-        ensure_future(self.monitor_battery()),
+        ensure_future(self.check_stream())
+        ensure_future(self.check_conn())
+        ensure_future(self.check_storage())
+        ensure_future(self.monitor_stream())
+        ensure_future(self.monitor_state())
+        ensure_future(self.monitor_ref())
+        ensure_future(self.monitor_battery())
         ensure_future(self.monitor_storage())
 
         await self._driver.wait_until_stop()

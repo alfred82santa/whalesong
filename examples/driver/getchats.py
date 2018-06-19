@@ -44,18 +44,18 @@ class GetChats:
                 if contact_it is None:
                     contact_it = self._driver.execute_command('chats.getItems',
                                                               result_class=IteratorResult)
-                    ensure_future(self.list_contacts(contact_it))
+                    ensure_future(self.list_chats(contact_it))
             else:
                 if contact_it is not None:
                     self._driver.cancel_iterators()
                     contact_it = None
 
-    async def list_contacts(self, it):
-        self.echo('List contacts')
-        async for contact in it:
-            self.echo('Contact: {}'.format(contact))
+    async def list_chats(self, it):
+        self.echo('List chats')
+        async for chat in it:
+            self.echo('Chat: {}'.format(chat))
 
-        self.echo('List contacts finished')
+        self.echo('List chats finished')
 
     async def start(self):
         await self.init()

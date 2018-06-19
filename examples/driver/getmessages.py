@@ -83,7 +83,7 @@ class GetMessages:
     async def monitor_new_messages(self, it):
         self.echo('Monitor new messages')
         async for message in it:
-            self.echo('Message: {}'.format(message))
+            self.echo('New message: {}'.format(message))
 
         self.echo('Stop new messages monitor')
 

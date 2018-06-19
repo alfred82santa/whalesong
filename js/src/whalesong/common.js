@@ -36,8 +36,12 @@ export class FieldMonitor extends BaseFieldMonitor {
 export class CollectionItemMonitor extends Monitor {
 
   mapEventResult(...args) {
+    let item = this.mapFn(args[0]);
+    if (!item) {
+      return null;
+    }
     return {
-      'item': this.mapFn(args[0])
+      'item': item
     };
   }
 }
