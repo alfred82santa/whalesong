@@ -47,31 +47,48 @@ export class ResultManager {
 }
 
 export class Monitor {
-  constructor(obj, evt) {
+  constructor(obj, evt, mapFn) {
     this.obj = obj;
     this.evt = evt;
+    this.mapFn = mapFn;
     this.promise = new Promise(resolve => this._resolveFunc = resolve);
   }
 
   mapEventResult(...args) {
+    if (this.mapFn) {
+      return this.mapFn(...args);
+    }
     return {
       'args': args
     };
   }
 
-  async monit(partialResult) {
-    let self = this;
+  handler(partialResult, ...args) {
+    let result = this.mapEventResult(...args);
 
-    function handler(...args) {
-      let result = self.mapEventResult(...args);
-
-      if (result) {
-        partialResult(result);
-      }
+    if (result) {
+      partialResult(result);
     }
+  }
+
+  initMonitor(partialResult) {}
+  finishMonitor(partialResult) {}
+
+  _addHandler(handler) {
     this.obj.on(this.evt, handler, this);
-    await this.promise;
+  }
+
+  _removeHandler(handler) {
     this.obj.off(this.evt, handler, this);
+  }
+
+  async monitor(partialResult) {
+    let handler = this.handler.bind(this, partialResult);
+    this.initMonitor(partialResult);
+    this._addHandler(handler);
+    await this.promise;
+    this._removeHandler(handler);
+    this.finishMonitor(partialResult);
     throw new StopMonitor();
   }
 
@@ -248,7 +265,7 @@ export default class MainManager extends CommandManager {
       );
       if (result instanceof Monitor) {
         this.monitorManager.addMonitor(exId, result);
-        await result.monit(
+        await result.monitor(
           (partial) => this.resultManager.setPartialResult(exId, partial)
         );
       } else if (result instanceof Iterator) {
@@ -258,6 +275,7 @@ export default class MainManager extends CommandManager {
       }
       this.resultManager.setFinalResult(exId, result);
     } catch (err) {
+      console.exception(err);
       if ((err instanceof Error) || (err instanceof BaseError)) {
         this.resultManager.setErrorResult(exId, {
           'name': err.name,

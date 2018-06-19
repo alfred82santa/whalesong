@@ -12,17 +12,12 @@ export class StorageMonitor extends Monitor {
     return {};
   }
 
-  async monit(partialResult) {
-    let self = this;
-
-    function handler(evt) {
-      let result = self.mapEventResult(evt);
-      partialResult(result);
-    }
+  _addHandler(handler) {
     window.addEventListener('storageChange', handler);
-    await this.promise;
+  }
+
+  _removeHandler(handler) {
     window.removeEventListener('storageChange', handler);
-    throw new StopMonitor();
   }
 }
 
@@ -36,19 +31,14 @@ export class StorageItemMonitor extends Monitor {
     };
   }
 
-  async monit(partialResult) {
-    let self = this;
-
-    function handler(evt) {
-      let result = self.mapEventResult(evt);
-      partialResult(result);
-    }
+  _addHandler(handler) {
     window.addEventListener('storageSet', handler);
     window.addEventListener('storageRemove', handler);
-    await this.promise;
+  }
+
+  _removeHandler(handler) {
     window.removeEventListener('storageSet', handler);
     window.removeEventListener('storageRemove', handler);
-    throw new StopMonitor();
   }
 }
 
@@ -130,13 +120,13 @@ export class StorageManager extends CommandManager {
   }
 
   @monitor
-  async monitStorage() {
+  async monitorStorage() {
     this.initStorageEvents();
     return new StorageMonitor();
   }
 
   @monitor
-  async monitItemStorage() {
+  async monitorItemStorage() {
     this.initStorageEvents();
     return new StorageItemMonitor();
   }

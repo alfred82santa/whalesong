@@ -27,7 +27,7 @@ export class ChatManager extends ModelManager {
       isGroup: item.isGroup,
       contact: item.contact ? ContactManager.mapModel(item.contact) : null,
       groupMetadata: item.groupMetadata ? GroupMetadataManager.mapModel(item.groupMetadata) : null,
-      lastReceivedKey: lastReceivedKey._serialized,
+      lastReceivedKey: item.lastReceivedKey._serialized,
       msgs: null
     });
   }

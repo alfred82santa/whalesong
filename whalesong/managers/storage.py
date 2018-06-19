@@ -16,8 +16,8 @@ class StorageManager(BaseManager):
     def set_storage(self, data):
         return self._execute_command('setStorage', {'data': data})
 
-    def monit_storage(self):
-        return self._execute_command('monitStorage', result_class=MonitorResult)
+    def monitor_storage(self):
+        return self._execute_command('monitorStorage', result_class=MonitorResult)
 
-    def monit_item_storage(self):
-        return self._execute_command('monitItemStorage', result_class=MonitorResult)
+    def monitor_item_storage(self):
+        return self._execute_command('monitorItemStorage', result_class=MonitorResult)

@@ -72,10 +72,7 @@ class BasePartialResult(BaseResultMixin):
         ensure_future(self._set_exception(StopAsyncIteration()))
 
 
-class IteratorResult(BasePartialResult):
-
-    def map(self, data):
-        return super(IteratorResult, self).map(data['item'])
+class BaseIteratorResult(BasePartialResult):
 
     def __aiter__(self):
         return self
@@ -90,7 +87,13 @@ class IteratorResult(BasePartialResult):
         return item
 
 
-class MonitorResult(IteratorResult):
+class IteratorResult(BaseIteratorResult):
+
+    def map(self, data):
+        return super(IteratorResult, self).map(data['item'])
+
+
+class MonitorResult(BaseIteratorResult):
 
     def __init__(self, result_id):
         super(MonitorResult, self).__init__(result_id)
@@ -105,12 +108,12 @@ class MonitorResult(IteratorResult):
         [ensure_future(cb(evt)) for cb in self._callbacks]
         return evt
 
-    async def _monit(self):
+    async def _monitor(self):
         async for _ in self:
             pass
 
-    def start_monit(self):
-        ensure_future(self._monit())
+    def start_monitor(self):
+        ensure_future(self._monitor())
 
 
 class ResultManager:

@@ -169,11 +169,8 @@ class MessageManager(BaseModelManager):
 class MessageCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = MessageManager
 
-    def monit_new(self):
-        return self._execute_command('monitNew', result_class=self.get_monitor_result_class())
-
-    def monit_ack(self):
-        return self._execute_command('monitAck', result_class=self.get_monitor_result_class())
+    def monitor_new(self):
+        return self._execute_command('monitorNew', result_class=self.get_monitor_result_class())
 
     async def download_media(self, media_msg, force_download=False):
         if not force_download:

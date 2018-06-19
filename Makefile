@@ -52,9 +52,14 @@ clean:
 	@echo "Cleaning coverage files..."
 	rm -f .coverage
 
-build:
+
+build-js:
 	cd js && $(MAKE) build
+
+build-python: build-js
 	python3 setup.py bdist_wheel
+
+build: build-python
 
 flake:
 	@echo "Running flake8 tests..."

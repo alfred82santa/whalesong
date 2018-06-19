@@ -8,49 +8,46 @@ import {
 import ModelNotFound from './errors.js';
 
 
-export class FieldMonitor extends Monitor {
+export class BaseFieldMonitor extends Monitor {
 
-  constructor(mapFn, obj, field) {
-    super(obj, 'change:' + field);
-    this.mapFn = mapFn;
+  constructor(obj, field, mapFn) {
+    super(obj, 'change:' + field, mapFn);
     this.field = field;
   }
 
-  mapEventResult(model, value) {
+  mapEventResult(...args) {
+    if (this.mapFn) {
+      return this.mapFn(...args);
+    }
     return {
-      'value': value
+      'value': args[1]
     };
   }
+}
 
+export class FieldMonitor extends BaseFieldMonitor {
 
-  async monit(partialResult) {
-    let self = this;
-
-    function handler(...args) {
-      let result = self.mapEventResult(...args);
-
-      if (result) {
-        partialResult(result);
-      }
-    }
-    handler(this.obj, this.obj[this.field]);
-    this.obj.on(this.evt, handler, this);
-    await this.promise;
-    this.obj.off(this.evt, handler, this);
-    throw new StopMonitor();
+  initMonitor(partialResult) {
+    this.handler(partialResult, this.obj, this.obj[this.field]);
   }
 }
 
 
 export class CollectionItemMonitor extends Monitor {
-  constructor(mapFn, obj, evt) {
-    super(obj, evt);
-    this.mapFn = mapFn;
-  }
 
-  mapEventResult(item) {
+  mapEventResult(...args) {
     return {
-      'item': this.mapFn(item)
+      'item': this.mapFn(args[0])
+    };
+  }
+}
+
+export class CollectionItemFieldMonitor extends BaseFieldMonitor {
+
+  mapEventResult(...args) {
+    return {
+      'value': args[1],
+      'itemId': this.mapFn(args[0]).id
     };
   }
 }
@@ -72,12 +69,12 @@ export class ModelManager extends CommandManager {
   }
 
   @monitor
-  async monitModel() {
+  async monitorModel() {
     return new CollectionItemMonitor(this.constructor.mapItem, this.model, 'change');
   }
 
   @monitor
-  async monitField({
+  async monitorField({
     field
   }) {
     return new FieldMonitor(this.model, field);
@@ -126,18 +123,25 @@ export class CollectionManager extends CommandManager {
   }
 
   @monitor
-  async monitAdd() {
-    return new CollectionItemMonitor((item) => this.mapItem(item), this.collection, 'add');
+  async monitorAdd() {
+    return new CollectionItemMonitor(this.collection, 'add', (item) => this.mapItem(item));
   }
 
   @monitor
-  async monitRemove() {
-    return new CollectionItemMonitor((item) => this.mapItem(item), this.collection, 'remove');
+  async monitorRemove() {
+    return new CollectionItemMonitor(this.collection, 'remove', (item) => this.mapItem(item));
   }
 
   @monitor
-  async monitChange() {
-    return new CollectionItemMonitor((item) => this.mapItem(item), this.collection, 'change');
+  async monitorChange() {
+    return new CollectionItemMonitor(this.collection, 'change', (item) => this.mapItem(item));
+  }
+
+  @monitor
+  async monitorField({
+    field
+  }) {
+    return new CollectionItemFieldMonitor(this.collection, field, (item) => this.mapItem(item));
   }
 
   @command

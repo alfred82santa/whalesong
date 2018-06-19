@@ -9,6 +9,7 @@ from functools import partial
 from io import BytesIO
 from os.path import abspath, join, dirname
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
 
@@ -65,7 +66,7 @@ class WhalesongDriver:
             options = Options()
 
             if self._driver_options['headless']:
-                options.set_headless()
+                options.headless = True
 
             if self._profile:
                 options.add_argument('-profile')
@@ -87,21 +88,32 @@ class WhalesongDriver:
         await self._run_async(self.driver.get, self._URL)
         self.result_manager.cancel_all()
         await sleep(1)
-        await self.run_parasite()
+        await self.run_scriptlet()
 
     async def refresh(self):
         await self._run_async(self.driver.refresh)
         self.result_manager.cancel_all()
         await sleep(1)
-        await self.run_parasite()
+        await self.run_scriptlet()
 
-    async def run_parasite(self):
+    async def run_scriptlet(self):
         with open(join(dirname(__file__), "js", "whalesong.js"), "r") as script:
             await self._run_async(self.driver.get, self._URL)
             self.driver.execute_script(script.read())
 
     async def screenshot(self):
-        return BytesIO(b64decode(await self._run_async(self.driver.get_screenshot_as_base64)))
+        return BytesIO(await self._run_async(self.driver.get_screenshot_as_png))
+
+    async def screenshot_element(self, css_selector):
+        elem = await self._run_async(self.driver.find_element_by_css_selector, css_selector)
+
+        if not elem:
+            raise Exception('Element not found')
+
+        def take_screenshot():
+            return BytesIO(elem.screenshot_as_png)
+
+        return await self._run_async(take_screenshot)
 
     def execute_command(self, command, params=None, result_class=Result):
         result = self.result_manager.request_result(result_class)

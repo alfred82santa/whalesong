@@ -19,7 +19,7 @@ export class MessageManager extends ModelManager {
     return Object.assign(ModelManager.mapModel(item), {
       id: item.id._serialized,
       senderObj: item.senderObj ? ContactManager.mapModel(item.senderObj) : null,
-      chat: ChatManager.mapModel(item.chat),
+      chat: item.chat ? ChatManager.mapModel(item.chat) : null,
 
       isGroupMsg: item.isGroupMsg,
       isLink: item.isLink,
@@ -27,8 +27,6 @@ export class MessageManager extends ModelManager {
       isMedia: item.isMedia,
       isNotification: item.isNotification,
       isPSA: item.isPSA,
-
-      quotedMsgObj: MessageManager.mapModel(item.quotedMsgObj),
 
       streamingSidecar: null
     });
@@ -43,20 +41,11 @@ export class MessageCollectionManager extends CollectionManager {
 
 
   @monitor
-  async monitNew() {
+  async monitorNew() {
     return new CollectionItemMonitor(
-      (item) => item.isNewMsg && !item.isSentByMeFromWeb ? this.mapItem(item) : null,
       this.collection,
-      'add'
-    );
-  }
-
-  @monitor
-  async monitAck() {
-    return new CollectionItemMonitor(
-      (item) => this.mapItem(item),
-      this.collection,
-      'change:ack'
+      'add',
+      (item) => item.isNewMsg && !item.isSentByMeFromWeb ? this.mapItem(item) : null
     );
   }
 }

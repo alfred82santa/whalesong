@@ -58,12 +58,12 @@ class BaseModelManager(BaseManager):
     async def get_model(self):
         return self.MODEL_CLASS(await self._execute_command('getModel'))
 
-    def monit_model(self):
-        return self._execute_command('monitModel',
+    def monitor_model(self):
+        return self._execute_command('monitorModel',
                                      result_class=self.get_model_result_class())
 
-    def monit_model_field(self, field):
-        return self._execute_command('monitField',
+    def monitor_model_field(self, field):
+        return self._execute_command('monitorField',
                                      {'field': field},
                                      result_class=MonitorResult)
 
@@ -87,16 +87,21 @@ class BaseCollectionManager(BaseManager):
                                      {'id': item_id},
                                      partial(Result, fn_map=self.MODEL_MANAGER_CLASS.get_model_result_class()))
 
-    def monit_add(self):
-        return self._execute_command('monitAdd',
+    def monitor_add(self):
+        return self._execute_command('monitorAdd',
                                      result_class=self.get_monitor_result_class())
 
-    def monit_remove(self):
-        return self._execute_command('monitRemove',
+    def monitor_remove(self):
+        return self._execute_command('monitorRemove',
                                      result_class=self.get_monitor_result_class())
 
-    def monit_change(self):
-        return self._execute_command('monitChange',
+    def monitor_change(self):
+        return self._execute_command('monitorChange',
+                                     result_class=self.get_monitor_result_class())
+
+    def monitor_field(self, field):
+        return self._execute_command('monitorField',
+                                     {'field': field},
                                      result_class=self.get_monitor_result_class())
 
     async def create_model_manager(self, item_id):
