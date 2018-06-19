@@ -116,7 +116,7 @@ It prints any change on them. It takes a page screenshot on each stream state ch
 It tries to own WhatsappWeb session, it means that it will restore session
 if you open a new session in other browser.
 
-On the other hand, if no session is not started, it will renew QR automatically when it expires.
+On the other hand, if session is not started, it will renew QR automatically when it expires.
 It will save QR image each time it changes.
 
 .. code-block:: bash
@@ -153,3 +153,25 @@ It monitors message acknowledgments and prints them, as well.
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/driver/getmessages.py
+
+
+........................
+Whatsapp driver examples
+........................
+
+
+Status monitor
+==============
+
+It monitors Stream state, Connection state and localStorage.
+It prints any change on them. It takes a page screenshot on each stream state change.
+
+It tries to own WhatsappWeb session, it means that it will restore session
+if you open a new session in other browser.
+
+On the other hand, if session is not started, it will renew QR automatically when it expires.
+It will save QR image each time it changes.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/statemonitor.py
