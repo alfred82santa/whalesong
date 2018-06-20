@@ -154,7 +154,7 @@ export class CollectionManager extends CommandManager {
   }) {
     let model = this.loadItem(id);
 
-    this.addSubmanager(id, this.getModelManagerClass()(model));
+    this.addSubmanager(id, new this.constructor.getModelManagerClass()(model));
 
     return id;
   }

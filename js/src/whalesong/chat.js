@@ -53,7 +53,7 @@ export class ChatManager extends ModelManager {
     let msg = this.model.createMessageFromText(text)
 
     if (quotedMsgId) {
-      let quotedMsg = this.model.msg.get(quotedMsgId)
+      let quotedMsg = this.model.msgs.get(quotedMsgId)
       if (quotedMsg) {
         msg.set(quotedMsg.contextInfo(this.model.id));
       }
@@ -94,7 +94,7 @@ export class ChatManager extends ModelManager {
     msg.subtype = contactName;
 
     if (quotedMsgId) {
-      let quotedMsg = this.model.msg.get(quotedMsgId)
+      let quotedMsg = this.model.msgs.get(quotedMsgId)
       if (quotedMsg) {
         msg.set(quotedMsg.contextInfo(this.model.id));
       }
@@ -117,40 +117,48 @@ export class ChatManager extends ModelManager {
   @command
   async sendMedia({
     mediaData,
+    contentType,
+    filename,
     caption,
     quotedMsgId,
     mentions
   }) {
-    let mediaBlob = b64toblob(mediaData);
+    let mediaBlob = b64toblob(mediaData, contentType);
+
     let mc = this.buildMediaCollection();
 
-    await mc.prepareFiles([mediaBlob], this.model);
+    await mc.processFiles([mediaBlob], this.model, 1);
     let media = mc.models[0];
 
     let extraData = {};
 
+    if (caption) {
+      extraData.caption = caption
+    }
+
     if (quotedMsgId) {
-      extraData.quotedMsg = this.model.msg.get(quotedMsgId)
+      extraData.quotedMsg = this.model.msgs.get(quotedMsgId)
     }
 
     if (mentions && mentions.length) {
       extraData.mentionedJidList = mentions;
     }
 
-    await media.mediaPrep.waitForPrep();
+    await media.processPromise;
+
+    let chat = this.model;
 
     let promise = new Promise(function(resolve) {
-
       function handler(item) {
-        if (item.senderObj.isMe && item.isMedia && item.mediaData.filehash === media._mediaData.filehash) {
-          this.model.msgs.off('add', handler);
+        if (item.senderObj.isMe && item.isMedia && item.mediaData.filehash === media.mediaPrep._mediaData.filehash) {
+          chat.msgs.off('add', handler);
           resolve(item);
         }
       }
-      this.model.msgs.on('add', handler);
-    });
 
-    media.sendToChat(chat, extraData);
+      chat.msgs.on('add', handler);
+      media.sendToChat(chat, extraData);
+    });
 
     let msg = await promise;
 
@@ -212,7 +220,7 @@ export class ChatCollectionManager extends CollectionManager {
 
   @command
   async sendTextToChat({
-    chatId,
+    id,
     text,
     quotedMsgId,
     mentions,
@@ -231,7 +239,7 @@ export class ChatCollectionManager extends CollectionManager {
 
   @command
   async sendVCardToChat({
-    chatId,
+    id,
     contactName,
     vcard,
     quotedMsgId
@@ -248,8 +256,10 @@ export class ChatCollectionManager extends CollectionManager {
 
   @command
   async sendMediaToChat({
-    chatId,
+    id,
     mediaData,
+    contentType,
+    filename,
     caption,
     quotedMsgId,
     mentions
@@ -259,6 +269,8 @@ export class ChatCollectionManager extends CollectionManager {
     let chatManager = new ChatManager(chat);
     return await chatManager.sendMedia({
       mediaData: mediaData,
+      contentType: contentType,
+      filename: filename,
       caption: caption,
       quotedMsgId: quotedMsgId,
       mentions: mentions
@@ -267,7 +279,7 @@ export class ChatCollectionManager extends CollectionManager {
 
   @command
   async sendSeenToChat({
-    chatId
+    id
   }) {
     let chat = this.loadItem(id);
 

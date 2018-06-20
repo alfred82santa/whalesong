@@ -1,3 +1,4 @@
+from base64 import b64encode
 from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, StringIdField
 
 from . import BaseCollectionManager, BaseModelManager
@@ -29,7 +30,6 @@ class Chat(BaseModel):
 
 
 class ChatManager(BaseModelManager):
-
     MODEL_CLASS = Chat
 
     def get_messages(self):
@@ -91,7 +91,7 @@ class ChatCollectionManager(BaseCollectionManager):
                                      result_class=MessageCollectionManager.get_iterator_result_class())
 
     def send_text_to_chat(self, chat_id, text, quoted_msg_id=None, mentions=None, link_desc=None):
-        params = {'chatId': chat_id,
+        params = {'id': chat_id,
                   'text': text}
 
         if quoted_msg_id:
@@ -106,18 +106,25 @@ class ChatCollectionManager(BaseCollectionManager):
         return self._execute_command('sendTextToChat', params)
 
     def send_vcard_to_chat(self, chat_id, contact_name, vcard, quoted_msg_id=None):
-        params = {'chatId': chat_id,
+        params = {'id': chat_id,
                   'contactName': contact_name,
-                  'vcard': vcard}
+                  'vcard': vcard.serialize()}
 
         if quoted_msg_id:
             params['quotedMsgId'] = quoted_msg_id
 
         return self._execute_command('sendVCardToChat', params)
 
-    def send_media_to_chat(self, chat_id, media_data, caption=None, quoted_msg_id=None, mentions=None):
-        params = {'chatId': chat_id,
-                  'mediaData': media_data}
+    def send_media_to_chat(self, chat_id, media_data, content_type=None, filename=None, caption=None,
+                           quoted_msg_id=None, mentions=None):
+        params = {'id': chat_id,
+                  'mediaData': b64encode(media_data.read()).decode()}
+
+        if content_type:
+            params['contentType'] = content_type
+
+        if filename:
+            params['filename'] = filename
 
         if caption:
             params['caption'] = caption
@@ -129,3 +136,8 @@ class ChatCollectionManager(BaseCollectionManager):
             params['mentions'] = mentions
 
         return self._execute_command('sendMediaToChat', params)
+
+    def send_seen_to_chat(self, chat_id):
+        params = {'id': chat_id}
+
+        return self._execute_command('sendSeenToChat', params)

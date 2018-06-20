@@ -53,6 +53,10 @@ class BaseModelManager(BaseManager):
 
     @classmethod
     def get_model_result_class(cls):
+        return partial(Result, fn_map=cls.map_model)
+
+    @classmethod
+    def get_monitor_result_class(cls):
         return partial(MonitorResult, fn_map=cls.map_model)
 
     async def get_model(self):
@@ -60,7 +64,7 @@ class BaseModelManager(BaseManager):
 
     def monitor_model(self):
         return self._execute_command('monitorModel',
-                                     result_class=self.get_model_result_class())
+                                     result_class=self.get_monitor_result_class())
 
     def monitor_field(self, field):
         return self._execute_command('monitorField',
@@ -82,10 +86,14 @@ class BaseCollectionManager(BaseManager):
     def get_iterator_result_class(cls):
         return partial(IteratorResult, fn_map=cls.MODEL_MANAGER_CLASS.map_model)
 
+    @classmethod
+    def get_item_result_class(cls):
+        return cls.MODEL_MANAGER_CLASS.get_model_result_class()
+
     def get_item_by_id(self, item_id):
         return self._execute_command('getItemById',
                                      {'id': item_id},
-                                     partial(Result, fn_map=self.MODEL_MANAGER_CLASS.get_model_result_class()))
+                                     result_class=self.get_item_result_class())
 
     def monitor_add(self):
         return self._execute_command('monitorAdd',

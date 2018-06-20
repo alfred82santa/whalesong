@@ -85,14 +85,14 @@ class GetMessages:
         async for message in it:
             self.echo('New message: {}'.format(message))
 
-        self.echo('Stop new messages monitor')
+        self.echo('Stop new messages bot')
 
     async def monitor_message_acks(self, it):
         self.echo('Monitor message ack')
         async for ack in it:
             self.echo('ACK: {}'.format(ack))
 
-        self.echo('Stop message acks monitor')
+        self.echo('Stop message acks bot')
 
     async def start(self):
         await self.init()

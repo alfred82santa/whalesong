@@ -3,3 +3,4 @@ aiohttp
 selenium>=3.4.3
 python-axolotl
 cryptography
+vobject

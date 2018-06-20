@@ -51,6 +51,7 @@ Whatsapp features
 * Reply messages.
 * Send VCard messages.
 * Send Media (image/video/pdf) messages.
+* Send seen to chats.
 
 
 ----
@@ -204,5 +205,29 @@ It monitors message acknowledgments and prints them, as well.
 
 .. code-block:: bash
 
-    $ PYTHONPATH=.:$PYTHONPATH python3 examples/    getmessages.py
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getmessages.py
 
+
+Minibot
+=======
+
+Minibot implements 3 features:
+
+Echo
+----
+
+When a contact sends `/echo [text]` it replies with `[text]`.
+
+Contact
+-------
+
+When a contact sends `/contact [contactID]` it replies with the contact in VCard format.
+
+Download
+--------
+
+When a contact sends `/donwload [url]` it replies with content pointed by URL (image, pdf, video).
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot.py

@@ -1,4 +1,5 @@
 from dirty_models import ArrayField, BooleanField, ModelField, StringIdField
+from vobject import vCard, vcard
 
 from . import BaseCollectionManager, BaseModelManager
 from ..models import BaseModel
@@ -13,7 +14,7 @@ class ProfilePicture(BaseModel):
 
 class Contact(BaseModel):
     name = StringIdField()
-    formatted_mame = StringIdField()
+    formatted_name = StringIdField()
     pushname = StringIdField()
     short_name = StringIdField()
     type = StringIdField()
@@ -40,6 +41,17 @@ class Contact(BaseModel):
     section_header = StringIdField()
 
     labels = ArrayField(field_type=StringIdField(), default=[])
+
+    def to_vcard(self):
+        vc = vCard()
+        o = vc.add('fn')
+        o.value = self.formatted_name
+
+        o = vc.add('tel')
+        o.type_param = "cell"
+        o.value = '+' + self.id[:self.id.index('@')]
+
+        return vc
 
 
 class ContactManager(BaseModelManager):

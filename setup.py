@@ -69,5 +69,6 @@ setup(
         'python-axolotl',
         'cryptography',
         'aiohttp>=3.0',
+        'vobject'
     ]
 )

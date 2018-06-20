@@ -259,6 +259,7 @@ export default class MainManager extends CommandManager {
 
   async executeCommand(exId, command, params) {
     try {
+      console.log(exId, command, params);
       let result = await super.executeCommand(
         command,
         params

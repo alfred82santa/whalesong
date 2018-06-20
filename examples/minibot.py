@@ -1,0 +1,115 @@
+from asyncio import ensure_future
+from io import BytesIO
+
+from aiohttp import ClientSession, hdrs
+from os import path
+
+from whalesong import Whalesong
+from whalesong.managers.message import MessageTypes
+
+OUTPUT_DIR = path.join(path.dirname(__file__), 'output')
+
+
+class Minibot:
+
+    def __init__(self, print_fn=print, loop=None):
+        self._print_fn = print_fn
+        self._driver = Whalesong(
+            profile=path.join(path.dirname(__file__), 'profile'),
+            loadstyles=True,
+            loop=loop
+        )
+
+    @property
+    def loop(self):
+        return self._driver.loop
+
+    def echo(self, txt):
+        self._print_fn(txt)
+
+    async def monitor_stream(self):
+        self.echo('Monitor stream')
+        new_message_monitor = None
+
+        async for evt in self._driver.stream.monitor_field('stream'):
+            self.echo('Stream value: {}'.format(evt['value']))
+
+            if evt['value'] == 'CONNECTED':
+                if new_message_monitor is None:
+                    new_message_monitor = self._driver.messages.monitor_new()
+                    ensure_future(self.monitor_new_messages(new_message_monitor))
+            else:
+                if new_message_monitor is not None:
+                    self._driver.stop_monitor(new_message_monitor)
+                    new_message_monitor = None
+
+    async def monitor_new_messages(self, it):
+        self.echo('Monitor new messages')
+        async for message in it:
+            try:
+                if message.type == MessageTypes.CHAT:
+                    if message.body.startswith('/echo '):
+                        ensure_future(self.make_echo(message))
+                    elif message.body.startswith('/contact '):
+                        ensure_future(self.make_contact(message))
+                    elif message.body.startswith('/download '):
+                        ensure_future(self.make_download(message))
+            except Exception as ex:
+                self.echo('Ignoring message {} because error : {}'.format(message.id, ex))
+
+        self.echo('Stop new messages bot')
+
+    async def make_echo(self, message):
+        self._driver.chats.send_seen_to_chat(message.chat.id)
+        text = message.body[len('/echo '):].strip()
+        self.echo('Sent message: {}'.format(await self._driver.chats.send_text_to_chat(message.chat.id,
+                                                                                       text,
+                                                                                       message.id)))
+
+    async def make_contact(self, message):
+        self._driver.chats.send_seen_to_chat(message.chat.id)
+        contact_id = message.body[len('/contact '):].strip()
+
+        contact = await self._driver.contacts.get_item_by_id(contact_id)
+
+        self.echo('Sent message: {}'.format(await self._driver.chats.send_vcard_to_chat(message.chat.id,
+                                                                                        contact.formatted_name,
+                                                                                        contact.to_vcard(),
+                                                                                        message.id)))
+
+    async def make_download(self, message):
+        self._driver.chats.send_seen_to_chat(message.chat.id)
+        url = message.body[len('/download '):].strip()
+
+        async with ClientSession() as session:
+            async with session.get(url) as resp:
+                content_type = resp.headers.get(hdrs.CONTENT_TYPE)
+                data = BytesIO(await resp.read())
+
+        if content_type and ';' in content_type:
+            content_type = content_type[:content_type.index(';')]
+
+        _, filename = url.rstrip('/').rsplit('/', 1)
+        if '?' in filename:
+            filename = filename[:filename.index('?')]
+        if '#' in filename:
+            filename = filename[:filename.index('#')]
+
+        self.echo('Sent message: {}'.format(await self._driver.chats.send_media_to_chat(message.chat.id,
+                                                                                        data,
+                                                                                        content_type,
+                                                                                        filename,
+                                                                                        url,
+                                                                                        message.id)))
+
+    async def start(self):
+        await self._driver.start()
+
+        ensure_future(self.monitor_stream())
+
+        await self._driver.wait_until_stop()
+
+
+if __name__ == '__main__':
+    bot = Minibot()
+    bot.loop.run_until_complete(bot.start())
