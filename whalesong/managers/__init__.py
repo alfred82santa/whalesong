@@ -5,6 +5,8 @@ from ..errors import ManagerNotFound
 from ..models import BaseModel
 from ..results import IteratorResult, MonitorResult, Result
 
+COMMAND_SEPARATOR = '|'
+
 
 class BaseManager:
 
@@ -15,7 +17,7 @@ class BaseManager:
 
     def _build_command(self, command):
         if self._manager_path:
-            return '.'.join([self._manager_path, command])
+            return COMMAND_SEPARATOR.join([self._manager_path, command])
         return command
 
     def _execute_command(self, command, *args, **kwargs):
@@ -23,6 +25,9 @@ class BaseManager:
 
     def get_commands(self):
         return self._execute_command('getCommands')
+
+    def add_submanager(self, name, submanager):
+        self._submanagers[name] = submanager
 
     def remove_submanager(self, name):
         try:
@@ -90,9 +95,24 @@ class BaseCollectionManager(BaseManager):
     def get_item_result_class(cls):
         return cls.MODEL_MANAGER_CLASS.get_model_result_class()
 
+    def get_length(self):
+        return self._execute_command('getLength')
+
     def get_item_by_id(self, item_id):
         return self._execute_command('getItemById',
                                      {'id': item_id},
+                                     result_class=self.get_item_result_class())
+
+    def remove_item_by_id(self, item_id):
+        return self._execute_command('removeItemById',
+                                     {'id': item_id})
+
+    def get_first(self):
+        return self._execute_command('getFirst',
+                                     result_class=self.get_item_result_class())
+
+    def get_last(self):
+        return self._execute_command('getLast',
                                      result_class=self.get_item_result_class())
 
     def monitor_add(self):
@@ -112,12 +132,9 @@ class BaseCollectionManager(BaseManager):
                                      {'field': field},
                                      result_class=MonitorResult)
 
-    async def create_model_manager(self, item_id):
-        name = await self._execute_command('createModelManager', {'id': item_id})
-
-        manager_path = '.'.join([self._manager_path, name])
-
-        submanager = self.MODEL_MANAGER_CLASS(self._driver, manager_path=manager_path)
-        self._submanagers[name] = submanager
-
-        return submanager
+    def get_submanager(self, name):
+        try:
+            return super(BaseCollectionManager, self).get_submanager(name)
+        except ManagerNotFound:
+            return self.MODEL_MANAGER_CLASS(driver=self._driver,
+                                            manager_path=self._build_command(name))

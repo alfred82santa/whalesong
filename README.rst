@@ -54,6 +54,21 @@ Whatsapp features
 * Send seen to chats.
 
 
+---------
+Changelog
+---------
+
+.............
+Version 0.2.0
+.............
+
+.. warning:: Command separator changed from `.` to `|`.
+
+* Simplified code to manage models.
+* Added `remove_item_by_id`, `get_length`, `get_first` and `get_last` methods to collection managers.
+* Added `load_earlier_messages` and `load_all_earlier_messages` methods to chat manager.
+
+
 ----
 TODO
 ----
@@ -66,6 +81,7 @@ TODO
 * Drop Selenium and Geckodriver.
 * Create/Use a small footprint headless browser with async interface (like marionette).
 * Push results. Avoid continuous polling.
+* Publish at Pypi.
 
 ---------------
 Getting started

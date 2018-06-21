@@ -12,6 +12,8 @@ export const ResultTypes = {
   PARTIAL: 'PARTIAL'
 }
 
+export const COMMAND_SEPARATOR = '|';
+
 export class ResultManager {
 
   constructor() {
@@ -162,6 +164,14 @@ export class CommandManager {
     this.submanagers[name] = manager;
   }
 
+  getSubmanager(name) {
+    let manager = this.submanagers[name];
+    if (!manager) {
+      throw new ManagerNotFound(name);
+    }
+    return manager;
+  }
+
   @command
   async getSubmanagers() {
     let submanagers = {};
@@ -182,15 +192,14 @@ export class CommandManager {
 
   async executeCommand(command, params) {
 
-    if (command.indexOf('.') >= 0) {
-      let deco = command.split('.');
+    if (command.indexOf(COMMAND_SEPARATOR) >= 0) {
+      let deco = command.split(COMMAND_SEPARATOR);
       let manager = deco.shift(),
-        cmd = deco.join('.');
-      if (!(manager in this.submanagers)) {
-        throw new ManagerNotFound(manager);
-      }
+        cmd = deco.join(COMMAND_SEPARATOR);
 
-      return await this.submanagers[manager].executeCommand(cmd, params);
+      manager = this.getSubmanager(manager);
+
+      return await manager.executeCommand(cmd, params);
     }
 
     if (!(command in this.commands)) {
@@ -207,7 +216,7 @@ export class CommandManager {
     for (let sm in this.submanagers) {
       let subcommands = await this.submanagers[sm].getCommands();
       for (let cm in subcommands) {
-        commands[sm + '.' + cm] = subcommands[cm];
+        commands[sm + COMMAND_SEPARATOR + cm] = subcommands[cm];
       }
     }
 

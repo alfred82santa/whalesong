@@ -27,7 +27,7 @@ class GetChats:
         self.echo('Connected')
 
     async def check_stream(self):
-        stream = await self._driver.execute_command('stream.getModel')
+        stream = await self._driver.execute_command('stream|getModel')
         self.echo("Stream: {}".format(stream['stream']))
         self.echo("State: {}".format(stream['state']))
 
@@ -35,14 +35,14 @@ class GetChats:
         self.echo('Monitor stream')
         contact_it = None
 
-        async for evt in self._driver.execute_command('stream.monitorField',
+        async for evt in self._driver.execute_command('stream|monitorField',
                                                       {'field': 'stream'},
                                                       result_class=MonitorResult):
             self.echo('Stream value: {}'.format(evt['value']))
 
             if evt['value'] == 'CONNECTED':
                 if contact_it is None:
-                    contact_it = self._driver.execute_command('chats.getItems',
+                    contact_it = self._driver.execute_command('chats|getItems',
                                                               result_class=IteratorResult)
                     ensure_future(self.list_chats(contact_it))
             else:
