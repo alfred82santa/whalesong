@@ -27,7 +27,7 @@ class GetMessages:
         self.echo('Connected')
 
     async def check_stream(self):
-        stream = await self._driver.execute_command('stream.getModel')
+        stream = await self._driver.execute_command('stream|getModel')
         self.echo("Stream: {}".format(stream['stream']))
         self.echo("State: {}".format(stream['state']))
 
@@ -37,24 +37,24 @@ class GetMessages:
         new_message_monitor = None
         message_ack_monitor = None
 
-        async for evt in self._driver.execute_command('stream.monitorField',
+        async for evt in self._driver.execute_command('stream|monitorField',
                                                       {'field': 'stream'},
                                                       result_class=MonitorResult):
             self.echo('Stream value: {}'.format(evt['value']))
 
             if evt['value'] == 'CONNECTED':
                 if messages_it is None:
-                    messages_it = self._driver.execute_command('messages.getItems',
+                    messages_it = self._driver.execute_command('messages|getItems',
                                                                result_class=IteratorResult)
                     ensure_future(self.list_messages(messages_it))
 
                 if new_message_monitor is None:
-                    new_message_monitor = self._driver.execute_command('messages.monitorNew',
+                    new_message_monitor = self._driver.execute_command('messages|monitorNew',
                                                                        result_class=MonitorResult)
                     ensure_future(self.monitor_new_messages(new_message_monitor))
 
                 if message_ack_monitor is None:
-                    message_ack_monitor = self._driver.execute_command('messages.monitorField',
+                    message_ack_monitor = self._driver.execute_command('messages|monitorField',
                                                                        {'field': 'ack'},
                                                                        result_class=MonitorResult)
                     ensure_future(self.monitor_message_acks(message_ack_monitor))

@@ -6,7 +6,8 @@ import {
   ModelManager
 } from './common.js';
 import {
-  MessageManager
+  MessageManager,
+  MessageCollectionManager
 } from './message.js';
 import {
   ContactManager
@@ -18,6 +19,9 @@ import {
   SendMessageFail
 } from './errors.js';
 import b64toblob from 'b64-to-blob';
+
+
+export class MsgLoadStateManager extends ModelManager {}
 
 export class ChatManager extends ModelManager {
 
@@ -32,15 +36,10 @@ export class ChatManager extends ModelManager {
     });
   }
 
-  @command
-  async getMessages() {
-    return new Iterator(
-      (partialResult) => this.model.msgs.forEach(
-        (item) => partialResult(
-          MessageManager.mapItem(item)
-        )
-      )
-    );
+  constructor(model) {
+    super(model);
+    this.addSubmanager('msgs', new MessageCollectionManager(model.msgs));
+    this.addSubmanager('msgLoadState', new MsgLoadStateManager(model.msgs.msgLoadState));
   }
 
   @command
@@ -125,6 +124,12 @@ export class ChatManager extends ModelManager {
   }) {
     let mediaBlob = b64toblob(mediaData, contentType);
 
+    if (filename) {
+      mediaBlob = new File([mediaBlob], filename, {
+        'type': contentType
+      });
+    }
+
     let mc = this.buildMediaCollection();
 
     await mc.processFiles([mediaBlob], this.model, 1);
@@ -182,6 +187,18 @@ export class ChatManager extends ModelManager {
   async sendSeen() {
     return await this.model.sendSeen();
   }
+
+  @command
+  async loadEarlierMessages() {
+    return await this.model.loadEarlierMsgs();
+  }
+
+  @command
+  async loadAllEarlierMessages() {
+    while (!this.model.msgs.msgLoadState.noEarlierMsgs) {
+      await this.model.loadEarlierMsgs();
+    }
+  }
 }
 
 export class ChatCollectionManager extends CollectionManager {
@@ -206,84 +223,5 @@ export class ChatCollectionManager extends CollectionManager {
   @command
   async resyncMessages() {
     return await this.collection.resyncMessages();
-  }
-
-  @command
-  async getChatMessages({
-    id
-  }) {
-    let chat = this.loadItem(id);
-
-    let chatManager = new ChatManager(chat);
-    return await chatManager.getMessages();
-  }
-
-  @command
-  async sendTextToChat({
-    id,
-    text,
-    quotedMsgId,
-    mentions,
-    linkDesc
-  }) {
-    let chat = this.loadItem(id);
-
-    let chatManager = new ChatManager(chat);
-    return await chatManager.sendText({
-      text: text,
-      quotedMsgId: quotedMsgId,
-      mentions: mentions,
-      linkDesc: linkDesc
-    });
-  }
-
-  @command
-  async sendVCardToChat({
-    id,
-    contactName,
-    vcard,
-    quotedMsgId
-  }) {
-    let chat = this.loadItem(id);
-
-    let chatManager = new ChatManager(chat);
-    return await chatManager.sendVCard({
-      contactName: contactName,
-      vcard: vcard,
-      quotedMsgId: quotedMsgId
-    });
-  }
-
-  @command
-  async sendMediaToChat({
-    id,
-    mediaData,
-    contentType,
-    filename,
-    caption,
-    quotedMsgId,
-    mentions
-  }) {
-    let chat = this.loadItem(id);
-
-    let chatManager = new ChatManager(chat);
-    return await chatManager.sendMedia({
-      mediaData: mediaData,
-      contentType: contentType,
-      filename: filename,
-      caption: caption,
-      quotedMsgId: quotedMsgId,
-      mentions: mentions
-    });
-  }
-
-  @command
-  async sendSeenToChat({
-    id
-  }) {
-    let chat = this.loadItem(id);
-
-    let chatManager = new ChatManager(chat);
-    return await chatManager.sendSeen();
   }
 }

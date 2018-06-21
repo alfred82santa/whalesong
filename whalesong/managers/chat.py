@@ -29,13 +29,30 @@ class Chat(BaseModel):
     not_spam = BooleanField(default=False)
 
 
+class MsgLoadState(BaseModel):
+    context_loaded = BooleanField(default=False)
+    is_loading_around_msgs = BooleanField(default=False)
+    is_loading_earlier_msgs = BooleanField(default=False)
+    is_loading_recent_msgs = BooleanField(default=False)
+    no_earlier_msgs = BooleanField(default=False)
+
+
+class MsgLoadStateManager(BaseModelManager):
+    MODEL_CLASS = MsgLoadState
+
+
 class ChatManager(BaseModelManager):
     MODEL_CLASS = Chat
 
-    def get_messages(self):
+    def __init__(self, driver, manager_path=''):
+        super(ChatManager, self).__init__(driver=driver, manager_path=manager_path)
+
         from .message import MessageCollectionManager
-        return self._execute_command('getMessages',
-                                     result_class=MessageCollectionManager.get_iterator_result_class())
+        self.add_submanager('msgs', MessageCollectionManager(driver=self._driver,
+                                                             manager_path=self._build_command('msgs')))
+
+        self.add_submanager('msg_load_state', MsgLoadStateManager(driver=self._driver,
+                                                                  manager_path=self._build_command('msgLoadState')))
 
     def send_text(self, text, quoted_msg_id=None, mentions=None, link_desc=None):
         params = {'text': text}
@@ -53,72 +70,16 @@ class ChatManager(BaseModelManager):
 
     def send_vcard(self, contact_name, vcard, quoted_msg_id=None):
         params = {'contactName': contact_name,
-                  'vcard': vcard}
-
-        if quoted_msg_id:
-            params['quotedMsgId'] = quoted_msg_id
-
-        return self._execute_command('sendVCardt', params)
-
-    def send_media(self, media_data, caption=None, quoted_msg_id=None, mentions=None):
-        params = {'mediaData': media_data}
-
-        if caption:
-            params['caption'] = caption
-
-        if quoted_msg_id:
-            params['quotedMsgId'] = quoted_msg_id
-
-        if mentions:
-            params['mentions'] = mentions
-
-        return self._execute_command('sendMedia', params)
-
-
-class ChatCollectionManager(BaseCollectionManager):
-    MODEL_MANAGER_CLASS = ChatManager
-
-    def get_active(self):
-        return self._execute_command('getActive')
-
-    def resync_messages(self):
-        return self._execute_command('resyncMessages')
-
-    def get_chat_messages(self, chat_id):
-        from .message import MessageCollectionManager
-        return self._execute_command('getChatMessages',
-                                     {'id': chat_id},
-                                     result_class=MessageCollectionManager.get_iterator_result_class())
-
-    def send_text_to_chat(self, chat_id, text, quoted_msg_id=None, mentions=None, link_desc=None):
-        params = {'id': chat_id,
-                  'text': text}
-
-        if quoted_msg_id:
-            params['quotedMsgId'] = quoted_msg_id
-
-        if mentions:
-            params['mentions'] = mentions
-
-        if link_desc:
-            params['linkDesc'] = link_desc
-
-        return self._execute_command('sendTextToChat', params)
-
-    def send_vcard_to_chat(self, chat_id, contact_name, vcard, quoted_msg_id=None):
-        params = {'id': chat_id,
-                  'contactName': contact_name,
                   'vcard': vcard.serialize()}
 
         if quoted_msg_id:
             params['quotedMsgId'] = quoted_msg_id
 
-        return self._execute_command('sendVCardToChat', params)
+        return self._execute_command('sendVCard', params)
 
-    def send_media_to_chat(self, chat_id, media_data, content_type=None, filename=None, caption=None,
-                           quoted_msg_id=None, mentions=None):
-        params = {'id': chat_id,
-                  'mediaData': b64encode(media_data.read()).decode()}
+    def send_media(self, media_data, content_type=None, filename=None, caption=None,
+                   quoted_msg_id=None, mentions=None):
+        params = {'mediaData': b64encode(media_data.read()).decode()}
 
         if content_type:
             params['contentType'] = content_type
@@ -135,9 +96,23 @@ class ChatCollectionManager(BaseCollectionManager):
         if mentions:
             params['mentions'] = mentions
 
-        return self._execute_command('sendMediaToChat', params)
+        return self._execute_command('sendMedia', params)
 
-    def send_seen_to_chat(self, chat_id):
-        params = {'id': chat_id}
+    def send_seen(self):
+        return self._execute_command('sendSeen')
 
-        return self._execute_command('sendSeenToChat', params)
+    def load_earlier_messages(self):
+        return self._execute_command('loadEarlierMessages')
+
+    def load_all_earlier_messages(self):
+        return self._execute_command('loadAllEarlierMessages')
+
+
+class ChatCollectionManager(BaseCollectionManager):
+    MODEL_MANAGER_CLASS = ChatManager
+
+    def get_active(self):
+        return self._execute_command('getActive')
+
+    def resync_messages(self):
+        return self._execute_command('resyncMessages')

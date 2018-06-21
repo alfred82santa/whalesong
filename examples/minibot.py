@@ -1,7 +1,7 @@
 from asyncio import ensure_future
-from io import BytesIO
 
 from aiohttp import ClientSession, hdrs
+from io import BytesIO
 from os import path
 
 from whalesong import Whalesong
@@ -60,25 +60,24 @@ class Minibot:
         self.echo('Stop new messages bot')
 
     async def make_echo(self, message):
-        self._driver.chats.send_seen_to_chat(message.chat.id)
+        self._driver.chats[message.chat.id].send_seen()
+        self.echo(message.chat.id)
         text = message.body[len('/echo '):].strip()
-        self.echo('Sent message: {}'.format(await self._driver.chats.send_text_to_chat(message.chat.id,
-                                                                                       text,
-                                                                                       message.id)))
+        self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_text(text,
+                                                                                                message.id)))
 
     async def make_contact(self, message):
-        self._driver.chats.send_seen_to_chat(message.chat.id)
+        self._driver.chats[message.chat.id].send_seen()
         contact_id = message.body[len('/contact '):].strip()
 
         contact = await self._driver.contacts.get_item_by_id(contact_id)
 
-        self.echo('Sent message: {}'.format(await self._driver.chats.send_vcard_to_chat(message.chat.id,
-                                                                                        contact.formatted_name,
-                                                                                        contact.to_vcard(),
-                                                                                        message.id)))
+        self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_vcard(contact.formatted_name,
+                                                                                                 contact.to_vcard(),
+                                                                                                 message.id)))
 
     async def make_download(self, message):
-        self._driver.chats.send_seen_to_chat(message.chat.id)
+        self._driver.chats[message.chat.id].send_seen()
         url = message.body[len('/download '):].strip()
 
         async with ClientSession() as session:
@@ -89,18 +88,18 @@ class Minibot:
         if content_type and ';' in content_type:
             content_type = content_type[:content_type.index(';')]
 
-        _, filename = url.rstrip('/').rsplit('/', 1)
+        filename = url
         if '?' in filename:
             filename = filename[:filename.index('?')]
         if '#' in filename:
             filename = filename[:filename.index('#')]
+        _, filename = filename.rstrip('/').rsplit('/', 1)
 
-        self.echo('Sent message: {}'.format(await self._driver.chats.send_media_to_chat(message.chat.id,
-                                                                                        data,
-                                                                                        content_type,
-                                                                                        filename,
-                                                                                        url,
-                                                                                        message.id)))
+        self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_media(data,
+                                                                                                 content_type,
+                                                                                                 filename,
+                                                                                                 url,
+                                                                                                 message.id)))
 
     async def start(self):
         await self._driver.start()

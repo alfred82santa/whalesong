@@ -108,6 +108,19 @@ export class CollectionManager extends CommandManager {
     return item;
   }
 
+  getSubmanager(name) {
+    try {
+      return super.getSubmanager(name);
+    } catch (err) {
+      try {
+        return new (this.constructor.getModelManagerClass())(this.loadItem(name));
+      } catch (err2) {
+        console.log(name, err2);
+        throw err;
+      }
+    }
+  }
+
   @command
   async getItems() {
     return new Iterator(
@@ -120,10 +133,32 @@ export class CollectionManager extends CommandManager {
   }
 
   @command
+  async getLength() {
+    return this.collection.length;
+  }
+
+  @command
   async getItemById({
     id
   }) {
     return this.mapItem(this.loadItem(id));
+  }
+
+  @command
+  async removeItemById({
+    id
+  }) {
+    this.collection.remove(this.loadItem(id));
+  }
+
+  @command
+  async getFirst() {
+    return this.mapItem(this.collection.models[0]);
+  }
+
+  @command
+  async getLast() {
+    return this.mapItem(this.collection.last());
   }
 
   @monitor
@@ -147,16 +182,4 @@ export class CollectionManager extends CommandManager {
   }) {
     return new CollectionItemFieldMonitor(this.collection, field, (item) => this.mapItem(item));
   }
-
-  @command
-  async createModelManager({
-    id
-  }) {
-    let model = this.loadItem(id);
-
-    this.addSubmanager(id, new this.constructor.getModelManagerClass()(model));
-
-    return id;
-  }
-
 }
