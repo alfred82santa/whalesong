@@ -1,4 +1,4 @@
-from os import path, remove
+from os import path, remove, mkdir, makedirs
 from selenium.webdriver import FirefoxProfile as BaseFirefoxProfile
 from shutil import copyfile
 
@@ -12,6 +12,8 @@ class FirefoxProfile(BaseFirefoxProfile):
 
         if profile_directory:
             self.profile_dir = profile_directory
+
+            makedirs(profile_directory, exist_ok=True)
 
             copyfile(path.join(TEMPLATE_DIR, 'addons.json'), path.join(self.profile_dir, 'addons.json'))
             copyfile(path.join(TEMPLATE_DIR, 'containers.json'), path.join(self.profile_dir, 'containers.json'))
