@@ -1,8 +1,12 @@
+import mimetypes
 from asyncio import ensure_future
 
-from os import path
+from os import mkdir, path
 
 from whalesong import Whalesong
+from whalesong.managers.message import LocationMessage, MediaFrameMixin, MediaMixin, TextMessage
+
+OUTPUT_DIR = path.join(path.dirname(__file__), 'output', 'media')
 
 
 class GetMessages:
@@ -14,6 +18,11 @@ class GetMessages:
             loadstyles=True,
             loop=loop
         )
+
+        try:
+            mkdir(OUTPUT_DIR)
+        except FileExistsError:
+            pass
 
     @property
     def loop(self):
@@ -66,12 +75,26 @@ class GetMessages:
         async for message in it:
             self.echo('Message: {}'.format(message))
 
+            if isinstance(message, MediaMixin):
+                await self.download_media(message)
+            elif isinstance(message, LocationMessage):
+                await self.store_thumbnail(message.id, message.body)
+            elif isinstance(message, TextMessage) and message.thumbnail:
+                await self.store_thumbnail(message.id, message.thumbnail)
+
         self.echo('List messages finished')
 
     async def monitor_new_messages(self, it):
         self.echo('Monitor new messages')
         async for message in it:
             self.echo('New message: {}'.format(message))
+
+            if isinstance(message, MediaMixin):
+                await self.download_media(message)
+            elif isinstance(message, LocationMessage):
+                await self.store_thumbnail(message.id, message.body)
+            elif isinstance(message, TextMessage) and message.thumbnail:
+                await self.store_thumbnail(message.id, message.thumbnail)
 
         self.echo('Stop new messages bot')
 
@@ -89,6 +112,27 @@ class GetMessages:
         ensure_future(self.monitor_stream())
 
         await self._driver.wait_until_stop()
+
+    async def download_media(self, message):
+        if isinstance(message, MediaFrameMixin):
+            await self.store_thumbnail(message.id, message.body)
+
+        media_data = await self._driver.messages.download_media(message)
+
+        ext = mimetypes.guess_extension(message.mimetype, strict=False)
+
+        await self._store_media('{}{}'.format(message.id, ext), media_data.read())
+
+    async def store_thumbnail(self, message_id, image_data):
+        await self._store_media('{}_thumb.jpg'.format(message_id), image_data)
+
+    async def _store_media(self, filename, filedata):
+        filepath = path.join(OUTPUT_DIR, filename)
+
+        self.echo('Storing file {}'.format(filepath))
+
+        with open(filepath, 'wb') as f:
+            f.write(filedata)
 
 
 if __name__ == '__main__':

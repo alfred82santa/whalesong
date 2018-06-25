@@ -63,7 +63,8 @@ Version 0.3.0
 .............
 
 * Reduce Firefox footprint.
-
+* Message classes.
+* Improved getMessages example. Now, it downloads media files.
 
 .............
 Version 0.2.0
@@ -225,6 +226,8 @@ Get messages
 
 It prints message list and monitors it. So, if new messages are received it will print them.
 It monitors message acknowledgments and prints them, as well.
+
+It stores files and thumbnails from media messages.
 
 .. code-block:: bash
 
