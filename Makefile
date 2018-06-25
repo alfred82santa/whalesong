@@ -36,9 +36,9 @@ run-tests:
 	@echo "Running tests..."
 	nosetests --with-coverage -d --cover-package=${PACKAGE_COVERAGE} --cover-erase
 
-publish:
+publish: build
 	@echo "Publishing new version on Pypi..."
-	python setup.py bdist_wheel upload
+	twine upload dist/*
 
 clean:
 	@echo "Cleaning compiled files..."
