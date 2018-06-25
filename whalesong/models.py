@@ -1,9 +1,8 @@
 from base64 import b64decode, b64encode
-
 from dirty_models import BaseModel as DirtyBaseModel, StringIdField
 from dirty_models.fields import BytesField
 from dirty_models.models import CamelCaseMeta
-from dirty_models.utils import ModelFormatterIter as BaseModelFormatterIter, JSONEncoder as BaseJSONEncoder
+from dirty_models.utils import JSONEncoder as BaseJSONEncoder, ModelFormatterIter as BaseModelFormatterIter
 
 
 class Base64Field(BytesField):
@@ -16,7 +15,6 @@ class Base64Field(BytesField):
 
 class BaseModel(DirtyBaseModel, metaclass=CamelCaseMeta):
     id = StringIdField(read_only=True)
-
 
 
 class ModelFormatterIter(BaseModelFormatterIter):

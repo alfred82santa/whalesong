@@ -1,10 +1,9 @@
-from shutil import copyfile
-
 from os import path, remove
 from selenium.webdriver import FirefoxProfile as BaseFirefoxProfile
-
+from shutil import copyfile
 
 TEMPLATE_DIR = path.join(path.dirname(__file__), 'firefox_profile_template')
+
 
 class FirefoxProfile(BaseFirefoxProfile):
 
@@ -21,7 +20,6 @@ class FirefoxProfile(BaseFirefoxProfile):
             copyfile(path.join(TEMPLATE_DIR, 'prefs.js'), path.join(self.profile_dir, 'prefs.js'))
             copyfile(path.join(TEMPLATE_DIR, 'xulstore.json'), path.join(self.profile_dir, 'xulstore.json'))
 
-
             self.extensionsDir = path.join(self.profile_dir, "extensions")
             self.userPrefs = path.join(self.profile_dir, "user.js")
             try:
@@ -30,7 +28,3 @@ class FirefoxProfile(BaseFirefoxProfile):
                 pass
 
             self.update_preferences()
-
-
-
-

@@ -1,5 +1,5 @@
 from dirty_models import ArrayField, BooleanField, ModelField, StringIdField
-from vobject import vCard, vcard
+from vobject import vCard
 
 from . import BaseCollectionManager, BaseModelManager
 from ..models import BaseModel
