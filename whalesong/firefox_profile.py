@@ -1,6 +1,10 @@
-import os
+from shutil import copyfile
+
+from os import path, remove
 from selenium.webdriver import FirefoxProfile as BaseFirefoxProfile
 
+
+TEMPLATE_DIR = path.join(path.dirname(__file__), 'firefox_profile_template')
 
 class FirefoxProfile(BaseFirefoxProfile):
 
@@ -9,6 +13,24 @@ class FirefoxProfile(BaseFirefoxProfile):
 
         if profile_directory:
             self.profile_dir = profile_directory
-            self._read_existing_userjs(os.path.join(self.profile_dir, "user.js"))
-            self.extensionsDir = os.path.join(self.profile_dir, "extensions")
-            self.userPrefs = os.path.join(self.profile_dir, "user.js")
+
+            copyfile(path.join(TEMPLATE_DIR, 'addons.json'), path.join(self.profile_dir, 'addons.json'))
+            copyfile(path.join(TEMPLATE_DIR, 'containers.json'), path.join(self.profile_dir, 'containers.json'))
+            copyfile(path.join(TEMPLATE_DIR, 'extensions.json'), path.join(self.profile_dir, 'extensions.json'))
+            copyfile(path.join(TEMPLATE_DIR, 'handlers.json'), path.join(self.profile_dir, 'handlers.json'))
+            copyfile(path.join(TEMPLATE_DIR, 'prefs.js'), path.join(self.profile_dir, 'prefs.js'))
+            copyfile(path.join(TEMPLATE_DIR, 'xulstore.json'), path.join(self.profile_dir, 'xulstore.json'))
+
+
+            self.extensionsDir = path.join(self.profile_dir, "extensions")
+            self.userPrefs = path.join(self.profile_dir, "user.js")
+            try:
+                remove(self.userPrefs)
+            except FileNotFoundError:
+                pass
+
+            self.update_preferences()
+
+
+
+

@@ -34,6 +34,8 @@ class WhalesongDriver:
             self._profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so',
                                          'false')
 
+        self._profile.update_preferences()
+
         self._driver_options = {'headless': headless}
 
         self.loop = loop or get_event_loop()

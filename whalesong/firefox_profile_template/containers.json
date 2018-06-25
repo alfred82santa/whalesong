@@ -1,0 +1,14 @@
+{
+  "version": 3,
+  "lastUserContextId": 5,
+  "identities": [
+    {
+      "userContextId": 5,
+      "public": false,
+      "icon": "",
+      "color": "",
+      "name": "userContextIdInternal.thumbnail",
+      "accessKey": ""
+    }
+  ]
+}

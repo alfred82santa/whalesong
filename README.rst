@@ -59,6 +59,13 @@ Changelog
 ---------
 
 .............
+Version 0.3.0
+.............
+
+* Reduce Firefox footprint.
+
+
+.............
 Version 0.2.0
 .............
 
