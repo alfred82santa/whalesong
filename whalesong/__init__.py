@@ -1,16 +1,15 @@
-from asyncio import Future, sleep, ensure_future
+from asyncio import Future, ensure_future, sleep
 
-from whalesong.managers.chat import ChatCollectionManager
-from whalesong.managers.conn import ConnManager
-from whalesong.managers.contact import ContactCollectionManager
-from whalesong.managers.message import MessageCollectionManager
-from whalesong.managers.storage import StorageManager
-from whalesong.managers.stream import StreamManager
 from .driver import WhalesongDriver
 from .managers import BaseManager
+from .managers.chat import ChatCollectionManager
+from .managers.conn import ConnManager
+from .managers.contact import ContactCollectionManager
+from .managers.message import MessageCollectionManager
+from .managers.storage import StorageManager
+from .managers.stream import StreamManager
 
-
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 class Whalesong(BaseManager):

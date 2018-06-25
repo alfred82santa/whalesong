@@ -1,7 +1,7 @@
 
 import ast
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 PACKAGE_NAME = 'whalesong'
 
@@ -62,7 +62,10 @@ setup(
 
     # What does your project relate to?
     keywords='WebApp Selenium Web Whatsapp Chat Bot Chatbot',
-    packages=[PACKAGE_NAME, ],
+    packages=find_packages(),
+    package_data={PACKAGE_NAME: ['js/whalesong.js',
+                                 'firefox_profile_template/*.js',
+                                 'firefox_profile_template/*.json']},
     install_requires=[
         'dirty-models>=0.11',
         'selenium>=3.4.3',

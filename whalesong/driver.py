@@ -4,12 +4,10 @@ from json import dumps
 from logging import getLogger
 
 from aiohttp import ClientSession
-from base64 import b64decode
 from functools import partial
 from io import BytesIO
-from os.path import abspath, join, dirname
+from os.path import abspath, dirname, join
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
 
@@ -18,7 +16,6 @@ from .results import Result, ResultManager
 
 
 class WhalesongDriver:
-
     _URL = "https://web.whatsapp.com"
 
     def __init__(self, profile=None, loadstyles=False, headless=False, *, logger=None, loop=None):
@@ -33,6 +30,8 @@ class WhalesongDriver:
             # Disable Flash
             self._profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so',
                                          'false')
+
+        self._profile.update_preferences()
 
         self._driver_options = {'headless': headless}
 

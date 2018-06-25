@@ -16,6 +16,15 @@ Requirements
 * npm (only for development)
 * make (only for development)
 
+------------
+Installation
+------------
+
+.. code-block:: bash
+
+    $ pip install whalesong
+
+
 --------
 Features
 --------
@@ -53,10 +62,18 @@ Whatsapp features
 * Send Media (image/video/pdf) messages.
 * Send seen to chats.
 
-
 ---------
 Changelog
 ---------
+
+.............
+Version 0.3.0
+.............
+
+* Reduce Firefox footprint.
+* Message classes.
+* Improved getMessages example. Now, it downloads media files.
+* Package published at Pypi.
 
 .............
 Version 0.2.0
@@ -81,7 +98,6 @@ TODO
 * Drop Selenium and Geckodriver.
 * Create/Use a small footprint headless browser with async interface (like marionette).
 * Push results. Avoid continuous polling.
-* Publish at Pypi.
 
 ---------------
 Getting started
@@ -219,6 +235,8 @@ Get messages
 It prints message list and monitors it. So, if new messages are received it will print them.
 It monitors message acknowledgments and prints them, as well.
 
+It stores files and thumbnails from media messages.
+
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/getmessages.py
@@ -242,8 +260,17 @@ When a contact sends `/contact [contactID]` it replies with the contact in VCard
 Download
 --------
 
-When a contact sends `/donwload [url]` it replies with content pointed by URL (image, pdf, video).
+When a contact sends `/download [url]` it replies with content pointed by URL (image, pdf, video).
 
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot.py
+
+
+-----
+Legal
+-----
+
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by WhatsApp
+or any of its affiliates or subsidiaries. This is an independent and unofficial software.
+Use at your own risk.
