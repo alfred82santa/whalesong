@@ -67,6 +67,15 @@ Changelog
 ---------
 
 .............
+Version 0.4.0
+.............
+
+* Removed `send_vcard` on chats. It is not possible now because WhatsappWeb changes.
+* Added `send_contact` and `send_contact_phone` in order to send contacts using contact id or contact name and phone.
+* Small changes and refactors.
+
+
+.............
 Version 0.3.0
 .............
 

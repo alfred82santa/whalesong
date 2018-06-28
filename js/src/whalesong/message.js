@@ -45,7 +45,7 @@ export class MessageCollectionManager extends CollectionManager {
     return new CollectionItemMonitor(
       this.collection,
       'add',
-      (item) => item.isNewMsg && !item.isSentByMeFromWeb ? this.mapItem(item) : null
+      (item) => item.isNewMsg ? this.mapItem(item) : null
     );
   }
 }

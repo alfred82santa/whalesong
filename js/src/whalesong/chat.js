@@ -16,7 +16,8 @@ import {
   GroupMetadataManager
 } from './groupMetadata.js';
 import {
-  SendMessageFail
+  SendMessageFail,
+  ModelNotFound
 } from './errors.js';
 import b64toblob from 'b64-to-blob';
 
@@ -42,6 +43,42 @@ export class ChatManager extends ModelManager {
     this.addSubmanager('msgLoadState', new MsgLoadStateManager(model.msgs.msgLoadState));
   }
 
+  async _sendMessage(send_fn, check_fn) {
+    let chat = this.model;
+
+    let promise = new Promise(function(resolve) {
+      function handler(item) {
+        try {
+          if (item.isNewMsg && item.isSentByMeFromWeb && check_fn(item)) {
+            chat.msgs.off('add', handler);
+            resolve(item);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      chat.msgs.on('add', handler);
+      send_fn()
+    });
+
+    let msg = await promise;
+
+    if (msg.promises.sendPromise) {
+      try {
+        await msg.promises.sendPromise;
+      } catch (err) {
+        throw new SendMessageFail(
+          `Send message ${msg.id._serialized} to chat ${this.model.id} fail`, {
+            'msgId': msg.id._serialized,
+            'chatId': this.model.id
+          }
+        );
+      }
+    }
+
+    return msg.id._serialized;
+  }
+
   @command
   async sendText({
     text,
@@ -49,68 +86,67 @@ export class ChatManager extends ModelManager {
     mentions,
     linkDesc
   }) {
-    let msg = this.model.createMessageFromText(text)
-
+    let extraData = {};
     if (quotedMsgId) {
       let quotedMsg = this.model.msgs.get(quotedMsgId)
       if (quotedMsg) {
-        msg.set(quotedMsg.contextInfo(this.model.id));
+        extraData['quotedMsg'] = quotedMsg;
       }
     }
 
     if (mentions && mentions.length) {
-      msg.mentionedJidList = mentions;
+      extraData['mentionedJidList'] = mentions;
     }
 
     if (linkDesc) {
-      msg.set(linkDesc);
+      extraData['linkPreview'] = linkDesc;
     }
 
-    let res = this.model.addAndSendMsg(msg);
-    msg = await res[0];
-    let r = await res[1];
-    if (r === 'success') {
-      return msg.id._serialized;
+    let chat = this.model;
+
+    return await this._sendMessage(
+      () => this.model.sendMessage(text, extraData),
+      (item) => item.body === text && item.type === 'chat'
+    );
+  }
+
+  async _sendContact(contact, quotedMsgId) {
+    let quotedMsg;
+    if (quotedMsgId) {
+      quotedMsg = this.model.msgs.get(quotedMsgId);
     }
-    throw new SendMessageFail(
-      `Send message ${msg.id._serialized} to chat ${this.model.id} fail`, {
-        'msgId': msg.id._serialized,
-        'chatId': this.model.id
-      }
+
+    return await this._sendMessage(
+      () => this.model.sendContact(contact, quotedMsg),
+      (item) => item.subtype && item.type === 'vcard'
     );
   }
 
   @command
-  async sendVCard({
+  async sendContactPhone({
     contactName,
-    vcard,
+    phoneNumber,
     quotedMsgId
   }) {
-    let msg = this.model.createMessageFromText('.')
+    let contact = new this.contacts._model({
+      id: phoneNumber + '@c.us',
+      name: contactName
+    });
 
-    msg.body = vcard;
-    msg.type = "vcard";
-    msg.subtype = contactName;
+    return await this._sendContact(contact, quotedMsgId);
+  }
 
-    if (quotedMsgId) {
-      let quotedMsg = this.model.msgs.get(quotedMsgId)
-      if (quotedMsg) {
-        msg.set(quotedMsg.contextInfo(this.model.id));
-      }
+  @command
+  async sendContact({
+    contactId,
+    quotedMsgId
+  }) {
+    let contact = this.contacts.get(contactId);
+    if (!contact) {
+      throw ModelNotFound(`Contact with ID "${contactId}" not found`);
     }
 
-    let res = this.model.addAndSendMsg(msg);
-    msg = await res[0];
-    let r = await res[1];
-    if (r === 'success') {
-      return msg.id._serialized;
-    }
-    throw new SendMessageFail(
-      `Send message ${msg.id._serialized} to chat ${this.model.id} fail`, {
-        'msgId': msg.id._serialized,
-        'chatId': this.model.id
-      }
-    );
+    return await this._sendContact(contact, quotedMsgId);
   }
 
   @command
@@ -151,36 +187,10 @@ export class ChatManager extends ModelManager {
 
     await media.processPromise;
 
-    let chat = this.model;
-
-    let promise = new Promise(function(resolve) {
-      function handler(item) {
-        if (item.senderObj.isMe && item.isMedia && item.mediaData.filehash === media.mediaPrep._mediaData.filehash) {
-          chat.msgs.off('add', handler);
-          resolve(item);
-        }
-      }
-
-      chat.msgs.on('add', handler);
-      media.sendToChat(chat, extraData);
-    });
-
-    let msg = await promise;
-
-    if (msg.promises.sendPromise) {
-      try {
-        await msg.promises.sendPromise;
-      } catch (err) {
-        throw new SendMessageFail(
-          `Send message ${msg.id._serialized} to chat ${this.model.id} fail`, {
-            'msgId': msg.id._serialized,
-            'chatId': this.model.id
-          }
-        );
-      }
-    }
-
-    return msg.id._serialized;
+    return await this._sendMessage(
+      () => media.sendToChat(this.model, extraData),
+      (item) => item.isMedia && item.mediaData.filehash === media.mediaPrep._mediaData.filehash
+    );
   }
 
   @command
@@ -207,8 +217,11 @@ export class ChatCollectionManager extends CollectionManager {
     return ChatManager;
   }
 
-  constructor(collection, mediaCollectionClass) {
+  constructor(collection, contactCollection, mediaCollectionClass) {
     super(collection);
+
+    ChatManager.prototype.contacts = contactCollection;
+
     ChatManager.prototype.buildMediaCollection = function() {
       return new mediaCollectionClass();
     }

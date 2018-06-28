@@ -1,4 +1,5 @@
-from asyncio import Future, ensure_future, sleep
+from asyncio import Future, ensure_future, sleep, wait
+from builtins import ConnectionRefusedError
 
 from .driver import WhalesongDriver
 from .managers import BaseManager
@@ -9,7 +10,7 @@ from .managers.message import MessageCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 
 class Whalesong(BaseManager):
@@ -28,7 +29,6 @@ class Whalesong(BaseManager):
         self._submanagers['messages'] = MessageCollectionManager(self._driver, manager_path='messages')
 
         self._fut_running = None
-        self._fut_stopped = None
 
     @property
     def loop(self):
@@ -39,19 +39,18 @@ class Whalesong(BaseManager):
             return
 
         self._fut_running = Future()
-        self._fut_stopped = Future()
 
         await self._driver.start_driver()
         await self._driver.connect()
 
-        ensure_future(self._polling(interval), loop=self.loop)
+        self._fut_polling = ensure_future(self._polling(interval), loop=self.loop)
 
     async def stop(self):
         self._fut_running.set_result(None)
         await self.wait_until_stop()
 
     async def wait_until_stop(self):
-        await self._fut_stopped
+        await self._fut_polling
 
     async def _polling(self, interval):
         try:
@@ -61,10 +60,14 @@ class Whalesong(BaseManager):
         finally:
             if not self._fut_running.done():
                 self._fut_running.set_result(None)
-            await self._driver.cancel_iterators()
+            await wait([self._driver.cancel_iterators(),
+                        self._driver.cancel_monitors()])
             self._driver.result_manager.cancel_all()
-            await self._driver.close()
-            self._fut_stopped.set_result(None)
+
+            try:
+                await self._driver.close()
+            except ConnectionRefusedError:
+                pass
 
     async def screenshot(self):
         return await self._driver.screenshot()
@@ -77,3 +80,6 @@ class Whalesong(BaseManager):
 
     async def cancel_iterators(self):
         return await self._driver.cancel_iterators()
+
+    async def download_file(self, url):
+        return await self._driver.download_file(url)

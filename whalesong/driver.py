@@ -159,6 +159,10 @@ class WhalesongDriver:
         for it in self.result_manager.get_iterators():
             await it.set_error_result({'name': 'StopIterator'})
 
+    async def cancel_monitors(self):
+        for it in self.result_manager.get_monitors():
+            await it.set_error_result({'name': 'StopIterator'})
+
     async def download_file(self, url):
         async with ClientSession() as session:
             async with session.get(url) as resp:
