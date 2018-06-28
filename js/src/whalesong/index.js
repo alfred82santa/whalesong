@@ -35,7 +35,7 @@ function getArtifactsDefs() {
     'wap': (module) => module.createGroup ? module : null,
     'stream': (module) => module.default && typeof module.default == "object" && 'stream' in module.default && 'socket' in module.default ? module.default : null,
     'uiController': (module) => module.default && module.default.focusNextChat ? module.default : null,
-    'mediaCollectionClass': (module) => module.prototype && module.prototype.processFiles !== undefined ? module : null
+    'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null
   };
 }
 
@@ -52,7 +52,12 @@ function getRequirementsDefs() {
     'chatManager': {
       'requirements': ['store', 'mediaCollectionClass'],
       'build': function(mainManager, artifacts) {
-        let manager = new ChatCollectionManager(artifacts['store'].Chat, artifacts['mediaCollectionClass']);
+        let manager = new ChatCollectionManager(
+          artifacts['store'].Chat,
+          artifacts['store'].Contact,
+          artifacts['mediaCollectionClass'],
+
+        );
         mainManager.addSubmanager('chats', manager);
         return manager;
       }

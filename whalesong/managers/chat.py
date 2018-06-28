@@ -68,14 +68,22 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendText', params)
 
-    def send_vcard(self, contact_name, vcard, quoted_msg_id=None):
-        params = {'contactName': contact_name,
-                  'vcard': vcard.serialize()}
+    def send_contact(self, contact_id, quoted_msg_id=None):
+        params = {'contactId': contact_id}
 
         if quoted_msg_id:
             params['quotedMsgId'] = quoted_msg_id
 
-        return self._execute_command('sendVCard', params)
+        return self._execute_command('sendContact', params)
+
+    def send_contact_phone(self, contact_name, phone_number, quoted_msg_id=None):
+        params = {'contactName': contact_name,
+                  'phoneNumber': phone_number}
+
+        if quoted_msg_id:
+            params['quotedMsgId'] = quoted_msg_id
+
+        return self._execute_command('sendContactPhone', params)
 
     def send_media(self, media_data, content_type=None, filename=None, caption=None,
                    quoted_msg_id=None, mentions=None):

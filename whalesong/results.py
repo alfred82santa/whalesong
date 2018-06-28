@@ -187,3 +187,6 @@ class ResultManager:
 
     def get_iterators(self):
         return [it for it in self._pendant.values() if isinstance(it, IteratorResult)]
+
+    def get_monitors(self):
+        return [it for it in self._pendant.values() if isinstance(it, MonitorResult)]

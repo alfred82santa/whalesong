@@ -72,9 +72,20 @@ class Minibot:
 
         contact = await self._driver.contacts.get_item_by_id(contact_id)
 
-        self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_vcard(contact.formatted_name,
-                                                                                                 contact.to_vcard(),
-                                                                                                 message.id)))
+        self.echo('Sent message (by phone): {}'.format(
+            await self._driver.chats[message.chat.id].send_contact_phone(
+                contact.formatted_name,
+                contact.userid,
+                message.id
+            )
+        ))
+
+        self.echo('Sent message (by contact id): {}'.format(
+            await self._driver.chats[message.chat.id].send_contact(
+                contact_id,
+                message.id
+            )
+        ))
 
     async def make_download(self, message):
         self._driver.chats[message.chat.id].send_seen()
