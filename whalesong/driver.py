@@ -2,6 +2,7 @@ from asyncio import ensure_future, get_event_loop, sleep
 from concurrent.futures import ThreadPoolExecutor
 from json import dumps
 from logging import getLogger
+import codecs
 
 from aiohttp import ClientSession
 from functools import partial
@@ -96,7 +97,7 @@ class WhalesongDriver:
         await self.run_scriptlet()
 
     async def run_scriptlet(self):
-        with open(join(dirname(__file__), "js", "whalesong.js"), "r") as script:
+        with codecs.open(join(dirname(__file__), "js", "whalesong.js"), "r", "utf-8") as script:
             await self._run_async(self.driver.get, self._URL)
             self.driver.execute_script(script.read())
 
