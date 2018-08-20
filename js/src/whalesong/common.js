@@ -5,7 +5,9 @@ import {
   Iterator,
   Monitor
 } from '../manager.js';
-import ModelNotFound from './errors.js';
+import {
+  ModelNotFound
+} from './errors.js';
 
 
 export class BaseFieldMonitor extends Monitor {
@@ -103,7 +105,7 @@ export class CollectionManager extends CommandManager {
   loadItem(id) {
     let item = this.collection.get(id);
     if (!item) {
-      throw ModelNotFound(`Item with ID "${id}" not found`);
+      throw new ModelNotFound(`Item with ID "${id}" not found`);
     }
     return item;
   }
