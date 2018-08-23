@@ -76,7 +76,7 @@ export class ModelManager extends CommandManager {
 
   @monitor
   async monitorModel() {
-    return new CollectionItemMonitor(this.constructor.mapItem, this.model, 'change');
+    return new CollectionItemMonitor(this.model, 'change', (item) => this.constructor.mapModel(item));
   }
 
   @monitor
