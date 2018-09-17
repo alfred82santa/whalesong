@@ -195,7 +195,12 @@ export class ChatManager extends ModelManager {
 
   @command
   async leaveGroup() {
-    return await (this.model.sendExit() && this.model.sendDelete());
+    return await this.model.sendExit();
+  }
+
+  @command
+  async deleteChat() {
+    return await this.model.sendDelete();
   }
 
   @command

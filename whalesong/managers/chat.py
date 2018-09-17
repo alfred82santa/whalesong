@@ -109,6 +109,9 @@ class ChatManager(BaseModelManager):
     def leave_group(self):
         return self._execute_command('leaveGroup')
 
+    def delete_chat(self):
+        return self._execute_command('deleteChat')
+
     def send_seen(self):
         return self._execute_command('sendSeen')
 
