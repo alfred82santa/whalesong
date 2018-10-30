@@ -10,15 +10,16 @@ from .managers.message import MessageCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
 
-__version__ = '0.4.0'
+__version__ = '0.4.3'
 
 
 class Whalesong(BaseManager):
 
-    def __init__(self, profile=None, loadstyles=False, headless=False, loop=None):
+    def __init__(self, profile=None, loadstyles=False, headless=False, extra_params=None, loop=None):
         super(Whalesong, self).__init__(WhalesongDriver(profile=profile,
                                                         loadstyles=loadstyles,
                                                         headless=headless,
+                                                        extra_params=extra_params,
                                                         loop=loop))
 
         self._submanagers['storage'] = StorageManager(self._driver, manager_path='storage')
