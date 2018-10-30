@@ -27,7 +27,7 @@ export class MessageManager extends ModelManager {
       isMedia: item.isMedia,
       isNotification: item.isNotification,
       isPSA: item.isPSA,
-      hasPromises: item.promises.length? true: false,
+      hasPromises: item.promises.length ? true : false,
 
       streamingSidecar: null
     });

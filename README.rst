@@ -71,6 +71,8 @@ Version 0.4.3
 .............
 
 * Allow extra options for Firefox driver.
+* Added `leaveGroup`. Thx @jabolina
+* Added `deleteChat`. Thx @jabolina
 
 .............
 Version 0.4.0
