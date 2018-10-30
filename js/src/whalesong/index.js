@@ -35,8 +35,9 @@ function getArtifactsDefs() {
     'wap': (module) => module.createGroup ? module : null,
     'stream': (module) => module.default && typeof module.default == "object" && 'stream' in module.default && 'socket' in module.default ? module.default : null,
     'uiController': (module) => module.default && module.default.focusNextChat ? module.default : null,
-    'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null
-  };
+    'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null,
+    'createPeerForContact': (module) => (module.default && module.default.prototype && module.default.prototype.isServer && module.default.prototype.isUser) ? module.default : null
+  }
 }
 
 function getRequirementsDefs() {
@@ -50,13 +51,13 @@ function getRequirementsDefs() {
       }
     },
     'chatManager': {
-      'requirements': ['store', 'mediaCollectionClass'],
+      'requirements': ['store', 'mediaCollectionClass', 'createPeerForContact'],
       'build': function(mainManager, artifacts) {
         let manager = new ChatCollectionManager(
           artifacts['store'].Chat,
           artifacts['store'].Contact,
           artifacts['mediaCollectionClass'],
-
+          artifacts['createPeerForContact']
         );
         mainManager.addSubmanager('chats', manager);
         return manager;

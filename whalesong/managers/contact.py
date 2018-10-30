@@ -57,6 +57,12 @@ class Contact(BaseModel):
 class ContactManager(BaseModelManager):
     MODEL_CLASS = Contact
 
+    def block(self):
+        return self._execute_command('block')
+
+    def unblock(self):
+        return self._execute_command('unblock')
+
 
 class ContactCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = ContactManager

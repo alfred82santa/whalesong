@@ -24,6 +24,16 @@ export class ContactManager extends ModelManager {
       userid: item.userid
     });
   }
+
+  @command
+  async block() {
+    return this.model.setBlock(true);
+  }
+
+  @command
+  async unblock() {
+    return this.model.setBlock(false);
+  }
 }
 
 export class ContactCollectionManager extends CollectionManager {

@@ -28,6 +28,7 @@ export class ChatManager extends ModelManager {
 
   static mapModel(item) {
     return Object.assign(ModelManager.mapModel(item), {
+      id: item.id._serialized,
       kind: item.kind,
       isGroup: item.isGroup,
       contact: item.contact ? ContactManager.mapModel(item.contact) : null,
@@ -41,6 +42,7 @@ export class ChatManager extends ModelManager {
     super(model);
     this.addSubmanager('msgs', new MessageCollectionManager(model.msgs));
     this.addSubmanager('msgLoadState', new MsgLoadStateManager(model.msgs.msgLoadState));
+    this.addSubmanager('metadata', new GroupMetadataManager(this.model.groupMetadata));
   }
 
   async _sendMessage(send_fn, check_fn) {
@@ -227,13 +229,17 @@ export class ChatCollectionManager extends CollectionManager {
     return ChatManager;
   }
 
-  constructor(collection, contactCollection, mediaCollectionClass) {
+  constructor(collection, contactCollection, mediaCollectionClass, createPeerForContact) {
     super(collection);
 
     ChatManager.prototype.contacts = contactCollection;
 
     ChatManager.prototype.buildMediaCollection = function() {
       return new mediaCollectionClass();
+    }
+
+    this.createPeerForContact = function(contactId) {
+      return new createPeerForContact(contactId);
     }
   }
 
@@ -244,7 +250,34 @@ export class ChatCollectionManager extends CollectionManager {
   }
 
   @command
+  async ensureChatWithContact({
+    contactId
+  }) {
+    let result = this.collection.get(contactId);
+    if (!result) {
+      result = await this.collection.find(this.createPeerForContact(contactId));
+    }
+    return this.constructor.getModelManagerClass().mapModel(result);
+  }
+
+  @command
   async resyncMessages() {
     return await this.collection.resyncMessages();
+  }
+
+  @command
+  async createGroup({
+    name,
+    contactIds,
+    picture
+  }) {
+    if (picture) {
+      picture = 'data:image/jpeg;base64,' + picture;
+    }
+    return await this.collection.createGroup(
+      name,
+      picture,
+      picture,
+      contactIds.map((item) => this.contacts.get(item)).filter(Boolean));
   }
 }
