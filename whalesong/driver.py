@@ -18,7 +18,7 @@ from .results import Result, ResultManager
 class WhalesongDriver:
     _URL = "https://web.whatsapp.com"
 
-    def __init__(self, profile=None, loadstyles=False, headless=False, *, logger=None, loop=None):
+    def __init__(self, profile=None, loadstyles=False, headless=False, extra_params=None, *, logger=None, loop=None):
         self._start_fut = None
 
         self._profile = FirefoxProfile(profile_directory=abspath(profile) if profile else None)
@@ -33,7 +33,7 @@ class WhalesongDriver:
 
         self._profile.update_preferences()
 
-        self._driver_options = {'headless': headless}
+        self._driver_options = {'headless': headless, 'extra_params': extra_params or {}}
 
         self.loop = loop or get_event_loop()
         self.logger = logger or getLogger('whalesong.driver')
@@ -73,7 +73,8 @@ class WhalesongDriver:
 
             driver = webdriver.Firefox(capabilities=capabilities,
                                        options=options,
-                                       service_args=['--marionette-port', '2828'])
+                                       service_args=['--marionette-port', '2828'],
+                                       **self._driver_options['extra_params'])
 
             driver.set_script_timeout(500)
             driver.implicitly_wait(10)
