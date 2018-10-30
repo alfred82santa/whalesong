@@ -1,6 +1,7 @@
 from base64 import b64encode
 from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, StringIdField
 
+from whalesong.managers.group_metadata import GroupMetadataManager
 from . import BaseCollectionManager, BaseModelManager
 from .contact import Contact
 from .group_metadata import GroupMetadata
@@ -53,6 +54,9 @@ class ChatManager(BaseModelManager):
 
         self.add_submanager('msg_load_state', MsgLoadStateManager(driver=self._driver,
                                                                   manager_path=self._build_command('msgLoadState')))
+
+        self.add_submanager('metadata', GroupMetadataManager(driver=self._driver,
+                                                             manager_path=self._build_command('metadata')))
 
     def send_text(self, text, quoted_msg_id=None, mentions=None, link_desc=None):
         params = {'text': text}
@@ -130,3 +134,15 @@ class ChatCollectionManager(BaseCollectionManager):
 
     def resync_messages(self):
         return self._execute_command('resyncMessages')
+
+    def ensure_chat_with_contact(self, contact_id):
+        return self._execute_command('ensureChatWithContact', {'contactId': contact_id})
+
+    def create_group(self, name, contact_ids, picture=None):
+        params = {'name': name,
+                  'contactIds': contact_ids}
+
+        if picture:
+            params['picture'] = b64encode(picture.read()).decode()
+
+        return self._execute_command('createGroup', params)

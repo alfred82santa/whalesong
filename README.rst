@@ -66,6 +66,17 @@ Whatsapp features
 Changelog
 ---------
 
+-------------
+Version 0.5.0
+-------------
+
+* Added `ensure_chat_with_contact` to chat collection manager.
+  Ensure chat with a whatsapp user, if it does not exist it will be created. (Be careful with SPAM)
+
+* Added `create_group` to chat collection manager.
+* Added `block` and `unblock` methods to contact manager.
+* Added group participants management: add, remove, promote, demote.
+* Added group link management.
 
 
 .............
@@ -73,8 +84,8 @@ Version 0.4.4
 .............
 
 * Allow extra options for Firefox driver.
-* Added `leaveGroup`. Thx @jabolina
-* Added `deleteChat`. Thx @jabolina
+* Added `leave_group`. Thx @jabolina
+* Added `delete_chat`. Thx @jabolina
 
 .............
 Version 0.4.0

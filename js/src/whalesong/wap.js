@@ -2,4 +2,21 @@ import {
   ModelManager
 } from './common.js';
 
-export class WapManager extends ModelManager {}
+import {
+  ChatManager
+} from './chat.js';
+
+import {
+  command
+} from '../manager.js';
+
+export class WapManager extends ModelManager {
+
+  @command
+  async createGroup({
+    name,
+    contactIds
+  }) {
+    return ChatManager.mapModel(this.model.createGroup(name, contactIds));
+  }
+}
