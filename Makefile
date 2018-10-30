@@ -36,7 +36,7 @@ run-tests:
 	@echo "Running tests..."
 	nosetests --with-coverage -d --cover-package=${PACKAGE_COVERAGE} --cover-erase
 
-publish: build
+publish: clean build
 	@echo "Publishing new version on Pypi..."
 	twine upload dist/*
 

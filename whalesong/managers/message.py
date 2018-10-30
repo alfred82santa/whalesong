@@ -159,6 +159,8 @@ class BaseMessage(BaseModel):
     is_persistent = BooleanField(default=False)
     is_user_created_type = BooleanField(default=False)
 
+    has_promises = BooleanField(default=False)
+
 
 class TextMessage(QuotedMessageMixin, LinkContentMixin, MentionsMixin, BaseMessage):
     text_color = StringIdField()

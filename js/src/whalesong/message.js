@@ -27,6 +27,7 @@ export class MessageManager extends ModelManager {
       isMedia: item.isMedia,
       isNotification: item.isNotification,
       isPSA: item.isPSA,
+      hasPromises: item.promises.length? true: false,
 
       streamingSidecar: null
     });
@@ -39,13 +40,11 @@ export class MessageCollectionManager extends CollectionManager {
     return MessageManager;
   }
 
-
   @monitor
   async monitorNew() {
     return new CollectionItemMonitor(
       this.collection,
-      'add',
-      (item) => item.isNewMsg && !item.isSentByMeFromWeb ? this.mapItem(item) : null
+      'add', (item) => item.isNewMsg && !item.isSentByMeFromWeb ? this.mapItem(item) : null
     );
   }
 }
