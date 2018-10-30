@@ -66,8 +66,10 @@ Whatsapp features
 Changelog
 ---------
 
+
+
 .............
-Version 0.4.3
+Version 0.4.4
 .............
 
 * Allow extra options for Firefox driver.
