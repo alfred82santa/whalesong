@@ -42,7 +42,9 @@ export class ChatManager extends ModelManager {
     super(model);
     this.addSubmanager('msgs', new MessageCollectionManager(model.msgs));
     this.addSubmanager('msgLoadState', new MsgLoadStateManager(model.msgs.msgLoadState));
-    this.addSubmanager('metadata', new GroupMetadataManager(this.model.groupMetadata));
+    try {
+      this.addSubmanager('metadata', new GroupMetadataManager(this.model.groupMetadata));
+    } catch (err) {}
   }
 
   async _sendMessage(send_fn, check_fn) {

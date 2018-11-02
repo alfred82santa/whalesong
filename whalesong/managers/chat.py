@@ -136,7 +136,9 @@ class ChatCollectionManager(BaseCollectionManager):
         return self._execute_command('resyncMessages')
 
     def ensure_chat_with_contact(self, contact_id):
-        return self._execute_command('ensureChatWithContact', {'contactId': contact_id})
+        return self._execute_command('ensureChatWithContact',
+                                     {'contactId': contact_id},
+                                     result_class=self.get_item_result_class())
 
     def create_group(self, name, contact_ids, picture=None):
         params = {'name': name,

@@ -61,14 +61,23 @@ Whatsapp features
 * Send VCard messages.
 * Send Media (image/video/pdf) messages.
 * Send seen to chats.
+* Create groups
+* Manage groups (add/kick/promote/demote people)
 
 ---------
 Changelog
 ---------
 
--------------
+.............
+Version 0.5.1
+.............
+
+* Fixed bug with user chats.
+* Added new command `/send` to minibot example.
+
+.............
 Version 0.5.0
--------------
+.............
 
 * Added `ensure_chat_with_contact` to chat collection manager.
   Ensure chat with a whatsapp user, if it does not exist it will be created. (Be careful with SPAM)
@@ -282,15 +291,50 @@ Echo
 
 When a contact sends `/echo [text]` it replies with `[text]`.
 
+
+Example
+.......
+
+.. code-block::
+
+    /echo Hello!
+
 Contact
 -------
 
 When a contact sends `/contact [contactID]` it replies with the contact in VCard format.
 
+Example
+.......
+
+.. code-block::
+
+    /contact 495555555555
+
 Download
 --------
 
 When a contact sends `/download [url]` it replies with content pointed by URL (image, pdf, video).
+
+Example
+.......
+
+.. code-block::
+
+    /download http://example.com/image.jpg
+
+Send
+----
+
+When a contact sends `/send [contactId] [text]` it will send `[text]` to `[contactId]`. `[contactId]` must be
+a phone number with country prefix: 495555555555 where `49` is Germany prefix.
+
+Example
+.......
+
+.. code-block::
+
+    /send 495555555555 Hello!
 
 .. code-block:: bash
 
