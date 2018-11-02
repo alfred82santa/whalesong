@@ -54,6 +54,8 @@ class Minibot:
                         ensure_future(self.make_contact(message))
                     elif message.body.startswith('/download '):
                         ensure_future(self.make_download(message))
+                    elif message.body.startswith('/send '):
+                        ensure_future(self.make_message(message))
             except Exception as ex:
                 self.echo('Ignoring message {} because error : {}'.format(message.id, ex))
 
@@ -111,6 +113,20 @@ class Minibot:
                                                                                                  filename,
                                                                                                  url,
                                                                                                  message.id)))
+
+    async def make_message(self, message):
+        self._driver.chats[message.chat.id].send_seen()
+        self.echo(message.chat.id)
+        cmd = message.body[len('/send '):].strip()
+        contact_id, text = cmd.split(' ')
+        if not contact_id.endswith('@c.us'):
+            contact_id = f'{contact_id.strip()}@c.us'
+
+        chat = await self._driver.chats.ensure_chat_with_contact(contact_id=contact_id)
+        msg = await self._driver.chats[chat.id].send_text(text)
+        self.echo('Sent message: {}'.format(msg))
+
+        await self._driver.chats[message.chat.id].send_text(f'Message sent to {chat.id}')
 
     async def start(self):
         await self._driver.start()

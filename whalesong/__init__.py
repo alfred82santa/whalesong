@@ -10,7 +10,7 @@ from .managers.message import MessageCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
 
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class Whalesong(BaseManager):
