@@ -1,7 +1,11 @@
+from typing import List, Optional
+
 from base64 import b64encode
 from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, StringIdField
+from io import BytesIO
 
 from whalesong.managers.group_metadata import GroupMetadataManager
+from whalesong.results import Result
 from . import BaseCollectionManager, BaseModelManager
 from .contact import Contact
 from .group_metadata import GroupMetadata
@@ -9,40 +13,156 @@ from ..models import BaseModel
 
 
 class Chat(BaseModel):
+    """
+    Chat model.
+    """
+
     name = StringIdField()
-    last_message_ts = DateTimeField(name='t')
+    """
+    Chat title.
+    """
+
+    last_message_ts = DateTimeField(alias=['t'])
+    """
+    Last message timestamp.
+    """
+
     pin = IntegerField()
+    """
+    Pin type (¿?)
+    """
+
     unread_count = IntegerField()
+    """
+    Unread message count.
+    """
 
     archive = BooleanField(default=False)
+    """
+    Whether chat is archived or not.
+    """
+
     change_number_new_jid = StringIdField()
+    """
+    Information about peer's new jabber id (user identifier). 
+    It happens when a peer change its phone number.
+    """
+
     change_number_old_jid = StringIdField()
+    """
+    Information about peer's old phone numberjabber id (user identifier). 
+    It happens when a peer change its phone number.
+    """
+
     contact = ModelField(model_class=Contact)
+    """
+    Contact object.
+    """
+
     group_metadata = ModelField(model_class=GroupMetadata)
+    """
+    Group metadata object.
+    """
+
     is_announce_grp_restrict = BooleanField(default=False)
+    """
+    ¿?
+    """
+
     is_group = BooleanField(default=False)
+    """
+    Whether chat is group or not.
+    """
+
     is_read_only = BooleanField(default=False)
+    """
+    Whether chat is read only or not.
+    """
+
     kind = StringIdField()
+    """
+    ¿?
+    """
 
     last_received_key = StringIdField()
+    """
+    Last encryption key received (¿?).
+    """
+
     modify_tag = StringIdField()
+    """
+    ¿?
+    """
+
     mute_expiration = IntegerField()
+    """
+    Seconds to mute expiration.
+    """
+
     not_spam = BooleanField(default=False)
+    """
+    Whether it was notified as spam chat.
+    """
 
 
 class MsgLoadState(BaseModel):
     context_loaded = BooleanField(default=False)
+    """
+    Whether context was loaded (¿?).
+    """
+
     is_loading_around_msgs = BooleanField(default=False)
+    """
+    Whether it is loading messages (¿?).
+    """
+
     is_loading_earlier_msgs = BooleanField(default=False)
+    """
+    Whether it is loading earlier messages.
+    """
+
     is_loading_recent_msgs = BooleanField(default=False)
+    """
+    Whether it is loading recent messages.
+    """
+
     no_earlier_msgs = BooleanField(default=False)
+    """
+    Whether it all message have been loaded.
+    """
 
 
 class MsgLoadStateManager(BaseModelManager):
+    """
+    Message load state manager
+    """
+
     MODEL_CLASS = MsgLoadState
 
 
 class ChatManager(BaseModelManager):
+    """
+    Chat manager. It allows manage a chat.
+
+    .. attribute:: msgs
+
+        :class:`~whalesong.managers.message.MessageCollectionManager`
+
+        Chat's message collection manager.
+
+    .. attribute:: msg_load_state
+
+        :class:`~MsgLoadStateManager`
+
+        Chat's message load state manager.
+
+    .. attribute:: metadata:
+
+        :class:`~GroupMetadataManager`
+
+        Chat's group metadata manager.
+
+    """
     MODEL_CLASS = Chat
 
     def __init__(self, driver, manager_path=''):
@@ -58,7 +178,19 @@ class ChatManager(BaseModelManager):
         self.add_submanager('metadata', GroupMetadataManager(driver=self._driver,
                                                              manager_path=self._build_command('metadata')))
 
-    def send_text(self, text, quoted_msg_id=None, mentions=None, link_desc=None):
+    def send_text(self, text: str,
+                  quoted_msg_id: Optional[str] = None,
+                  mentions: Optional[List[str]] = None,
+                  link_desc=None) -> Result:
+        """
+        Send text message to current chat.
+
+        :param text: Message to send.
+        :param quoted_msg_id: Quoted message's identifier.
+        :param mentions: List of user ids mentioned.
+        :param link_desc: Link description.
+        :return: New message's identifier
+        """
         params = {'text': text}
 
         if quoted_msg_id:
@@ -72,7 +204,14 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendText', params)
 
-    def send_contact(self, contact_id, quoted_msg_id=None):
+    def send_contact(self, contact_id: str, quoted_msg_id: Optional[str] = None) -> Result:
+        """
+        Send contact to current chat.
+
+        :param contact_id: Contact identifier to send.
+        :param quoted_msg_id: Quoted message's identifier.
+        :return: New message's identifier
+        """
         params = {'contactId': contact_id}
 
         if quoted_msg_id:
@@ -80,7 +219,15 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendContact', params)
 
-    def send_contact_phone(self, contact_name, phone_number, quoted_msg_id=None):
+    def send_contact_phone(self, contact_name: str, phone_number: str, quoted_msg_id: Optional[str] = None) -> Result:
+        """
+        Send contact to current chat using contact name and phone number.
+
+        :param contact_name: Contact's name.
+        :param phone_number: Contact's phone number.
+        :param quoted_msg_id: Quoted message's identifier.
+        :return: New message's identifier
+        """
         params = {'contactName': contact_name,
                   'phoneNumber': phone_number}
 
@@ -89,8 +236,22 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendContactPhone', params)
 
-    def send_media(self, media_data, content_type=None, filename=None, caption=None,
-                   quoted_msg_id=None, mentions=None):
+    def send_media(self, media_data: BytesIO,
+                   content_type: Optional[str] = None, filename: Optional[str] = None,
+                   caption: Optional[str] = None,
+                   quoted_msg_id: Optional[str] = None, mentions: Optional[List[str]] = None) -> Result:
+        """
+        Send media file to current chat.
+
+        :param media_data: io.ByteIO
+        :param content_type: File content type. It is used by Whatsapp to known how to render it.
+        :param filename: File name.
+        :param caption: Media caption.
+        :param quoted_msg_id: Quoted message's identifier.
+        :param mentions: List of user ids mentioned.
+        :return: New message's identifier
+        """
+
         params = {'mediaData': b64encode(media_data.read()).decode()}
 
         if content_type:
@@ -110,37 +271,103 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendMedia', params)
 
-    def leave_group(self):
+    def leave_group(self) -> Result:
+        """
+        Leave current chat group.
+
+        .. warning:: Only available on group chats.
+
+        """
         return self._execute_command('leaveGroup')
 
-    def delete_chat(self):
+    def delete_chat(self) -> Result:
+        """
+        Delete chat.
+        """
         return self._execute_command('deleteChat')
 
-    def send_seen(self):
+    def send_seen(self) -> Result:
+        """
+        Mark chat as seen.
+        """
         return self._execute_command('sendSeen')
 
     def load_earlier_messages(self):
+        """
+        Load earlier messages.
+
+        .. tip::
+
+            You should monitor chat messages in order to get new messages loaded.
+
+            .. code-block:: python3
+
+                async for msg in driver.chat[chat_id].msgs.monitor_add():
+                    print(msg)
+
+
+        """
         return self._execute_command('loadEarlierMessages')
 
-    def load_all_earlier_messages(self):
+    def load_all_earlier_messages(self) -> Result:
+        """
+        Load ALL earlier messages.
+
+        .. tip::
+
+            You should monitor chat messages in order to get new messages loaded.
+            And perhaps you should remove them after process in order to save memory.
+
+            .. code-block:: python3
+
+                async for msg in driver.chat[chat_id].msgs.monitor_add():
+                    print(msg)
+                    await driver.chat[chat_id].msgs.remove_item_by_id(item.id)
+
+
+        """
         return self._execute_command('loadAllEarlierMessages')
 
 
 class ChatCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = ChatManager
 
-    def get_active(self):
-        return self._execute_command('getActive')
+    def get_active(self) -> Result:
+        """
+        Returns chat selected.
 
-    def resync_messages(self):
+        :return: Chat object
+        """
+        return self._execute_command('getActive',
+                                     result_class=self.get_item_result_class())
+
+    def resync_messages(self) -> Result:
+        """
+        Resynchronize messages.
+        """
         return self._execute_command('resyncMessages')
 
-    def ensure_chat_with_contact(self, contact_id):
+    def ensure_chat_with_contact(self, contact_id: str) -> Result:
+        """
+        Ensure there is a chat with a given contact. If it does not exist it will be created.
+
+        :param contact_id: Contact's identifier.
+        :return: Chat object
+        """
+
         return self._execute_command('ensureChatWithContact',
                                      {'contactId': contact_id},
                                      result_class=self.get_item_result_class())
 
-    def create_group(self, name, contact_ids, picture=None):
+    def create_group(self, name: str, contact_ids: List[str], picture: BytesIO=None) -> Result:
+        """
+        Create a new chat group.
+
+        :param name: Group's name
+        :param contact_ids: List of contact identifier to invite.
+        :param picture: JPG image.
+        :return: Chat object.
+        """
         params = {'name': name,
                   'contactIds': contact_ids}
 

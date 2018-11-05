@@ -1,0 +1,5 @@
+=================
+Whalesong Service
+=================
+
+.. automodule:: whalesong

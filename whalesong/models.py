@@ -6,6 +6,9 @@ from dirty_models.utils import JSONEncoder as BaseJSONEncoder, ModelFormatterIte
 
 
 class Base64Field(BytesField):
+    """
+    Byte field which allows to set base64 string data.
+    """
 
     def convert_value(self, value):
         if isinstance(value, str):
@@ -14,7 +17,14 @@ class Base64Field(BytesField):
 
 
 class BaseModel(DirtyBaseModel, metaclass=CamelCaseMeta):
+    """
+    Base model which convert field name from underscore-style to camelCase-style automatically.
+    """
+
     id = StringIdField(read_only=True)
+    """
+    Unique identifier.
+    """
 
 
 class ModelFormatterIter(BaseModelFormatterIter):
