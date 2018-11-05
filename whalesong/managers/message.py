@@ -10,11 +10,11 @@ from dirty_models import ArrayField, BooleanField, DateTimeField, EnumField, Flo
 from enum import Enum
 from io import BytesIO
 
-from whalesong.models import Base64Field
+from whalesong import MonitorResult
 from . import BaseCollectionManager, BaseModelManager
 from .chat import Chat
 from .contact import Contact
-from ..models import BaseModel
+from ..models import Base64Field, BaseModel
 
 
 class MessageTypes(Enum):
@@ -255,25 +255,57 @@ def message_factory(data):
 
 
 class MessageManager(BaseModelManager):
+    """
+    Message object manager.
+    """
+
     MODEL_CLASS = message_factory
 
-    async def download_media(self):
+    async def download_media(self) -> BytesIO:
+        """
+        Download message's attached media file. It will decrypt media file using key on message object.
+
+        :return: Media stream.
+        """
         model = await self.get_model()
 
         return await download_media(self._driver, model)
 
 
 class MessageCollectionManager(BaseCollectionManager):
+    """
+    Message collection manager.
+    """
+
     MODEL_MANAGER_CLASS = MessageManager
 
-    def monitor_new(self):
+    def monitor_new(self) -> MonitorResult:
+        """
+        Monitor new messages.
+
+        :return: New message monitor.
+        """
+
         return self._execute_command('monitorNew', result_class=self.get_monitor_result_class())
 
-    async def download_media(self, media_msg):
+    async def download_media(self, media_msg: MediaMixin) -> BytesIO:
+        """
+        Download message's attached media file. It will decrypt media file using key on message object.
+
+        :param model: MediaMixin
+        :return: Media stream.
+        """
         return await download_media(self._driver, media_msg)
 
 
-async def download_media(driver, model):
+async def download_media(driver, model: MediaMixin) -> BytesIO:
+    """
+    Download message's attached media file. It will decrypt media file using key on message object.
+
+    :param driver:
+    :param model: MediaMixin
+    :return: Media stream.
+    """
     file_data = (await driver.download_file(model.client_url)).read()
 
     media_key = b64decode(model.media_key)

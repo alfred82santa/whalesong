@@ -1,19 +1,45 @@
 from asyncio import Future, Queue, ensure_future
 from logging import getLogger
+from typing import Callable, Optional, Union, Any, Coroutine, Awaitable
 
+from whalesong.models import BaseModel
 from . import errors
 
 logger = getLogger(__name__)
 
 
 class BaseResultMixin:
+    """
+    Base result mixin.
 
-    def __init__(self, result_id, *, fn_map=None):
+    .. attribute:: result_id: str
+
+        Result unique identifier.
+
+    .. attribute:: fn_map: Callable[[dict], Union[BaseModel, dict]]
+
+        Mapping function used to map result.
+
+    """
+
+    def __init__(self, result_id: str, *, fn_map: Optional[Callable[[dict], Union[BaseModel, dict]]] = None):
+        """
+        Result constructor.
+
+        :param result_id: Result unique identifier.
+        :param fn_map: Mapping function used to map result.
+        """
         self.result_id = result_id
         self.fn_map = fn_map
         super(BaseResultMixin, self).__init__()
 
-    def map(self, data):
+    def map(self, data: dict) -> Union[BaseModel, dict]:
+        """
+        Maps data from browser to an object if `fn_map` function is defined.
+
+        :param data: Data from browser.
+        :return: Mapped object.
+        """
         if self.fn_map:
             return self.fn_map(data)
         return data
@@ -41,6 +67,9 @@ class BaseResultMixin:
 
 
 class Result(BaseResultMixin, Future):
+    """
+    Result of command.
+    """
 
     async def _set_result(self, data):
         self.set_result(data)
@@ -73,6 +102,9 @@ class BasePartialResult(BaseResultMixin):
 
 
 class BaseIteratorResult(BasePartialResult):
+    """
+    Base iterable result.
+    """
 
     def __aiter__(self):
         return self
@@ -88,19 +120,55 @@ class BaseIteratorResult(BasePartialResult):
 
 
 class IteratorResult(BaseIteratorResult):
+    """
+    Iterator result. It is used as result of command which returns a list of object.
+
+    .. warning::
+
+        It is an async iterator.
+
+    **How to use**
+
+    .. code-block:: python3
+
+        async for item in result_iterator:
+            print(item)
+
+    """
 
     def map(self, data):
         return super(IteratorResult, self).map(data['item'])
 
 
 class MonitorResult(BaseIteratorResult):
+    """
+    Monitor result. It is used as result of monitor command. It is a infinite iterator. Each change on object or
+    field it is monitoring will be a new item on iterator.
+
+    .. warning::
+
+        It is an async iterator.
+
+    **How to use**
+
+    .. code-block:: python3
+
+        async for item_changed in monitor:
+            print(item_changed)
+
+    """
 
     def __init__(self, result_id, *, fn_map=None):
         super(MonitorResult, self).__init__(result_id, fn_map=fn_map)
 
         self._callbacks = []
 
-    def add_callback(self, fn):
+    def add_callback(self, fn: Awaitable[Any]):
+        """
+        Add a callback to be called each time object or field change.
+
+        :param fn: Callback function
+        """
         self._callbacks.append(fn)
 
     async def __anext__(self):
@@ -113,6 +181,9 @@ class MonitorResult(BaseIteratorResult):
             pass
 
     def start_monitor(self):
+        """
+        Starts automatic monitor iteration. Useful when callback functions are defined.
+        """
         ensure_future(self._monitor())
 
 

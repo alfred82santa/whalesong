@@ -1,6 +1,9 @@
 from asyncio import Future, ensure_future, sleep, wait
 from builtins import ConnectionRefusedError
 
+from io import BytesIO
+
+from whalesong.results import MonitorResult
 from .driver import WhalesongDriver
 from .managers import BaseManager
 from .managers.chat import ChatCollectionManager
@@ -14,6 +17,45 @@ __version__ = '0.5.1'
 
 
 class Whalesong(BaseManager):
+    """
+    Main Whalesong manager.
+
+    .. attribute:: storage
+
+        :class:`~whalesong.managers.storage.StorageManager`
+
+        Manager for local storage.
+
+    .. attribute:: stream
+
+        :class:`~whalesong.managers.stream.StreamManager`
+
+        Manager for stream object.
+
+    .. attribute:: conn
+
+        :class:`~whalesong.managers.conn.ConnManager`
+
+        Manager for connection object
+
+    .. attribute:: contacts
+
+        :class:`~`whalesong.managers.contact.ContactCollectionManager`
+
+        Manager for contact collection.
+
+    .. attribute:: chats
+
+        :class:`~whalesong.managers.chat.ChatCollectionManager`
+
+        Manager for chat collection.
+
+    .. attribute:: messages
+
+        :class:`~whalesong.managers.message.MessageCollectionManager`
+
+        Manager for messages collection.
+    """
 
     def __init__(self, profile=None, loadstyles=False, headless=False, extra_params=None, loop=None):
         super(Whalesong, self).__init__(WhalesongDriver(profile=profile,
@@ -35,7 +77,12 @@ class Whalesong(BaseManager):
     def loop(self):
         return self._driver.loop
 
-    async def start(self, interval=0.5):
+    async def start(self, interval: float = 0.5):
+        """
+        Start Whalesong service.
+
+        :param interval: Polling interval
+        """
         if self._fut_running:
             return
 
@@ -47,10 +94,16 @@ class Whalesong(BaseManager):
         self._fut_polling = ensure_future(self._polling(interval), loop=self.loop)
 
     async def stop(self):
+        """
+        Stop Whalesong service.
+        """
         self._fut_running.set_result(None)
         await self.wait_until_stop()
 
     async def wait_until_stop(self):
+        """
+        Wait until Whalesong service stop.
+        """
         await self._fut_polling
 
     async def _polling(self, interval):
@@ -70,17 +123,42 @@ class Whalesong(BaseManager):
             except ConnectionRefusedError:
                 pass
 
-    async def screenshot(self):
+    async def screenshot(self) -> BytesIO:
+        """
+        Take a screenshot of whole page.
+
+        :return: It returns a stream of a PNG image.
+        """
         return await self._driver.screenshot()
 
-    async def qr(self):
+    async def qr(self) -> BytesIO:
+        """
+        Take a screenshot of QR.
+
+        :return: It returns a stream of a PNG image.
+        """
         return await self._driver.screenshot_element('div[data-ref]')
 
-    def stop_monitor(self, monitor):
+    def stop_monitor(self, monitor: MonitorResult) -> Future:
+        """
+        Stop a given monitor.
+
+        :param monitor: Monitor object to stop.
+        :return: a future which will be resolve when monitor stop.
+        """
         return self._driver.execute_command('stopMonitor', {'monitorId': monitor.result_id})
 
     async def cancel_iterators(self):
+        """
+        Cancel all iterators.
+        """
         return await self._driver.cancel_iterators()
 
-    async def download_file(self, url):
+    async def download_file(self, url: str) -> BytesIO:
+        """
+        Download a file by URL
+
+        :param url: URL to the file
+        :return: It returns a stream.
+        """
         return await self._driver.download_file(url)
