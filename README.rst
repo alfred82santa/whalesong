@@ -5,6 +5,13 @@ Whalesong
 Whalesong is a python library to manage WebApps remotely.
 Currently WhatsappWeb is implemented
 
+-------------
+Documentation
+-------------
+
+http://whalesong.readthedocs.io/
+
+
 ------------
 Requirements
 ------------
@@ -12,6 +19,11 @@ Requirements
 * Python 3.6+
 * Geckodriver
 * Firefox 50+
+
+........................
+Development requirements
+........................
+
 * node (only for development)
 * npm (only for development)
 * make (only for development)
@@ -284,7 +296,7 @@ It stores files and thumbnails from media messages.
 Minibot
 =======
 
-Minibot implements 3 features:
+Minibot implements 4 features:
 
 Echo
 ----

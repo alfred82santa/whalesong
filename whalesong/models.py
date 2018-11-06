@@ -21,10 +21,8 @@ class BaseModel(DirtyBaseModel, metaclass=CamelCaseMeta):
     Base model which convert field name from underscore-style to camelCase-style automatically.
     """
 
+    #: Unique identifier.
     id = StringIdField(read_only=True)
-    """
-    Unique identifier.
-    """
 
 
 class ModelFormatterIter(BaseModelFormatterIter):

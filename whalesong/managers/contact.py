@@ -3,46 +3,155 @@ from vobject import vCard
 
 from . import BaseCollectionManager, BaseModelManager
 from ..models import BaseModel
+from ..results import Result
 
 
 class ProfilePicture(BaseModel):
-    id = StringIdField()
     eurl = StringIdField()
+    """
+    Url to contact picture.
+    """
+
     raw = StringIdField()
+    """
+    ¿?
+    """
+
     tag = StringIdField()
+    """
+    ¿?
+    
+    .. note:: I guess it is used to know when contact picture changed.
+    """
 
 
 class Contact(BaseModel):
     name = StringIdField()
+    """
+    Contact name. It will be name on phone contact list.
+    """
+
     formatted_name = StringIdField()
+    """
+    Contact's formatted name.
+    """
+
     pushname = StringIdField()
+    """
+    Contact defined name. It is set by contact on its whatsapp application. 
+    """
+
     short_name = StringIdField()
+    """
+    Short form of contact's name.
+    """
+
     type = StringIdField()
+    """
+    ¿?
+    """
+
     userhash = StringIdField()
+    """
+    ¿?
+    """
+
     userid = StringIdField()
+    """
+    User identifier. It used to be the phone number.
+    """
+
     verified_level = StringIdField()
+    """
+    Something about business accounts.
+    """
+
     verified_name = StringIdField()
+    """
+    Verified contact's name for business.
+    """
 
     profile_pic_thumb_obj = ModelField(model_class=ProfilePicture)
+    """
+    Contact picture.
+    """
 
     is_user = BooleanField(default=True)
+    """
+    Whether contact is a user or not.
+    """
+
     is_business = BooleanField(default=False)
+    """
+    Whether contact is a business or not.
+    """
+
     is_contact_blocked = BooleanField(default=False)
+    """
+    Whether contact has been blocked or not.
+    """
+
     is_enterprise = BooleanField(default=False)
+    """
+    Whether contact is an enterprise or not.
+    """
+
     is_high_level_verified = BooleanField(default=False)
+    """
+    Whether contact is verified as enterprise or not.
+    """
+
     is_me = BooleanField(default=False)
+    """
+    Whether contact is the current user or not.
+    """
+
     is_my_contact = BooleanField(default=True)
+    """
+    Whether contact is in phone's contact list or not.
+    """
+
     is_psa = BooleanField(default=False, name='isPSA')
+    """
+    ¿?
+    """
+
     is_verified = BooleanField(default=False)
+    """
+    Whether contact is verified or not.
+    """
+
     is_wa_contact = BooleanField(default=True, name='isWAContact')
+    """
+    Whether contact is a whatsapp user or not.
+    """
+
     plaintext_disabled = BooleanField(default=False)
+    """
+    Whether contact has disabled plain text or not.
+    """
+
     status_mute = BooleanField(default=False)
+    """
+    Whether contact is muted or not.
+    """
 
     section_header = StringIdField()
+    """
+    ¿?
+    """
 
     labels = ArrayField(field_type=StringIdField(), default=[])
+    """
+    List of contact labels ¿?
+    """
 
-    def to_vcard(self):
+    def to_vcard(self) -> vCard:
+        """
+        Build vCard from contact.
+
+        :return: vCard object of contact
+        """
         vc = vCard()
         o = vc.add('fn')
         o.value = self.formatted_name
@@ -55,20 +164,36 @@ class Contact(BaseModel):
 
 
 class ContactManager(BaseModelManager):
+    """
+    Contact manager. It allows manage a contact.
+    """
+
     MODEL_CLASS = Contact
 
-    def block(self):
+    def block(self) -> Result:
+        """
+        Block contact.
+        """
+
         return self._execute_command('block')
 
-    def unblock(self):
+    def unblock(self) -> Result:
+        """
+        Unblock contact.
+        """
+
         return self._execute_command('unblock')
 
 
 class ContactCollectionManager(BaseCollectionManager):
+    """
+    Contact collection manager. It allows manage contact collection.
+    """
+
     MODEL_MANAGER_CLASS = ContactManager
 
-    def resync_contacts(self):
+    def resync_contacts(self) -> Result:
         return self._execute_command('resyncContacts')
 
-    def get_me(self):
+    def get_me(self) -> Result:
         return self._execute_command('getMe')

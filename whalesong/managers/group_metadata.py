@@ -1,5 +1,8 @@
+from typing import List
+
 from dirty_models import ArrayField, BooleanField, DateTimeField, ModelField, StringField, StringIdField
 
+from whalesong.results import Result
 from . import BaseCollectionManager, BaseModelManager
 from ..models import BaseModel
 
@@ -31,32 +34,42 @@ class ParticipantManager(BaseModelManager):
 class ParticipantCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = ParticipantManager
 
-    def add_participants(self, contact_ids):
+    def add_participants(self, contact_ids: List[str]) -> Result:
         return self._execute_command('addParticipants', {'contactIds': contact_ids})
 
-    def can_add(self, contact_id):
+    def can_add(self, contact_id: str) -> Result:
         return self._execute_command('canAdd', {'contactId': contact_id})
 
-    def remove_participants(self, contact_ids):
+    def remove_participants(self, contact_ids: List[str]) -> Result:
         return self._execute_command('removeParticipants', {'contactIds': contact_ids})
 
-    def can_remove(self, contact_id):
+    def can_remove(self, contact_id: str) -> Result:
         return self._execute_command('canRemove', {'contactId': contact_id})
 
-    def promote_participants(self, contact_ids):
+    def promote_participants(self, contact_ids: List[str]) -> Result:
         return self._execute_command('promoteParticipants', {'contactIds': contact_ids})
 
-    def can_promote(self, contact_id):
+    def can_promote(self, contact_id: str) -> Result:
         return self._execute_command('canPromote', {'contactId': contact_id})
 
-    def demote_participants(self, contact_ids):
+    def demote_participants(self, contact_ids: List[str]) -> Result:
         return self._execute_command('demoteParticipants', {'contactIds': contact_ids})
 
-    def can_demote(self, contact_id):
+    def can_demote(self, contact_id: str) -> Result:
         return self._execute_command('canDemote', {'contactId': contact_id})
 
 
 class GroupMetadataManager(BaseModelManager):
+    """
+    Group metadata manager. It allows manage groups, further than a chat.
+
+    .. attribute:: participants
+
+        :class:`~whalesong.managers.group_metadata.ParticipantCollectionManager`
+
+        Group's participants collection manager.
+    """
+
     MODEL_CLASS = GroupMetadata
 
     def __init__(self, driver, manager_path=''):
@@ -67,10 +80,10 @@ class GroupMetadataManager(BaseModelManager):
             manager_path=self._build_command('participants')
         ))
 
-    def group_invite_code(self):
+    def group_invite_code(self) -> Result:
         return self._execute_command('groupInviteCode')
 
-    def revoke_group_invite(self):
+    def revoke_group_invite(self) -> Result:
         return self._execute_command('revokeGroupInvite')
 
 
