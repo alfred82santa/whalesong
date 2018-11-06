@@ -74,6 +74,7 @@ Table of contents
 
    examples
    api/index
+   develop
    changelog
 
 

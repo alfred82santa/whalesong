@@ -180,7 +180,7 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 
-## Autoclass
+# Autoclass
 
 autodoc_member_order = 'bysource'
 autodoc_default_flags = ['members',
