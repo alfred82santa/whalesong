@@ -193,7 +193,7 @@ export class ChatManager extends ModelManager {
 
     return await this._sendMessage(
       () => media.sendToChat(this.model, extraData),
-      (item) => item.isMedia && item.mediaData.filehash === media.mediaPrep._mediaData.filehash
+      (item) => (item.isMedia || item.isDoc) && item.mediaData.filehash === media.mediaPrep._mediaData.filehash
     );
   }
 
