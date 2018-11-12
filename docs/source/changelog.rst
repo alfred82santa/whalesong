@@ -3,6 +3,16 @@ Changelog
 =========
 
 -------------
+Version 0.5.2
+-------------
+
+* Fixed bug when sending docs. Thx to @jabolina.
+* Add `set_subject` method to chat manager in order to be able to change group title.
+* Add `mark_composing` method to chat manager in order to show "typing..." message.
+* Add `mark_recording` method to chat manager in order to show "recording audio..." message.
+* Add `mark_paused` method to chat manager in order to remove "typing..." or "recording audio..." message.
+
+-------------
 Version 0.5.1
 -------------
 
@@ -27,8 +37,8 @@ Version 0.4.4
 -------------
 
 * Allow extra options for Firefox driver.
-* Added `leave_group`. Thx @jabolina
-* Added `delete_chat`. Thx @jabolina
+* Added `leave_group`. Thx to @jabolina.
+* Added `delete_chat`. Thx to @jabolina.
 
 -------------
 Version 0.4.0

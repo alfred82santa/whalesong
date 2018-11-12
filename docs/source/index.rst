@@ -2,7 +2,7 @@
 Whalesong
 =========
 
-Whalesong is a python library to manage WebApps remotely.
+Whalesong is a asyncio python library to manage WebApps remotely.
 Currently WhatsappWeb is implemented
 
 ------------
