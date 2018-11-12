@@ -347,7 +347,6 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('markComposing')
 
-
     def mark_recording(self) -> Result:
         """
         Set "recording audio..." message.
@@ -365,7 +364,6 @@ class ChatManager(BaseModelManager):
         """
 
         return self._execute_command('markPaused')
-
 
 
 class ChatCollectionManager(BaseCollectionManager):

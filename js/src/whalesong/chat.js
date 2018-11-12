@@ -225,7 +225,9 @@ export class ChatManager extends ModelManager {
   }
 
   @command
-  async setSubject({subject}) {
+  async setSubject({
+    subject
+  }) {
     await this.model.setSubject(subject);
   }
 
