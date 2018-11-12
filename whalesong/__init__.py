@@ -3,7 +3,6 @@ from builtins import ConnectionRefusedError
 
 from io import BytesIO
 
-from whalesong.results import MonitorResult
 from .driver import WhalesongDriver
 from .managers import BaseManager
 from .managers.chat import ChatCollectionManager
@@ -12,8 +11,10 @@ from .managers.contact import ContactCollectionManager
 from .managers.message import MessageCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
+from .managers.wap import WapManager
+from .results import MonitorResult
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 
 class Whalesong(BaseManager):
@@ -55,6 +56,12 @@ class Whalesong(BaseManager):
         :class:`~whalesong.managers.message.MessageCollectionManager`
 
         Manager for messages collection.
+
+    .. attribute:: wap
+
+        :class:`~whalesong.managers.wap.WapManager`
+
+        Manager for wap object.
     """
 
     def __init__(self, profile=None, loadstyles=False, headless=False, extra_params=None, loop=None):
@@ -70,6 +77,7 @@ class Whalesong(BaseManager):
         self._submanagers['contacts'] = ContactCollectionManager(self._driver, manager_path='contacts')
         self._submanagers['chats'] = ChatCollectionManager(self._driver, manager_path='chats')
         self._submanagers['messages'] = MessageCollectionManager(self._driver, manager_path='messages')
+        self._submanagers['wap'] = WapManager(self._driver, manager_path='wap')
 
         self._fut_running = None
 

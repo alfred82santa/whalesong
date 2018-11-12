@@ -112,7 +112,13 @@ It stores files and thumbnails from media messages.
 Minibot
 =======
 
-Minibot implements 4 features:
+Mini bot to test features.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot.py
+
+Minibot implements 6 features:
 
 Echo
 ----
@@ -164,6 +170,31 @@ Example
 
     /send 495555555555 Hello!
 
-.. code-block:: bash
+Link
+----
 
-    $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot.py
+When a contact sends `/link [text]` it replies with `[text]`. It's very similar to `/echo`, but never quote original
+message and if there was a link it will try to get information and attach it.
+
+
+Example
+.......
+
+.. code-block:: text
+
+    /link https://www.google.com
+
+
+Exist
+-----
+
+When a contact sends `/exist [contactId]`, it will return whether a phone number is registered on Whatsapp.
+
+
+Example
+.......
+
+.. code-block:: text
+
+    /exist 495555555555
+

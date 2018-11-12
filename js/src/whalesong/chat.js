@@ -102,8 +102,14 @@ export class ChatManager extends ModelManager {
       extraData['mentionedJidList'] = mentions;
     }
 
-    if (linkDesc) {
-      extraData['linkPreview'] = linkDesc;
+    if (!extraData['quotedMsg']) {
+      if (linkDesc) {
+        extraData['linkPreview'] = linkDesc;
+      } else {
+        extraData['linkPreview'] = await manager.getSubmanager('wap').queryLinkPreview({
+          text
+        });
+      }
     }
 
     let chat = this.model;
