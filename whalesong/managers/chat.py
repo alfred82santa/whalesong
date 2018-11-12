@@ -328,6 +328,45 @@ class ChatManager(BaseModelManager):
         """
         return self._execute_command('loadAllEarlierMessages')
 
+    def set_subject(self, subject: str) -> Result:
+        """
+        Set group subject/title.
+
+        :param subject: New group subject/title string
+        :return: None
+        """
+
+        return self._execute_command('setSubject', {'subject': subject})
+
+    def mark_composing(self) -> Result:
+        """
+        Set "typing..." message for 2.5 seconds.
+
+        :return: None
+        """
+
+        return self._execute_command('markComposing')
+
+
+    def mark_recording(self) -> Result:
+        """
+        Set "recording audio..." message.
+
+        :return: None
+        """
+
+        return self._execute_command('markRecording')
+
+    def mark_paused(self) -> Result:
+        """
+        Unset "typing..." or "recording audio..." message.
+
+        :return: None
+        """
+
+        return self._execute_command('markPaused')
+
+
 
 class ChatCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = ChatManager
@@ -359,7 +398,7 @@ class ChatCollectionManager(BaseCollectionManager):
                                      {'contactId': contact_id},
                                      result_class=self.get_item_result_class())
 
-    def create_group(self, name: str, contact_ids: List[str], picture: BytesIO=None) -> Result:
+    def create_group(self, name: str, contact_ids: List[str], picture: BytesIO = None) -> Result:
         """
         Create a new chat group.
 

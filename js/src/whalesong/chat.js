@@ -223,6 +223,26 @@ export class ChatManager extends ModelManager {
       await this.model.loadEarlierMsgs();
     }
   }
+
+  @command
+  async setSubject({subject}) {
+    await this.model.setSubject(subject);
+  }
+
+  @command
+  async markComposing() {
+    this.model.markComposing();
+  }
+
+  @command
+  async markRecording() {
+    this.model.markRecording();
+  }
+
+  @command
+  async markPaused() {
+    this.model.markPaused();
+  }
 }
 
 export class ChatCollectionManager extends CollectionManager {
