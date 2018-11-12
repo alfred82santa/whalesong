@@ -11,5 +11,6 @@ API reference
    managers
    chat
    message
+   wap
 
 

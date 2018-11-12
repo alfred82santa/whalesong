@@ -56,6 +56,10 @@ class Minibot:
                         ensure_future(self.make_download(message))
                     elif message.body.startswith('/send '):
                         ensure_future(self.make_message(message))
+                    elif message.body.startswith('/link '):
+                        ensure_future(self.make_link(message))
+                    elif message.body.startswith('/exist '):
+                        ensure_future(self.make_exists(message))
             except Exception as ex:
                 self.echo('Ignoring message {} because error : {}'.format(message.id, ex))
 
@@ -127,6 +131,26 @@ class Minibot:
         self.echo('Sent message: {}'.format(msg))
 
         await self._driver.chats[message.chat.id].send_text(f'Message sent to {chat.id}')
+
+    async def make_link(self, message):
+        self._driver.chats[message.chat.id].send_seen()
+        self.echo(message.chat.id)
+        text = message.body[len('/link '):].strip()
+        self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_text(text)))
+
+    async def make_exists(self, message):
+        self._driver.chats[message.chat.id].send_seen()
+        self.echo(message.chat.id)
+        contact_id = message.body[len('/exist '):].strip()
+
+        if not contact_id.endswith('@c.us'):
+            contact_id = f'{contact_id.strip()}@c.us'
+
+        exists = await self._driver.wap.query_exist(contact_id=contact_id)
+        self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_text(
+            'It exists' if exists else 'It does not exist',
+            message.id
+        )))
 
     async def start(self):
         await self._driver.start()

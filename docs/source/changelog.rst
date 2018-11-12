@@ -3,14 +3,25 @@ Changelog
 =========
 
 -------------
+Version 0.5.3
+-------------
+
+* Add `query_exist` method to wap manager in order to get whether a contact indentifier exists or not.
+
+* When send a text message with an url it will try to get link preview and attach to message.
+  It's not compatible with quoted messages.
+
+* Added two new commands to `minibot.py` example: `/link` and `/exists`.
+
+-------------
 Version 0.5.2
 -------------
 
 * Fixed bug when sending docs. Thx to @jabolina.
-* Add `set_subject` method to chat manager in order to be able to change group title.
-* Add `mark_composing` method to chat manager in order to show "typing..." message.
-* Add `mark_recording` method to chat manager in order to show "recording audio..." message.
-* Add `mark_paused` method to chat manager in order to remove "typing..." or "recording audio..." message.
+* Added `set_subject` method to chat manager in order to be able to change group title.
+* Added `mark_composing` method to chat manager in order to show "typing..." message.
+* Added `mark_recording` method to chat manager in order to show "recording audio..." message.
+* Added `mark_paused` method to chat manager in order to remove "typing..." or "recording audio..." message.
 
 -------------
 Version 0.5.1

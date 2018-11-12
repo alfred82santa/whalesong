@@ -3,20 +3,32 @@ import {
 } from './common.js';
 
 import {
-  ChatManager
-} from './chat.js';
-
-import {
   command
 } from '../manager.js';
 
 export class WapManager extends ModelManager {
 
   @command
-  async createGroup({
-    name,
-    contactIds
+  async queryExist({
+    contactId
   }) {
-    return ChatManager.mapModel(this.model.createGroup(name, contactIds));
+    let result = await this.model.queryExist(contactId);
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async queryLinkPreview({
+    text
+  }) {
+    let result = await this.model.queryLinkPreview(text);
+
+    if (result.status && result.status !== 200) {
+      return;
+    }
+
+    return result;
   }
 }
