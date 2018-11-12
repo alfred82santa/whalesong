@@ -174,7 +174,7 @@ Link
 ----
 
 When a contact sends `/link [text]` it replies with `[text]`. It's very similar to `/echo`, but never quote original
-message and if there was a link it will try to get information and attach it.
+message and if there was a link it will try to get link preview and attach it.
 
 
 Example

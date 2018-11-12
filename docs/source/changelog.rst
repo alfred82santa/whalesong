@@ -8,7 +8,7 @@ Version 0.5.3
 
 * Add `query_exist` method to wap manager in order to get whether a contact indentifier exists or not.
 
-* When send a text message with an url it will try to get url data and attach to message.
+* When send a text message with an url it will try to get link preview and attach to message.
   It's not compatible with quoted messages.
 
 * Added two new commands to `minibot.py` example: `/link` and `/exists`.
