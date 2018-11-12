@@ -38,6 +38,7 @@ Features
 * AmpersandJS/BackboneJS field monitor.
 * Monitor localStorage.
 * Take screenshots (page and css elements).
+* Powered by AsyncIO.
 
 .................
 Whatsapp features
@@ -63,7 +64,8 @@ Whatsapp features
 * Send seen to chats.
 * Create groups
 * Manage groups (add/kick/promote/demote people)
-
+* Auto load link previews
+* Allow to check whether a contact is registered on Whatsapp.
 
 -----------------
 Table of contents
