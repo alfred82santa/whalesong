@@ -15,7 +15,7 @@ from . import BaseCollectionManager, BaseModelManager
 from .chat import Chat
 from .contact import Contact
 from ..models import Base64Field, BaseModel
-from ..results import MonitorResult
+from ..results import MonitorResult, Result
 
 
 class MessageTypes(Enum):
@@ -40,6 +40,7 @@ class MessageTypes(Enum):
     AUDIO = 'audio'
     PTT = 'ptt'
     VIDEO = 'video'  # body as thumbnail
+    STICKER = 'sticker'
 
 
 class Ack(Enum):
@@ -522,6 +523,14 @@ class GroupNotificationMessage(BaseMessage):
     url_number = IntegerField()
 
 
+class StickerMessage(ImageMessage):
+    """
+    Sticker message.
+    """
+
+    __default_data__ = {'type': MessageTypes.STICKER}
+
+
 CRYPT_KEYS = {MessageTypes.DOCUMENT: '576861747341707020446f63756d656e74204b657973',
               MessageTypes.IMAGE: '576861747341707020496d616765204b657973',
               MessageTypes.VIDEO: '576861747341707020566964656f204b657973',
@@ -529,12 +538,130 @@ CRYPT_KEYS = {MessageTypes.DOCUMENT: '576861747341707020446f63756d656e74204b6579
               MessageTypes.AUDIO: '576861747341707020417564696f204b657973'}
 
 
+class MessageAck(BaseModel):
+    """
+    Message acknowledgement.
+    """
+
+    timestamp = DateTimeField(alias=['t'])
+    """
+    Ack timestamp.
+    """
+
+
+class MessageInfo(BaseModel):
+    """
+    Message information.
+    """
+
+    delivery = ArrayField(field_type=ModelField(model_class=MessageAck))
+    """
+    Delivery message acknowledgement list.
+    """
+
+    delivery_remaining = IntegerField(default=0)
+    """
+    Remaining delivery count.
+    """
+
+    is_ptt = BooleanField(default=False)
+    """
+    Whether it was a push to talk message.
+    """
+
+    played = ArrayField(field_type=ModelField(model_class=MessageAck))
+    """
+    Played message acknowledgement list.
+    """
+
+    played_remaining = IntegerField(default=0)
+    """
+    Remaining played count.
+    """
+
+    read = ArrayField(field_type=ModelField(model_class=MessageAck))
+    """
+    Read message acknowledgement list.
+    """
+
+    read_remaining = IntegerField(default=0)
+    """
+    Remaining read count.
+    """
+
+
+class MessageAckManager(BaseModelManager):
+    """
+    Message acknowledgement object manager.
+    """
+
+    MODEL_CLASS = MessageAck
+
+
+class MessageAckCollectionManager(BaseCollectionManager):
+    """
+    Message acknowledgement collection manager.
+    """
+
+    MODEL_MANAGER_CLASS = MessageAckManager
+
+
+class MessageInfoManager(BaseModelManager):
+    """
+    Message information object manager.
+
+    .. attribute:: delivery
+
+        :class:`~whalesong.managers.message.MessageAckCollectionManager`
+
+        Message delivery acknowledgement collection manager.
+
+    .. attribute:: read
+
+        :class:`~whalesong.managers.message.MessageAckCollectionManager`
+
+        Message read acknowledgement collection manager.
+
+    .. attribute:: played
+
+        :class:`~whalesong.managers.message.MessageAckCollectionManager`
+
+        Message played acknowledgement collection manager.
+    """
+
+    MODEL_CLASS = MessageInfo
+
+    def __init__(self, driver, manager_path=''):
+        super(MessageInfoManager, self).__init__(driver=driver, manager_path=manager_path)
+
+        self.add_submanager('delivery', MessageAckCollectionManager(driver=self._driver,
+                                                                    manager_path=self._build_command('delivery')))
+
+        self.add_submanager('read', MessageAckCollectionManager(driver=self._driver,
+                                                                manager_path=self._build_command('read')))
+
+        self.add_submanager('played', MessageAckCollectionManager(driver=self._driver,
+                                                                  manager_path=self._build_command('played')))
+
+
 class MessageManager(BaseModelManager):
     """
     Message object manager.
+
+    .. attribute:: info
+
+        :class:`~whalesong.managers.message.MessageInfoManager`
+
+        Message information manager.
     """
 
     MODEL_CLASS = BaseMessage
+
+    def __init__(self, driver, manager_path=''):
+        super(MessageManager, self).__init__(driver=driver, manager_path=manager_path)
+
+        self.add_submanager('info', MessageInfoManager(driver=self._driver,
+                                                       manager_path=self._build_command('msgInfo')))
 
     async def download_media(self) -> BytesIO:
         """
@@ -545,6 +672,14 @@ class MessageManager(BaseModelManager):
         model = await self.get_model()
 
         return await download_media(self._driver, model)
+
+    def fetch_info(self) -> Result:
+        """
+        Fetch message information. It must fetch before try to use message information manager.
+
+        :return: Message information (:class:`~whalesong.managers.message.MessageInfo`)
+        """
+        return self._execute_command('fetchInfo', result_class=MessageInfoManager.get_model_result_class())
 
 
 class MessageCollectionManager(BaseCollectionManager):

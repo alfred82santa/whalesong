@@ -2,6 +2,30 @@
 Changelog
 =========
 
+---------------------------
+Version 0.6.0 (in progress)
+---------------------------
+
+* Ability to get message information, it includes message acks (with timestamps).
+  In addition, it is possible to monitor ack changes.
+
+  You must fetch message info before be able to monitor it.
+
+  .. code-block:: python3
+
+     msg_info: MessageInfo = driver.messages[message_id].fetch_info()
+
+  And in order to monitor acks (message information changes):
+
+  .. code-block:: python3
+
+     async for event in driver.messages[message_id].info.monitor_model():
+        print(event)
+
+* Added Sticker message.
+
+
+
 -------------
 Version 0.5.3
 -------------
@@ -11,7 +35,7 @@ Version 0.5.3
 * When send a text message with an url it will try to get link preview and attach to message.
   It's not compatible with quoted messages.
 
-* Added two new commands to `minibot.py` example: `/link` and `/exists`.
+* Added two new commands to `minibot.py` example: `/link` and `/exist`.
 
 -------------
 Version 0.5.2
