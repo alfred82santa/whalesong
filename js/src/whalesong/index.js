@@ -11,6 +11,9 @@ import {
   MessageCollectionManager
 } from './message.js';
 import {
+  MessageInfoCollectionManager
+} from './messageInfo.js';
+import {
   ContactCollectionManager
 } from './contact.js';
 import {
@@ -66,8 +69,20 @@ function getRequirementsDefs() {
     'messageManager': {
       'requirements': ['store'],
       'build': function(mainManager, artifacts) {
-        let manager = new MessageCollectionManager(artifacts['store'].Msg);
+        let manager = new MessageCollectionManager(
+          artifacts['store'].Msg
+        );
         mainManager.addSubmanager('messages', manager);
+        return manager;
+      }
+    },
+    'messageInfoManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new MessageInfoCollectionManager(
+          artifacts['store'].MsgInfo
+        );
+        mainManager.addSubmanager('messageInfos', manager);
         return manager;
       }
     },

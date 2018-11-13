@@ -4,7 +4,8 @@ import {
   CollectionItemMonitor
 } from './common.js';
 import {
-  monitor
+  monitor,
+  command
 } from '../manager.js';
 import {
   ContactManager
@@ -12,6 +13,7 @@ import {
 import {
   ChatManager
 } from './chat.js';
+
 
 export class MessageManager extends ModelManager {
 
@@ -32,12 +34,36 @@ export class MessageManager extends ModelManager {
       streamingSidecar: null
     });
   }
+
+  getSubmanager(name) {
+    try {
+      return super.getSubmanager(name);
+    } catch (err) {
+      if (name === 'msgInfo') {
+        try {
+          return manager.getSubmanager('messageInfos').getSubmanager(this.model.id._serialized);
+        } catch (err2) {}
+      }
+
+      throw err;
+    }
+  }
+
+  @command
+  async fetchInfo() {
+    return await manager.getSubmanager('messageInfos').fetchByMessage(this.model);
+  }
 }
 
 export class MessageCollectionManager extends CollectionManager {
 
   static getModelManagerClass() {
     return MessageManager;
+  }
+
+  constructor(collection) {
+    super();
+    this.collection = collection;
   }
 
   @monitor
