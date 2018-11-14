@@ -19,6 +19,7 @@ export class CommandNotFound extends BaseError {
   }
 }
 
+export class ValueError extends BaseError {}
 
 export class StopIterator extends BaseError {};
 

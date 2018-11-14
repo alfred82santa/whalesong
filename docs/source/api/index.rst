@@ -12,5 +12,6 @@ API reference
    chat
    message
    wap
+   sticker_pack
 
 

@@ -13,7 +13,7 @@ Version 0.6.0 (in progress)
 
   .. code-block:: python3
 
-     msg_info: MessageInfo = driver.messages[message_id].fetch_info()
+     msg_info: MessageInfo = await driver.messages[message_id].fetch_info()
 
   And in order to monitor acks (message information changes):
 
@@ -23,6 +23,8 @@ Version 0.6.0 (in progress)
         print(event)
 
 * Added Sticker message.
+
+* Load and send stickers.
 
 
 
