@@ -28,6 +28,9 @@ import {
 import {
   StorageManager
 } from './storage.js';
+import {
+  StickerPackCollectionManager
+} from './stickerPack.js';
 
 
 
@@ -132,7 +135,18 @@ function getRequirementsDefs() {
         mainManager.addSubmanager('storage', manager);
         return manager;
       }
-    }
+    },
+
+    'stickerManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new StickerPackCollectionManager(
+          artifacts['store'].StickerPack
+        );
+        mainManager.addSubmanager('stickerPack', manager);
+        return manager;
+      }
+    },
   };
 }
 
