@@ -2,3 +2,4 @@
 Sphinx
 dirty-models-sphinx
 sphinxcontrib-asyncio
+sphinxcontrib-trio
