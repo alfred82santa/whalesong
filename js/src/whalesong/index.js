@@ -143,7 +143,7 @@ function getRequirementsDefs() {
         let manager = new StickerPackCollectionManager(
           artifacts['store'].StickerPack
         );
-        mainManager.addSubmanager('stickerPack', manager);
+        mainManager.addSubmanager('stickerPacks', manager);
         return manager;
       }
     },

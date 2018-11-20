@@ -28,19 +28,22 @@ export class StickerManager extends ModelManager {
     quotedMsgId
   }) {
     try {
+      await this.model.downloadMedia();
+
       let chatManager = manager.getSubmanager('chats').getSubmanager(chatId);
+
+      if (quotedMsgId) {
+        chatManager.model.composeQuotedMsg = chatManager.model.msgs.get(quotedMsgId);
+      }
+
+      return await chatManager._sendMessage(
+        () => this.model.sendToChat(chatManager.model),
+        (item) => item.type === 'sticker' && item.filehash === this.model.filehash
+      );
     } catch (err) {
-      throw new ModelNotFound(`Chat with ID "${id}" not found`);
+      console.log(err);
+      throw new ModelNotFound(`Chat with ID "${chatId}" not found`);
     }
-
-    if (quotedMsgId) {
-      chatManager.model.composeQuotedMsg = this.model.msgs.get(quotedMsgId);
-    }
-
-    return await chatManager._sendMessage(
-      () => this.model.sendToChat(chatManager.model),
-      (item) => item.type === 'sticker' && item.filehash === this.model.filehash
-    );
   }
 }
 
@@ -63,7 +66,7 @@ export class StickerPackManager extends ModelManager {
       return super.getSubmanager(name);
     } catch (err) {
       if (name === 'stickers') {
-        return new StickerCollection(this.model.stickers);
+        return new StickerCollectionManager(this.model.stickers);
       }
       throw err;
     }
@@ -80,10 +83,23 @@ export class StickerPackCollectionManager extends CollectionManager {
   async fetchPage({
     page
   }) {
+
+    let prIdx = this.collection.pageWithIndex(page);
+
+    if (prIdx < page) {
+      throw new ValueError(`Page ${page} does not exist`);
+    }
+
+    if (this.collection.pageFetchStates[prIdx] === 'SUCCESS') {
+      return;
+    }
+
     await this.collection.fetchAt(page);
 
-    if (!this.collection.pageFetchStates[page]) {
-      throw ValueError(`Page ${page} does not exist`);
+    await this.collection._pageFetchPromises[prIdx];
+
+    if (!this.collection.pageFetchStates[prIdx]) {
+      throw new ValueError(`Page ${page} does not exist`);
     }
   }
 
@@ -95,12 +111,28 @@ export class StickerPackCollectionManager extends CollectionManager {
         await this.fetchPage({
           page: page
         });
+        page++;
       }
     } catch (err) {};
   }
 
   @command
   async reset() {
-    this.collection.reset();
+    return this.collection.reset();
+  }
+
+  @command
+  async getItemByName({
+    name
+  }) {
+    let l = this.collection.where({
+      name: name
+    });
+
+    if (l.length === 0) {
+      throw new ModelNotFound(`Sticker pack with name "${name}" not found`);
+    }
+
+    return this.mapItem(l[0]);
   }
 }

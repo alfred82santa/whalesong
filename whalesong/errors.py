@@ -32,3 +32,7 @@ class RequiredExecutionId(WhalesongException):
 
 class RequiredCommandName(WhalesongException):
     pass
+
+
+class ModelNotFound(WhalesongException):
+    pass

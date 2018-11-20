@@ -1,6 +1,7 @@
 from typing import Optional
 
 from dirty_models import EnumField, StringIdField
+from io import BytesIO
 
 from . import BaseCollectionManager, BaseModelManager
 from .message import MediaMixin, MessageTypes, download_media
@@ -24,14 +25,14 @@ class StickerPack(BaseModel):
     """
 
 
-class StickerManager(BaseModelManager):
+class StickerManager(BaseModelManager[Sticker]):
     """
     Sticker manager. It allows manage a sticker.
     """
 
     MODEL_CLASS = Sticker
 
-    def send_to_chat(self, chat_id: str, quoted_msg_id: Optional[str] = None) -> Result:
+    def send_to_chat(self, chat_id: str, quoted_msg_id: Optional[str] = None) -> Result[str]:
         """
         Send this sticker to a chat.
 
@@ -47,7 +48,7 @@ class StickerManager(BaseModelManager):
 
         return self._execute_command('sendToChat', params)
 
-    async def download_image(self):
+    async def download_image(self) -> BytesIO:
         """
         Download sticker's image file. It will decrypt image file using key on sticker object.
 
@@ -58,21 +59,21 @@ class StickerManager(BaseModelManager):
         return await download_media(self._driver, model)
 
 
-class StickerCollectionManager(BaseCollectionManager):
+class StickerCollectionManager(BaseCollectionManager[StickerManager]):
     """
     Sticker collection manager. It allows manage sticker collection.
     """
 
     MODEL_MANAGER_CLASS = StickerManager
 
-    def fetch(self) -> Result:
+    def fetch(self) -> Result[None]:
         """
         Fetch all stickers. You must fetch stickers before try to us them.
         """
         return self._execute_command('fetch')
 
 
-class StickerPackManager(BaseModelManager):
+class StickerPackManager(BaseModelManager[StickerPack]):
     """
     Sticker pack manager. It allows manage a sticker pack.
 
@@ -95,7 +96,7 @@ class StickerPackManager(BaseModelManager):
         ))
 
 
-class StickerPackCollectionManager(BaseCollectionManager):
+class StickerPackCollectionManager(BaseCollectionManager[StickerPackManager]):
     """
     Sticker pack collection manager. It allows manage sticker pack collection.
     """
@@ -108,7 +109,7 @@ class StickerPackCollectionManager(BaseCollectionManager):
         """
         return self._execute_command('fetchPage', {'page': page})
 
-    def fetch_all_pages(self) -> Result:
+    def fetch_all_pages(self) -> Result[bool]:
         """
         Fetch all sticker pack pages.
         """
@@ -119,3 +120,14 @@ class StickerPackCollectionManager(BaseCollectionManager):
         Reset sticker pack collection.
         """
         return self._execute_command('reset')
+
+    def get_item_by_name(self, name: str) -> Result[StickerPack]:
+        """
+        Get sticker pack by name.
+
+        :param name: Sticker pack name.
+        :return: Sticker pack object.
+        """
+        return self._execute_command('getItemByName',
+                                     {'name': name},
+                                     result_class=self.get_item_result_class())

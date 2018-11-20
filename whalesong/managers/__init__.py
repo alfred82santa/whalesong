@@ -1,3 +1,5 @@
+from typing import Any, ClassVar, Dict, Generic, List, Type, TypeVar, Union, cast
+
 from functools import partial
 
 from ..driver import WhalesongDriver
@@ -21,7 +23,7 @@ class BaseManager:
         """
         self._driver = driver
         self._manager_path = manager_path
-        self._submanagers = {}
+        self._submanagers: Dict[str, 'BaseManager'] = {}
 
     def _build_command(self, command):
         if self._manager_path:
@@ -31,7 +33,7 @@ class BaseManager:
     def _execute_command(self, command, *args, **kwargs):
         return self._driver.execute_command(self._build_command(command), *args, **kwargs)
 
-    def get_commands(self) -> Result:
+    def get_commands(self) -> Result[List[str]]:
         """
         Get manager available static commands.
 
@@ -60,7 +62,7 @@ class BaseManager:
             pass
         return self._execute_command('removeSubmanager', {'name': name})
 
-    def get_submanager(self, name):
+    def get_submanager(self, name: str) -> 'BaseManager':
         """
         Get a submanager.
 
@@ -71,41 +73,43 @@ class BaseManager:
         except KeyError:
             raise ManagerNotFound('Manager {} not found'.format(name))
 
-    def __getattr__(self, item):
-        return self.get_submanager(item)
+    __getattr__ = get_submanager
 
-    def __getitem__(self, item):
-        return self.get_submanager(item)
+    __getitem__ = get_submanager
 
 
-class BaseModelManager(BaseManager):
+MODEL_TYPE = TypeVar('MODEL_TYPE', bound=BaseModel, covariant=True)
+
+
+class BaseModelManager(BaseManager, Generic[MODEL_TYPE]):
     """
     Base model manager.
     """
 
-    MODEL_CLASS = BaseModel
+    MODEL_CLASS: ClassVar[Type[BaseModel]]
 
     @classmethod
-    def map_model(cls, data):
+    def map_model(cls, data) -> MODEL_TYPE:
         return cls.MODEL_CLASS(data)
 
     @classmethod
-    def get_model_result_class(cls):
-        return partial(Result, fn_map=cls.map_model)
+    def get_model_result_class(cls) -> Result[MODEL_TYPE]:
+        return cast(Result[MODEL_TYPE], partial(Result, fn_map=cls.map_model))
 
     @classmethod
-    def get_monitor_result_class(cls):
-        return partial(MonitorResult, fn_map=cls.map_model)
+    def get_monitor_result_class(cls) -> MonitorResult[MODEL_TYPE]:
+        return cast(MonitorResult[MODEL_TYPE], partial(MonitorResult, fn_map=cls.map_model))
 
-    async def get_model(self) -> Result:
+    def get_model(self) -> Result[MODEL_TYPE]:
         """
         Get model object
 
         :return: Model object
         """
-        return self.MODEL_CLASS(await self._execute_command('getModel'))
+        return self._execute_command('getModel',
+                                     result_class=self.get_model_result_class())
 
-    def monitor_model(self) -> MonitorResult:
+    def monitor_model(self) -> MonitorResult[MODEL_TYPE]:
         """
         Monitor any change on model.
 
@@ -114,7 +118,7 @@ class BaseModelManager(BaseManager):
         return self._execute_command('monitorModel',
                                      result_class=self.get_monitor_result_class())
 
-    def monitor_field(self, field: str) -> MonitorResult:
+    def monitor_field(self, field: str) -> MonitorResult[Dict[str, Any]]:
         """
         Monitor any change on a model's field.
 
@@ -126,14 +130,32 @@ class BaseModelManager(BaseManager):
                                      result_class=MonitorResult)
 
 
-class BaseCollectionManager(BaseManager):
+MODEL_MANAGER_TYPE = TypeVar('MODEL_MANAGER_TYPE', bound=BaseModelManager)
+
+
+class BaseCollectionManager(BaseManager, Generic[MODEL_MANAGER_TYPE]):
     """
     Base collection manager.
     """
 
-    MODEL_MANAGER_CLASS = BaseModelManager
+    MODEL_MANAGER_CLASS: ClassVar[Type[BaseModelManager]]
 
-    def get_items(self) -> IteratorResult:
+    @classmethod
+    def get_monitor_result_class(cls) -> MonitorResult[MODEL_TYPE]:
+        return cast(MonitorResult[MODEL_TYPE],
+                    partial(MonitorResult[MODEL_TYPE],
+                            fn_map=lambda evt: cls.MODEL_MANAGER_CLASS.map_model(evt['item'])))
+
+    @classmethod
+    def get_iterator_result_class(cls) -> IteratorResult[MODEL_TYPE]:
+        return cast(IteratorResult[MODEL_TYPE],
+                    partial(IteratorResult[MODEL_TYPE], fn_map=cls.MODEL_MANAGER_CLASS.map_model))
+
+    @classmethod
+    def get_item_result_class(cls) -> Result[MODEL_TYPE]:
+        return cls.MODEL_MANAGER_CLASS.get_model_result_class()
+
+    def get_items(self) -> IteratorResult[MODEL_TYPE]:
         """
         Get all items on collection.
 
@@ -141,19 +163,7 @@ class BaseCollectionManager(BaseManager):
         """
         return self._execute_command('getItems', result_class=self.get_iterator_result_class())
 
-    @classmethod
-    def get_monitor_result_class(cls):
-        return partial(MonitorResult, fn_map=lambda evt: cls.MODEL_MANAGER_CLASS.map_model(evt['item']))
-
-    @classmethod
-    def get_iterator_result_class(cls):
-        return partial(IteratorResult, fn_map=cls.MODEL_MANAGER_CLASS.map_model)
-
-    @classmethod
-    def get_item_result_class(cls):
-        return cls.MODEL_MANAGER_CLASS.get_model_result_class()
-
-    def get_length(self) -> Result:
+    def get_length(self) -> Result[int]:
         """
         Get collection items count.
 
@@ -161,7 +171,7 @@ class BaseCollectionManager(BaseManager):
         """
         return self._execute_command('getLength')
 
-    def get_item_by_id(self, item_id: str) -> Result:
+    def get_item_by_id(self, item_id: str) -> Result[MODEL_TYPE]:
         """
         Get model by identifier.
 
@@ -172,7 +182,7 @@ class BaseCollectionManager(BaseManager):
                                      {'id': item_id},
                                      result_class=self.get_item_result_class())
 
-    def remove_item_by_id(self, item_id: str) -> Result:
+    def remove_item_by_id(self, item_id: str) -> Result[None]:
         """
         Remove item by identifier.
 
@@ -181,7 +191,7 @@ class BaseCollectionManager(BaseManager):
         return self._execute_command('removeItemById',
                                      {'id': item_id})
 
-    def get_first(self) -> Result:
+    def get_first(self) -> Result[MODEL_TYPE]:
         """
         Get first item in collection.
 
@@ -190,7 +200,7 @@ class BaseCollectionManager(BaseManager):
         return self._execute_command('getFirst',
                                      result_class=self.get_item_result_class())
 
-    def get_last(self) -> Result:
+    def get_last(self) -> Result[MODEL_TYPE]:
         """
         Get last item in collection.
 
@@ -199,7 +209,7 @@ class BaseCollectionManager(BaseManager):
         return self._execute_command('getLast',
                                      result_class=self.get_item_result_class())
 
-    def monitor_add(self) -> MonitorResult:
+    def monitor_add(self) -> MonitorResult[MODEL_TYPE]:
         """
         Monitor add item collection. Iterate each time a item is added to collection.
 
@@ -208,7 +218,7 @@ class BaseCollectionManager(BaseManager):
         return self._execute_command('monitorAdd',
                                      result_class=self.get_monitor_result_class())
 
-    def monitor_remove(self) -> MonitorResult:
+    def monitor_remove(self) -> MonitorResult[MODEL_TYPE]:
         """
         Monitor remove item collection. Iterate each time a item is removed from collection.
 
@@ -217,7 +227,7 @@ class BaseCollectionManager(BaseManager):
         return self._execute_command('monitorRemove',
                                      result_class=self.get_monitor_result_class())
 
-    def monitor_change(self) -> MonitorResult:
+    def monitor_change(self) -> MonitorResult[MODEL_TYPE]:
         """
         Monitor change item collection. Iterate each time a item change in collection.
 
@@ -226,7 +236,7 @@ class BaseCollectionManager(BaseManager):
         return self._execute_command('monitorChange',
                                      result_class=self.get_monitor_result_class())
 
-    def monitor_field(self, field) -> MonitorResult:
+    def monitor_field(self, field: str) -> MonitorResult[Dict[str, Any]]:
         """
         Monitor item's field change. Iterate each time a field changed in any item of collection.
 
@@ -236,9 +246,19 @@ class BaseCollectionManager(BaseManager):
                                      {'field': field},
                                      result_class=MonitorResult)
 
-    def get_submanager(self, name) -> BaseManager:
+    def get_submanager(self, name: str) -> Union[BaseManager, MODEL_MANAGER_TYPE]:
+        """
+        Get a submanager. It could be a explicit submanager or contained model manager.
+
+        :param name: Field where submanager was stored.
+        """
+
         try:
             return super(BaseCollectionManager, self).get_submanager(name)
         except ManagerNotFound:
             return self.MODEL_MANAGER_CLASS(driver=self._driver,
                                             manager_path=self._build_command(name))
+
+    __getattr__ = get_submanager
+
+    __getitem__ = get_submanager

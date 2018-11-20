@@ -8,17 +8,22 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import sys
+from datetime import datetime
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
-from datetime import datetime
+
 sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('.'))
 
 import whalesong
+
 # -- Project information -----------------------------------------------------
+
 
 project = 'Whalesong'
 copyright = f'{datetime.now().year}, alfred82santa'
@@ -28,7 +33,6 @@ author = 'alfred82santa'
 version = whalesong.__version__
 # The full version, including alpha/beta/rc tags
 release = whalesong.__version__
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,9 +45,10 @@ release = whalesong.__version__
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'dirty_models_sphinx',
-    'sphinx_autodoc_typehints',
-    'sphinxcontrib.asyncio'
+    'autohint',
+    'sphinxcontrib_trio'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -73,7 +78,6 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -86,6 +90,18 @@ html_theme = 'alabaster'
 # documentation.
 #
 # html_theme_options = {}
+
+html_theme_options = {
+    'description': "Whalesong is an asyncio python library to manage WebApps remotely."
+                   "Currently WhatsappWeb is implemented",
+    'show_related': True,
+    'show_relbars': True,
+    'github_banner': True,
+    'github_button': True,
+
+    'github_repo': 'whalesong',
+    'github_user': 'alfred82santa'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -101,13 +117,20 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-
+html_sidebars = {
+    '**': [
+        "about.html",
+        'globaltoc.html',
+        'relations.html',
+        'sourcelink.html',
+        'searchbox.html'
+    ]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Whalesongdoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -137,7 +160,6 @@ latex_documents = [
      'alfred82santa', 'manual'),
 ]
 
-
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
@@ -146,7 +168,6 @@ man_pages = [
     (master_doc, 'whalesong', 'Whalesong Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -158,7 +179,6 @@ texinfo_documents = [
      author, 'Whalesong', 'Whalesong is a python library to manage WebApps remotely.',
      'Miscellaneous'),
 ]
-
 
 # -- Options for Epub output -------------------------------------------------
 
@@ -177,7 +197,6 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
-
 # -- Extension configuration -------------------------------------------------
 
 # Autoclass
@@ -188,3 +207,8 @@ autodoc_default_flags = ['members',
                          'show-inheritance']
 
 autoclass_content = 'both'
+
+# Intersphinx
+
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'dirty_models': ('https://dirty-models.readthedocs.io/', None)}

@@ -43,7 +43,7 @@ export class ResultManager {
   getResults() {
     let results = this._results;
     this._results = [];
-
+    console.log(results);
     return results;
   }
 }
@@ -283,6 +283,7 @@ export default class MainManager extends CommandManager {
           (partial) => this.resultManager.setPartialResult(exId, partial)
         );
       }
+      console.log(exId, command, result)
       this.resultManager.setFinalResult(exId, result);
     } catch (err) {
       console.exception(err);

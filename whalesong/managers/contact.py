@@ -163,21 +163,21 @@ class Contact(BaseModel):
         return vc
 
 
-class ContactManager(BaseModelManager):
+class ContactManager(BaseModelManager[Contact]):
     """
     Contact manager. It allows manage a contact.
     """
 
     MODEL_CLASS = Contact
 
-    def block(self) -> Result:
+    def block(self) -> Result[None]:
         """
         Block contact.
         """
 
         return self._execute_command('block')
 
-    def unblock(self) -> Result:
+    def unblock(self) -> Result[None]:
         """
         Unblock contact.
         """
@@ -185,15 +185,15 @@ class ContactManager(BaseModelManager):
         return self._execute_command('unblock')
 
 
-class ContactCollectionManager(BaseCollectionManager):
+class ContactCollectionManager(BaseCollectionManager[ContactManager]):
     """
     Contact collection manager. It allows manage contact collection.
     """
 
     MODEL_MANAGER_CLASS = ContactManager
 
-    def resync_contacts(self) -> Result:
+    def resync_contacts(self) -> Result[None]:
         return self._execute_command('resyncContacts')
 
-    def get_me(self) -> Result:
+    def get_me(self) -> Result[Contact]:
         return self._execute_command('getMe')

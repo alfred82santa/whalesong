@@ -1,7 +1,8 @@
-from asyncio import ensure_future, get_event_loop, sleep
+from asyncio import AbstractEventLoop, ensure_future, get_event_loop, sleep
 from concurrent.futures import ThreadPoolExecutor
 from json import dumps
-from logging import getLogger
+from logging import Logger, getLogger
+from typing import Any, Callable, Dict, List, Optional, Type, overload
 
 from aiohttp import ClientSession
 from functools import partial
@@ -12,13 +13,18 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
 
 from .firefox_profile import FirefoxProfile
-from .results import Result, ResultManager
+from .results import Result, ResultManager, TypeResult
 
 
 class WhalesongDriver:
     _URL = "https://web.whatsapp.com"
 
-    def __init__(self, profile=None, loadstyles=False, headless=False, extra_params=None, *, logger=None, loop=None):
+    def __init__(self, profile: str = None,
+                 loadstyles: bool = False,
+                 headless: bool = False,
+                 extra_params: Optional[Dict[str, Any]] = None, *,
+                 logger: Optional[Logger] = None,
+                 loop: Optional[AbstractEventLoop] = None):
         self._start_fut = None
 
         self._profile = FirefoxProfile(profile_directory=abspath(profile) if profile else None)
@@ -42,12 +48,12 @@ class WhalesongDriver:
 
         self.result_manager = ResultManager()
 
-        self._pendant = []
+        self._pendant: List[Dict[str, Any]] = []
 
-        self.driver = None
+        self.driver: webdriver.Firefox = None
         ensure_future(self.start_driver(), loop=self.loop)
 
-    async def _run_async(self, method, *args, **kwargs):
+    async def _run_async(self, method: Callable, *args, **kwargs) -> Any:
         self.logger.debug('Running async method {}'.format(method.__name__))
         return await self.loop.run_in_executor(self._pool_executor, partial(method, *args, **kwargs))
 
@@ -82,7 +88,6 @@ class WhalesongDriver:
 
         self._start_fut = ensure_future(self._run_async(start))
         self.driver = await self._start_fut
-        return
 
     async def connect(self):
         await self._run_async(self.driver.get, self._URL)
@@ -101,10 +106,10 @@ class WhalesongDriver:
             await self._run_async(self.driver.get, self._URL)
             self.driver.execute_script(script.read())
 
-    async def screenshot(self):
+    async def screenshot(self) -> BytesIO:
         return BytesIO(await self._run_async(self.driver.get_screenshot_as_png))
 
-    async def screenshot_element(self, css_selector):
+    async def screenshot_element(self, css_selector: str) -> BytesIO:
         elem = await self._run_async(self.driver.find_element_by_css_selector, css_selector)
 
         if not elem:
@@ -115,7 +120,22 @@ class WhalesongDriver:
 
         return await self._run_async(take_screenshot)
 
-    def execute_command(self, command, params=None, result_class=Result):
+    @overload
+    def execute_command(self, command: str,
+                        params: Dict[str, Any] = None, *,
+                        result_class: Type[Result] = None) -> Result:
+        ...
+
+    @overload
+    def execute_command(self, command: str,
+                        params: Dict[str, Any] = None, *,
+                        result_class: Type[TypeResult] = None) -> TypeResult:
+        ...
+
+    def execute_command(self, command, params=None, *, result_class=None):
+        if result_class is None:
+            result_class = Result
+
         result = self.result_manager.request_result(result_class)
         self._pendant.append({'exId': result.result_id,
                               'command': command,
@@ -126,8 +146,12 @@ class WhalesongDriver:
     async def poll(self):
         pendant = self._pendant
         self._pendant = []
-        results = await self._run_async(self.driver.execute_script,
-                                        "return window.manager.poll({});".format(dumps(pendant)))
+        try:
+            results = await self._run_async(self.driver.execute_script,
+                                            "return window.manager.poll({});".format(dumps(pendant)))
+        except Exception as ex:
+            self.logger.warning(ex)
+            return
 
         try:
             for err in results['errors']:
@@ -164,7 +188,7 @@ class WhalesongDriver:
         for it in self.result_manager.get_monitors():
             await it.set_error_result({'name': 'StopIterator'})
 
-    async def download_file(self, url):
+    async def download_file(self, url) -> BytesIO:
         async with ClientSession() as session:
             async with session.get(url) as resp:
                 return BytesIO(await resp.read())
