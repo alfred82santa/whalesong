@@ -51,6 +51,7 @@ class StatusMonitor:
     async def monitor_state(self):
         self.echo('Monitor state')
         async for evt in self._driver.stream.monitor_field('state'):
+            self.echo(evt)
             self.echo('State value: {}'.format(evt['value']))
             if evt['value'] == 'UNPAIRED_IDLE':
                 self.echo('Refreshing QR')

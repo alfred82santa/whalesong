@@ -4,7 +4,7 @@ from asyncio import ensure_future
 from os import mkdir, path
 
 from whalesong import Whalesong
-from whalesong.managers.message import LocationMessage, MediaFrameMixin, MediaMixin, TextMessage
+from whalesong.managers.message import LocationMessage, MediaFrameMixin, MediaMixin, TextMessage, StickerMessage
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output', 'media')
 
@@ -114,7 +114,7 @@ class GetMessages:
         await self._driver.wait_until_stop()
 
     async def download_media(self, message):
-        if isinstance(message, MediaFrameMixin):
+        if isinstance(message, MediaFrameMixin) and not isinstance(message, StickerMessage):
             await self.store_thumbnail(message.id, message.body)
 
         media_data = await self._driver.messages.download_media(message)

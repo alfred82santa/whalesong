@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Awaitable, Dict, List, Optional
 
 from base64 import b64encode
 from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, StringIdField
@@ -132,7 +132,7 @@ class MsgLoadState(BaseModel):
     """
 
 
-class MsgLoadStateManager(BaseModelManager):
+class MsgLoadStateManager(BaseModelManager[MsgLoadState]):
     """
     Message load state manager
     """
@@ -140,7 +140,7 @@ class MsgLoadStateManager(BaseModelManager):
     MODEL_CLASS = MsgLoadState
 
 
-class ChatManager(BaseModelManager):
+class ChatManager(BaseModelManager[Chat]):
     """
     Chat manager. It allows manage a chat.
 
@@ -181,7 +181,7 @@ class ChatManager(BaseModelManager):
     def send_text(self, text: str,
                   quoted_msg_id: Optional[str] = None,
                   mentions: Optional[List[str]] = None,
-                  link_desc=None) -> Result:
+                  link_desc=None) -> Awaitable[str]:
         """
         Send text message to current chat.
 
@@ -191,7 +191,7 @@ class ChatManager(BaseModelManager):
         :param link_desc: Link description.
         :return: New message's identifier
         """
-        params = {'text': text}
+        params: Dict[str, Any] = {'text': text}
 
         if quoted_msg_id:
             params['quotedMsgId'] = quoted_msg_id
@@ -204,7 +204,7 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendText', params)
 
-    def send_contact(self, contact_id: str, quoted_msg_id: Optional[str] = None) -> Result:
+    def send_contact(self, contact_id: str, quoted_msg_id: Optional[str] = None) -> Result[str]:
         """
         Send contact to current chat.
 
@@ -212,14 +212,16 @@ class ChatManager(BaseModelManager):
         :param quoted_msg_id: Quoted message's identifier.
         :return: New message's identifier
         """
-        params = {'contactId': contact_id}
+        params: Dict[str, Any] = {'contactId': contact_id}
 
         if quoted_msg_id:
             params['quotedMsgId'] = quoted_msg_id
 
         return self._execute_command('sendContact', params)
 
-    def send_contact_phone(self, contact_name: str, phone_number: str, quoted_msg_id: Optional[str] = None) -> Result:
+    def send_contact_phone(self, contact_name: str,
+                           phone_number: str,
+                           quoted_msg_id: Optional[str] = None) -> Result[str]:
         """
         Send contact to current chat using contact name and phone number.
 
@@ -228,8 +230,8 @@ class ChatManager(BaseModelManager):
         :param quoted_msg_id: Quoted message's identifier.
         :return: New message's identifier
         """
-        params = {'contactName': contact_name,
-                  'phoneNumber': phone_number}
+        params: Dict[str, Any] = {'contactName': contact_name,
+                                  'phoneNumber': phone_number}
 
         if quoted_msg_id:
             params['quotedMsgId'] = quoted_msg_id
@@ -239,7 +241,7 @@ class ChatManager(BaseModelManager):
     def send_media(self, media_data: BytesIO,
                    content_type: Optional[str] = None, filename: Optional[str] = None,
                    caption: Optional[str] = None,
-                   quoted_msg_id: Optional[str] = None, mentions: Optional[List[str]] = None) -> Result:
+                   quoted_msg_id: Optional[str] = None, mentions: Optional[List[str]] = None) -> Result[str]:
         """
         Send media file to current chat.
 
@@ -252,7 +254,7 @@ class ChatManager(BaseModelManager):
         :return: New message's identifier
         """
 
-        params = {'mediaData': b64encode(media_data.read()).decode()}
+        params: Dict[str, Any] = {'mediaData': b64encode(media_data.read()).decode()}
 
         if content_type:
             params['contentType'] = content_type
@@ -271,7 +273,7 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('sendMedia', params)
 
-    def leave_group(self) -> Result:
+    def leave_group(self) -> Result[None]:
         """
         Leave current chat group.
 
@@ -280,19 +282,19 @@ class ChatManager(BaseModelManager):
         """
         return self._execute_command('leaveGroup')
 
-    def delete_chat(self) -> Result:
+    def delete_chat(self) -> Result[None]:
         """
         Delete chat.
         """
         return self._execute_command('deleteChat')
 
-    def send_seen(self) -> Result:
+    def send_seen(self) -> Result[None]:
         """
         Mark chat as seen.
         """
         return self._execute_command('sendSeen')
 
-    def load_earlier_messages(self):
+    def load_earlier_messages(self) -> Result[None]:
         """
         Load earlier messages.
 
@@ -309,7 +311,7 @@ class ChatManager(BaseModelManager):
         """
         return self._execute_command('loadEarlierMessages')
 
-    def load_all_earlier_messages(self) -> Result:
+    def load_all_earlier_messages(self) -> Result[None]:
         """
         Load ALL earlier messages.
 
@@ -328,7 +330,7 @@ class ChatManager(BaseModelManager):
         """
         return self._execute_command('loadAllEarlierMessages')
 
-    def set_subject(self, subject: str) -> Result:
+    def set_subject(self, subject: str) -> Result[None]:
         """
         Set group subject/title.
 
@@ -338,7 +340,7 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('setSubject', {'subject': subject})
 
-    def mark_composing(self) -> Result:
+    def mark_composing(self) -> Result[None]:
         """
         Set "typing..." message for 2.5 seconds.
 
@@ -347,7 +349,7 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('markComposing')
 
-    def mark_recording(self) -> Result:
+    def mark_recording(self) -> Result[None]:
         """
         Set "recording audio..." message.
 
@@ -356,7 +358,7 @@ class ChatManager(BaseModelManager):
 
         return self._execute_command('markRecording')
 
-    def mark_paused(self) -> Result:
+    def mark_paused(self) -> Result[None]:
         """
         Unset "typing..." or "recording audio..." message.
 
@@ -369,7 +371,7 @@ class ChatManager(BaseModelManager):
 class ChatCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = ChatManager
 
-    def get_active(self) -> Result:
+    def get_active(self) -> Result[Chat]:
         """
         Returns chat selected.
 
@@ -378,13 +380,13 @@ class ChatCollectionManager(BaseCollectionManager):
         return self._execute_command('getActive',
                                      result_class=self.get_item_result_class())
 
-    def resync_messages(self) -> Result:
+    def resync_messages(self) -> Result[None]:
         """
         Resynchronize messages.
         """
         return self._execute_command('resyncMessages')
 
-    def ensure_chat_with_contact(self, contact_id: str) -> Result:
+    def ensure_chat_with_contact(self, contact_id: str) -> Result[Chat]:
         """
         Ensure there is a chat with a given contact. If it does not exist it will be created.
 
@@ -396,7 +398,7 @@ class ChatCollectionManager(BaseCollectionManager):
                                      {'contactId': contact_id},
                                      result_class=self.get_item_result_class())
 
-    def create_group(self, name: str, contact_ids: List[str], picture: BytesIO = None) -> Result:
+    def create_group(self, name: str, contact_ids: List[str], picture: BytesIO = None) -> Result[Chat]:
         """
         Create a new chat group.
 

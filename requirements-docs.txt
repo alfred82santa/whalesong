@@ -1,5 +1,4 @@
 -r requirements.txt
 Sphinx
 dirty-models-sphinx
-sphinx-autodoc-typehints
 sphinxcontrib-asyncio

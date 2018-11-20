@@ -2,4 +2,53 @@
 Whalesong Service
 =================
 
-.. automodule:: whalesong
+.. autoclass:: whalesong.Whalesong
+
+    .. attribute:: storage
+
+        :class:`~whalesong.managers.storage.StorageManager`
+
+        Manager for local storage.
+
+    .. attribute:: stream
+
+        :class:`~whalesong.managers.stream.StreamManager`
+
+        Manager for stream object.
+
+    .. attribute:: conn
+
+        :class:`~whalesong.managers.conn.ConnManager`
+
+        Manager for connection object
+
+    .. attribute:: contacts
+
+        :class:`~whalesong.managers.contact.ContactCollectionManager`
+
+        Manager for contact collection.
+
+    .. attribute:: chats
+
+        :class:`~whalesong.managers.chat.ChatCollectionManager`
+
+        Manager for chat collection.
+
+    .. attribute:: messages
+
+        :class:`~whalesong.managers.message.MessageCollectionManager`
+
+        Manager for messages collection.
+
+    .. attribute:: wap
+
+        :class:`~whalesong.managers.wap.WapManager`
+
+        Manager for wap object.
+
+
+    .. attribute:: sticker_packs
+
+        :class:`~whalesong.managers.sticker_pack.StickerPackCollectionManager`
+
+        Manager for sticker pack collection.

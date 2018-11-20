@@ -2,9 +2,9 @@
 Changelog
 =========
 
----------------------------
-Version 0.6.0 (in progress)
----------------------------
+-------------
+Version 0.6.0
+-------------
 
 * Ability to get message information, it includes message acks (with timestamps).
   In addition, it is possible to monitor ack changes.
@@ -26,7 +26,13 @@ Version 0.6.0 (in progress)
 
 * Load and send stickers.
 
+* Better type hinting.
 
+* Better documentation.
+
+* Added new command to `minibot.py` example: `/sticker`.
+
+* Added new example: `getstickers.py`. it downloads all stickers registered.
 
 -------------
 Version 0.5.3

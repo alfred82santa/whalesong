@@ -2,7 +2,7 @@
 Whalesong
 =========
 
-Whalesong is a python library to manage WebApps remotely.
+Whalesong is an asyncio python library to manage WebApps remotely.
 Currently WhatsappWeb is implemented
 
 -------------
@@ -35,6 +35,9 @@ Installation
 .. code-block:: bash
 
     $ pip install whalesong
+
+
+.. include:: docs/source/features.rst
 
 
 --------
@@ -78,6 +81,7 @@ Whatsapp features
 * Manage groups (add/kick/promote/demote people)
 * Auto load link previews
 * Allow to check whether a contact is registered on Whatsapp.
+* Load and send stickers (even with a quoted message).
 
 ---------
 Changelog

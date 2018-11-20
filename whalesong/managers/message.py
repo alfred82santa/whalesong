@@ -1,5 +1,6 @@
-import binascii
+from typing import Dict, Type, cast
 
+import binascii
 from axolotl.kdf.hkdfv3 import HKDFv3
 from axolotl.util.byteutil import ByteUtil
 from base64 import b64decode
@@ -73,7 +74,7 @@ class MessageMetaclass(CamelCaseMeta):
     Message metaclass. It will build message model according to type.
     """
 
-    __message_classes__ = {}
+    __message_classes__: Dict[str, Type['BaseMessage']] = {}
 
     def __init__(cls, name, bases, classdict):
         super(MessageMetaclass, cls).__init__(name, bases, classdict)
@@ -90,6 +91,7 @@ class MessageMetaclass(CamelCaseMeta):
         try:
             t = data['type']
         except (TypeError, KeyError):
+            print(data)
             try:
                 t = kwargs['type']
             except KeyError:
@@ -377,6 +379,8 @@ class LinkContentMixin(BaseModel):
 
 
 class MediaMixin(BaseModel):
+    type = EnumField(enum_class=MessageTypes, read_only=True)
+
     client_url = StringIdField()
     direct_path = StringIdField()
     mimetype = StringIdField()
@@ -532,11 +536,11 @@ class StickerMessage(ImageMessage):
 
 
 CRYPT_KEYS = {MessageTypes.DOCUMENT: '576861747341707020446f63756d656e74204b657973',
-              MessageTypes.IMAGE:    '576861747341707020496d616765204b657973',
-              MessageTypes.VIDEO:    '576861747341707020566964656f204b657973',
-              MessageTypes.PTT:      '576861747341707020417564696f204b657973',
-              MessageTypes.AUDIO:    '576861747341707020417564696f204b657973',
-              MessageTypes.STICKER:  '576861747341707020496d616765204b657973'}
+              MessageTypes.IMAGE: '576861747341707020496d616765204b657973',
+              MessageTypes.VIDEO: '576861747341707020566964656f204b657973',
+              MessageTypes.PTT: '576861747341707020417564696f204b657973',
+              MessageTypes.AUDIO: '576861747341707020417564696f204b657973',
+              MessageTypes.STICKER: '576861747341707020496d616765204b657973'}
 
 
 class MessageAck(BaseModel):
@@ -591,7 +595,7 @@ class MessageInfo(BaseModel):
     """
 
 
-class MessageAckManager(BaseModelManager):
+class MessageAckManager(BaseModelManager[MessageAck]):
     """
     Message acknowledgement object manager.
     """
@@ -599,7 +603,7 @@ class MessageAckManager(BaseModelManager):
     MODEL_CLASS = MessageAck
 
 
-class MessageAckCollectionManager(BaseCollectionManager):
+class MessageAckCollectionManager(BaseCollectionManager[MessageAckManager]):
     """
     Message acknowledgement collection manager.
     """
@@ -607,7 +611,7 @@ class MessageAckCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = MessageAckManager
 
 
-class MessageInfoManager(BaseModelManager):
+class MessageInfoManager(BaseModelManager[MessageInfo]):
     """
     Message information object manager.
 
@@ -645,7 +649,7 @@ class MessageInfoManager(BaseModelManager):
                                                                   manager_path=self._build_command('played')))
 
 
-class MessageManager(BaseModelManager):
+class MessageManager(BaseModelManager[BaseMessage]):
     """
     Message object manager.
 
@@ -672,9 +676,9 @@ class MessageManager(BaseModelManager):
         """
         model = await self.get_model()
 
-        return await download_media(self._driver, model)
+        return await download_media(self._driver, cast(MediaMixin, model))
 
-    def fetch_info(self) -> Result:
+    def fetch_info(self) -> Result[MessageInfo]:
         """
         Fetch message information. It must fetch before try to use message information manager.
 
@@ -683,14 +687,14 @@ class MessageManager(BaseModelManager):
         return self._execute_command('fetchInfo', result_class=MessageInfoManager.get_model_result_class())
 
 
-class MessageCollectionManager(BaseCollectionManager):
+class MessageCollectionManager(BaseCollectionManager[MessageManager]):
     """
     Message collection manager.
     """
 
     MODEL_MANAGER_CLASS = MessageManager
 
-    def monitor_new(self) -> MonitorResult:
+    def monitor_new(self) -> MonitorResult[BaseMessage]:
         """
         Monitor new messages.
 
@@ -699,14 +703,14 @@ class MessageCollectionManager(BaseCollectionManager):
 
         return self._execute_command('monitorNew', result_class=self.get_monitor_result_class())
 
-    async def download_media(self, media_msg: MediaMixin) -> BytesIO:
+    async def download_media(self, model: MediaMixin) -> BytesIO:
         """
         Download message's attached media file. It will decrypt media file using key on message object.
 
         :param model: MediaMixin
         :return: Media stream.
         """
-        return await download_media(self._driver, media_msg)
+        return await download_media(self._driver, model)
 
 
 async def download_media(driver, model: MediaMixin) -> BytesIO:
@@ -719,7 +723,11 @@ async def download_media(driver, model: MediaMixin) -> BytesIO:
     """
     file_data = (await driver.download_file(model.client_url)).read()
 
-    media_key = b64decode(model.media_key)
+    try:
+        media_key = b64decode(model.media_key)
+    except Exception:
+        media_key = b64decode(model.media_key + ('=' * (len(model.media_key) % 3)))
+
     try:
         derivative = HKDFv3().deriveSecrets(media_key,
                                             binascii.unhexlify(CRYPT_KEYS[model.type]),

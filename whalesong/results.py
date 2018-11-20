@@ -1,14 +1,18 @@
 from asyncio import Future, Queue, ensure_future
 from logging import getLogger
-from typing import Callable, Optional, Union, Any, Coroutine, Awaitable
+from typing import Any, AsyncIterable, AsyncIterator, Awaitable, Callable, Dict, List, Optional, Type, TypeVar, Union, \
+    cast
 
-from whalesong.models import BaseModel
+from abc import ABC, abstractmethod
+
 from . import errors
 
 logger = getLogger(__name__)
 
+T = TypeVar('T')
 
-class BaseResultMixin:
+
+class BaseResultMixin(ABC, Awaitable[T]):
     """
     Base result mixin.
 
@@ -22,9 +26,8 @@ class BaseResultMixin:
 
     """
 
-    def __init__(self, result_id: str, *, fn_map: Optional[Callable[[dict], Union[BaseModel, dict]]] = None):
+    def __init__(self, result_id: str, *, fn_map: Optional[Callable[[dict], T]] = None):
         """
-        Result constructor.
 
         :param result_id: Result unique identifier.
         :param fn_map: Mapping function used to map result.
@@ -33,7 +36,7 @@ class BaseResultMixin:
         self.fn_map = fn_map
         super(BaseResultMixin, self).__init__()
 
-    def map(self, data: dict) -> Union[BaseModel, dict]:
+    def map(self, data: dict) -> T:
         """
         Maps data from browser to an object if `fn_map` function is defined.
 
@@ -42,12 +45,12 @@ class BaseResultMixin:
         """
         if self.fn_map:
             return self.fn_map(data)
-        return data
+        return cast(T, data)
 
-    async def set_final_result(self, data):
+    async def set_final_result(self, data: dict):
         await self._set_result(self.map(data))
 
-    async def set_error_result(self, data):
+    async def set_error_result(self, data: dict):
         try:
             ex_class = getattr(errors, data['name'])
         except (AttributeError, KeyError):
@@ -65,33 +68,50 @@ class BaseResultMixin:
 
         await self._set_exception(ex_class(*args, **kwargs))
 
+    @abstractmethod
+    async def _set_result(self, data: T):
+        pass
 
-class Result(BaseResultMixin, Future):
+    @abstractmethod
+    async def _set_exception(self, ex: Exception):
+        pass
+
+
+class Result(BaseResultMixin[T], Future):
     """
-    Result of command.
+    Result of command. It is a subtype of :class:`asyncio.Future`, so in order to get
+    result value you must `await` it.
+
+    .. code-block:: python3
+
+        value = await result
+
     """
 
-    async def _set_result(self, data):
+    def __await__(self):
+        return Future.__await__(self)
+
+    async def _set_result(self, data: T):
         self.set_result(data)
 
-    async def _set_exception(self, ex):
+    async def _set_exception(self, ex: Exception):
         self.set_exception(ex)
 
 
-class BasePartialResult(BaseResultMixin):
+class BasePartialResult(BaseResultMixin[T], AsyncIterable[T]):
 
-    def __init__(self, result_id, *, fn_map=None):
+    def __init__(self, result_id: str, *, fn_map: Optional[Callable[[dict], T]] = None):
         super(BasePartialResult, self).__init__(result_id, fn_map=fn_map)
-        self._queue = Queue()
-        self._fut = Future()
+        self._queue: Queue = Queue()
+        self._fut: Future = Future()
 
-    async def _set_result(self, data):
+    async def _set_result(self, data: Union[T, Exception]):
         await self._queue.put(data)
 
-    async def _set_exception(self, ex):
+    async def _set_exception(self, ex: Exception):
         await self._set_result(ex)
 
-    async def set_partial_result(self, data):
+    async def set_partial_result(self, data: dict):
         await self._set_result(self.map(data))
 
     def __await__(self):
@@ -101,15 +121,15 @@ class BasePartialResult(BaseResultMixin):
         ensure_future(self._set_exception(StopAsyncIteration()))
 
 
-class BaseIteratorResult(BasePartialResult):
+class BaseIteratorResult(BasePartialResult[T]):
     """
     Base iterable result.
     """
 
-    def __aiter__(self):
+    def __aiter__(self) -> AsyncIterator[T]:
         return self
 
-    async def __anext__(self):
+    async def __anext__(self) -> T:
         item = await self._queue.get()
 
         if isinstance(item, Exception):
@@ -119,7 +139,7 @@ class BaseIteratorResult(BasePartialResult):
         return item
 
 
-class IteratorResult(BaseIteratorResult):
+class IteratorResult(BaseIteratorResult[T]):
     """
     Iterator result. It is used as result of command which returns a list of object.
 
@@ -136,11 +156,11 @@ class IteratorResult(BaseIteratorResult):
 
     """
 
-    def map(self, data):
+    def map(self, data) -> T:
         return super(IteratorResult, self).map(data['item'])
 
 
-class MonitorResult(BaseIteratorResult):
+class MonitorResult(BaseIteratorResult[T]):
     """
     Monitor result. It is used as result of monitor command. It is a infinite iterator. Each change on object or
     field it is monitoring will be a new item on iterator.
@@ -158,12 +178,12 @@ class MonitorResult(BaseIteratorResult):
 
     """
 
-    def __init__(self, result_id, *, fn_map=None):
+    def __init__(self, result_id: str, *, fn_map: Optional[Callable[[dict], T]] = None):
         super(MonitorResult, self).__init__(result_id, fn_map=fn_map)
 
-        self._callbacks = []
+        self._callbacks: List[Callable[[Any], Awaitable[Any]]] = []
 
-    def add_callback(self, fn: Awaitable[Any]):
+    def add_callback(self, fn: Callable[[T], Awaitable[Any]]):
         """
         Add a callback to be called each time object or field change.
 
@@ -171,8 +191,8 @@ class MonitorResult(BaseIteratorResult):
         """
         self._callbacks.append(fn)
 
-    async def __anext__(self):
-        evt = await super(MonitorResult, self).__anext__()
+    async def __anext__(self) -> T:
+        evt: T = await super(MonitorResult, self).__anext__()
         [ensure_future(cb(evt)) for cb in self._callbacks]
         return evt
 
@@ -187,24 +207,29 @@ class MonitorResult(BaseIteratorResult):
         ensure_future(self._monitor())
 
 
+TypeResult = TypeVar('TypeResult', Result, IteratorResult, MonitorResult)
+UnionResultType = Union[Type[Result], Type[IteratorResult], Type[MonitorResult]]
+UnionResult = Union[Result, IteratorResult, MonitorResult]
+
+
 class ResultManager:
 
     def __init__(self):
-        self._pendant = {}
+        self._pendant: Dict[str, UnionResult] = {}
         self._next_id = 1
 
-    def get_next_id(self):
+    def get_next_id(self) -> str:
         v = self._next_id
         self._next_id += 1
-        return v
+        return str(v)
 
-    def remove_result(self, result_id):
+    def remove_result(self, result_id) -> Optional[UnionResult]:
         try:
             return self._pendant.pop(result_id)
         except KeyError:
-            return
+            return None
 
-    async def _autoclean_result(self, fut):
+    async def _autoclean_result(self, fut: UnionResult):
         try:
             await fut
         except Exception:
@@ -213,23 +238,23 @@ class ResultManager:
             logger.debug('Remove result {}'.format(fut.result_id))
             self.remove_result(fut.result_id)
 
-    def request_result(self, result_class):
+    def request_result(self, result_class: Type[TypeResult]) -> TypeResult:
         result_id = self.get_next_id()
         result = result_class(result_id)
         self._pendant[result_id] = result
         ensure_future(self._autoclean_result(result))
         return result
 
-    def request_final_result(self):
+    def request_final_result(self) -> Result:
         return self.request_result(Result)
 
-    def request_iterator_result(self):
+    def request_iterator_result(self) -> IteratorResult:
         return self.request_result(IteratorResult)
 
-    def request_monitor_result(self):
+    def request_monitor_result(self) -> MonitorResult:
         return self.request_result(MonitorResult)
 
-    def cancel_result(self, result_id):
+    def cancel_result(self, result_id: str):
         try:
             self._pendant[result_id].cancel()
         except KeyError:
@@ -238,26 +263,26 @@ class ResultManager:
     def cancel_all(self):
         [self.cancel_result(result_id) for result_id in self._pendant.keys()]
 
-    async def set_final_result(self, result_id, data):
+    async def set_final_result(self, result_id: str, data: Any):
         try:
             await self._pendant[result_id].set_final_result(data)
         except KeyError:
             pass
 
-    async def set_error_result(self, result_id, data):
+    async def set_error_result(self, result_id: str, data: Any):
         try:
             await self._pendant[result_id].set_error_result(data)
         except KeyError:
             pass
 
-    async def set_partial_result(self, result_id, data):
+    async def set_partial_result(self, result_id: str, data: Any):
         try:
-            await self._pendant[result_id].set_partial_result(data)
-        except KeyError:
+            await cast(BasePartialResult, self._pendant[result_id]).set_partial_result(data)
+        except (KeyError, AttributeError):
             pass
 
-    def get_iterators(self):
+    def get_iterators(self) -> List[IteratorResult]:
         return [it for it in self._pendant.values() if isinstance(it, IteratorResult)]
 
-    def get_monitors(self):
+    def get_monitors(self) -> List[MonitorResult]:
         return [it for it in self._pendant.values() if isinstance(it, MonitorResult)]

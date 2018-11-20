@@ -109,6 +109,17 @@ It stores files and thumbnails from media messages.
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/getmessages.py
 
 
+Get stickers
+============
+
+It fetch all sticker packs installed. It fetch all sticker for each sticker pack. And, finally, it downloads
+all sticker images.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getstickers.py
+
+
 Minibot
 =======
 
@@ -118,7 +129,7 @@ Mini bot to test features.
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot.py
 
-Minibot implements 6 features:
+Minibot implements some test features:
 
 Echo
 ----
@@ -197,4 +208,33 @@ Example
 .. code-block:: text
 
     /exist 495555555555
+
+
+List sticker packs
+------------------
+
+When a contact sends `/sticker list`, it will send all sticker pack names with main image attached.
+
+
+Example
+.......
+
+.. code-block:: text
+
+    /sticker list
+
+
+
+Send random sticker
+-------------------
+
+When a contact sends `/sticker [stickerPackName]`, it will send a random sticker from sticker pack with name `[stickerPackName]`.
+
+
+Example
+.......
+
+.. code-block:: text
+
+    /sticker Cuppy
 

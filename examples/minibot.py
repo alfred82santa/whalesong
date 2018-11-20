@@ -3,6 +3,7 @@ from asyncio import ensure_future
 from aiohttp import ClientSession, hdrs
 from io import BytesIO
 from os import path
+from random import choice
 
 from whalesong import Whalesong
 from whalesong.managers.message import MessageTypes
@@ -26,6 +27,17 @@ class Minibot:
 
     def echo(self, txt):
         self._print_fn(txt)
+
+    async def download_url(self, url):
+        async with ClientSession() as session:
+            async with session.get(url) as resp:
+                content_type = resp.headers.get(hdrs.CONTENT_TYPE)
+                data = BytesIO(await resp.read())
+
+        if content_type and ';' in content_type:
+            content_type = content_type[:content_type.index(';')]
+
+        return content_type, data
 
     async def monitor_stream(self):
         self.echo('Monitor stream')
@@ -60,6 +72,8 @@ class Minibot:
                         ensure_future(self.make_link(message))
                     elif message.body.startswith('/exist '):
                         ensure_future(self.make_exists(message))
+                    elif message.body.startswith('/sticker '):
+                        ensure_future(self.make_sticker(message))
             except Exception as ex:
                 self.echo('Ignoring message {} because error : {}'.format(message.id, ex))
 
@@ -97,13 +111,7 @@ class Minibot:
         self._driver.chats[message.chat.id].send_seen()
         url = message.body[len('/download '):].strip()
 
-        async with ClientSession() as session:
-            async with session.get(url) as resp:
-                content_type = resp.headers.get(hdrs.CONTENT_TYPE)
-                data = BytesIO(await resp.read())
-
-        if content_type and ';' in content_type:
-            content_type = content_type[:content_type.index(';')]
+        content_type, data = await self.download_url(url)
 
         filename = url
         if '?' in filename:
@@ -140,7 +148,7 @@ class Minibot:
 
     async def make_exists(self, message):
         self._driver.chats[message.chat.id].send_seen()
-        self.echo(message.chat.id)
+
         contact_id = message.body[len('/exist '):].strip()
 
         if not contact_id.endswith('@c.us'):
@@ -151,6 +159,50 @@ class Minibot:
             'It exists' if exists else 'It does not exist',
             message.id
         )))
+
+    async def make_sticker(self, message):
+        self._driver.chats[message.chat.id].send_seen()
+
+        sticker_pack_name = message.body[len('/sticker '):].strip()
+
+        if sticker_pack_name == 'list':
+            ensure_future(self.make_sticker_pack_list(message))
+            return
+
+        await self._driver.sticker_packs.fetch_all_pages()
+
+        try:
+            sticker_pack = await self._driver.sticker_packs.get_item_by_name(sticker_pack_name)
+        except ModuleNotFoundError:
+            self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_text(
+                f'Sticker pack "{sticker_pack_name}" does not exist',
+                message.id
+            )))
+
+            return
+
+        await self._driver.sticker_packs[sticker_pack.id].stickers.fetch()
+
+        sticker = choice([s async for s in self._driver.sticker_packs[sticker_pack.id].stickers.get_items()])
+
+        msg = await self._driver.sticker_packs[sticker_pack.id].stickers[sticker.id].send_to_chat(
+            chat_id=message.chat.id,
+            quoted_msg_id=message.id
+        )
+
+        self.echo(f'Sent message: {msg}')
+
+    async def make_sticker_pack_list(self, message):
+        await self._driver.sticker_packs.fetch_all_pages()
+
+        async for sticker_pack in self._driver.sticker_packs.get_items():
+            content_type, image = await self.download_url(sticker_pack.url)
+
+            self.echo('Sent message: {}'.format(await self._driver.chats[message.chat.id].send_media(
+                image,
+                content_type,
+                caption=sticker_pack.name
+            )))
 
     async def start(self):
         await self._driver.start()

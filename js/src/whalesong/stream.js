@@ -38,7 +38,7 @@ export class StreamManager extends ModelManager {
       lastPhoneMessage: item.lastPhoneMessage,
       launchGeneration: item.launchGeneration,
       launched: item.launched,
-      pokeable: item.pokeable,
+      pokeable: null,
       retryTimestamp: item.retryTimestamp,
       state: item.state,
       stream: item.stream,

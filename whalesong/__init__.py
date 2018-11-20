@@ -1,4 +1,4 @@
-from asyncio import Future, ensure_future, sleep, wait
+from asyncio import AbstractEventLoop, Future, ensure_future, sleep, wait
 from builtins import ConnectionRefusedError
 
 from io import BytesIO
@@ -9,10 +9,11 @@ from .managers.chat import ChatCollectionManager
 from .managers.conn import ConnManager
 from .managers.contact import ContactCollectionManager
 from .managers.message import MessageCollectionManager
+from .managers.sticker_pack import StickerPack, StickerPackCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
 from .managers.wap import WapManager
-from .results import MonitorResult
+from .results import MonitorResult, Result
 
 __version__ = '0.6.0'
 
@@ -20,51 +21,22 @@ __version__ = '0.6.0'
 class Whalesong(BaseManager):
     """
     Main Whalesong manager.
-
-    .. attribute:: storage
-
-        :class:`~whalesong.managers.storage.StorageManager`
-
-        Manager for local storage.
-
-    .. attribute:: stream
-
-        :class:`~whalesong.managers.stream.StreamManager`
-
-        Manager for stream object.
-
-    .. attribute:: conn
-
-        :class:`~whalesong.managers.conn.ConnManager`
-
-        Manager for connection object
-
-    .. attribute:: contacts
-
-        :class:`~`whalesong.managers.contact.ContactCollectionManager`
-
-        Manager for contact collection.
-
-    .. attribute:: chats
-
-        :class:`~whalesong.managers.chat.ChatCollectionManager`
-
-        Manager for chat collection.
-
-    .. attribute:: messages
-
-        :class:`~whalesong.managers.message.MessageCollectionManager`
-
-        Manager for messages collection.
-
-    .. attribute:: wap
-
-        :class:`~whalesong.managers.wap.WapManager`
-
-        Manager for wap object.
     """
 
-    def __init__(self, profile=None, loadstyles=False, headless=False, extra_params=None, loop=None):
+    def __init__(self, profile: str = None,
+                 loadstyles: bool = False,
+                 headless: bool = False,
+                 extra_params: dict = None,
+                 loop: AbstractEventLoop = None):
+        """
+
+        :param profile: Path to firefox profile.
+        :param loadstyles: Whether CSS styles must be loaded. It is need in order to get QR image.
+        :param headless: Whether firefox must be started with headless flag. In production environments
+                         it should be set to :class:`True`.
+        :param extra_params: Extra parametres for firefox.
+        :param loop: Event loop.
+        """
         super(Whalesong, self).__init__(WhalesongDriver(profile=profile,
                                                         loadstyles=loadstyles,
                                                         headless=headless,
@@ -78,11 +50,17 @@ class Whalesong(BaseManager):
         self._submanagers['chats'] = ChatCollectionManager(self._driver, manager_path='chats')
         self._submanagers['messages'] = MessageCollectionManager(self._driver, manager_path='messages')
         self._submanagers['wap'] = WapManager(self._driver, manager_path='wap')
+        self._submanagers['sticker_packs'] = StickerPackCollectionManager(self._driver, manager_path='stickerPacks')
 
         self._fut_running = None
 
     @property
     def loop(self):
+        """
+        Event loop.
+
+        :return: Event loop.
+        """
         return self._driver.loop
 
     async def start(self, interval: float = 0.5):
@@ -147,12 +125,11 @@ class Whalesong(BaseManager):
         """
         return await self._driver.screenshot_element('div[data-ref]')
 
-    def stop_monitor(self, monitor: MonitorResult) -> Future:
+    def stop_monitor(self, monitor: MonitorResult) -> Result[None]:
         """
         Stop a given monitor.
 
         :param monitor: Monitor object to stop.
-        :return: a future which will be resolve when monitor stop.
         """
         return self._driver.execute_command('stopMonitor', {'monitorId': monitor.result_id})
 
