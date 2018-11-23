@@ -1,8 +1,8 @@
-from asyncio import ensure_future, sleep, wait
+from asyncio import ensure_future, wait
 
 from os import path
 
-from whalesong.driver import WhalesongDriver
+from whalesong.driver_firefox import WhalesongDriver
 from whalesong.results import IteratorResult, MonitorResult
 
 
@@ -62,9 +62,7 @@ class GetChats:
         futs = [ensure_future(self.monitor_stream())]
 
         try:
-            while True:
-                await self._driver.poll()
-                await sleep(0.5)
+            await self._driver.whai_until_stop()
         finally:
             await self._driver.cancel_iterators()
             self._driver.result_manager.cancel_all()

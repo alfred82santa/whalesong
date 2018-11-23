@@ -1,7 +1,6 @@
 import mimetypes
-from asyncio import ensure_future, sleep
+from asyncio import ensure_future
 
-from base64 import b64decode
 from os import mkdir, path
 
 from whalesong import Whalesong
@@ -53,7 +52,6 @@ class GetStickers:
         await self._driver.sticker_packs.fetch_all_pages()
 
         async for sticker_pack in self._driver.sticker_packs.get_items():
-
             await self._driver.sticker_packs[sticker_pack.id].stickers.fetch()
             await self.download_all_sticker(sticker_pack)
 

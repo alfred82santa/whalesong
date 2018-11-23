@@ -73,5 +73,9 @@ setup(
         'cryptography',
         'aiohttp>=3.0',
         'vobject'
-    ]
+    ],
+    extras_require={
+        'firefox':  ['selenium>=3.4.3'],
+        'chromium': ['pyppeteer'],
+    }
 )

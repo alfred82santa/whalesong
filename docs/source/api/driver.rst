@@ -2,4 +2,21 @@
 Whalesong Driver
 ================
 
-.. automodule:: whalesong.driver
+-----------
+Base driver
+-----------
+
+.. autoclass:: whalesong.driver.BaseWhalesongDriver
+
+--------------
+Firefox driver
+--------------
+
+.. autoclass:: whalesong.driver_firefox.WhalesongDriver
+
+
+---------------
+Chromium driver
+---------------
+
+.. autoclass:: whalesong.driver_chromium.WhalesongDriver

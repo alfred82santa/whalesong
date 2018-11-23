@@ -1,9 +1,8 @@
-from asyncio import AbstractEventLoop, Future, ensure_future, sleep, wait
-from builtins import ConnectionRefusedError
+from asyncio import AbstractEventLoop
 
 from io import BytesIO
 
-from .driver import WhalesongDriver
+from .driver import BaseWhalesongDriver
 from .managers import BaseManager
 from .managers.chat import ChatCollectionManager
 from .managers.conn import ConnManager
@@ -15,33 +14,50 @@ from .managers.stream import StreamManager
 from .managers.wap import WapManager
 from .results import MonitorResult, Result
 
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 
 class Whalesong(BaseManager):
     """
-    Main Whalesong manager.
+    Whalesong service.
+
+    The main Whalesong manager.
     """
 
     def __init__(self, profile: str = None,
-                 loadstyles: bool = False,
+                 *,
+                 autostart: bool = True,
                  headless: bool = False,
-                 extra_params: dict = None,
-                 loop: AbstractEventLoop = None):
+                 extra_options: dict = None,
+                 driver: BaseWhalesongDriver = None,
+                 loop: AbstractEventLoop = None,
+                 **kwargs):
         """
 
         :param profile: Path to firefox profile.
-        :param loadstyles: Whether CSS styles must be loaded. It is need in order to get QR image.
-        :param headless: Whether firefox must be started with headless flag. In production environments
+        :param autostart: Whether driver must start immediately.
+
+        :param headless: Whether browser must be started with headless flag. In production environments
                          it should be set to :class:`True`.
-        :param extra_params: Extra parametres for firefox.
+        :param extra_options: Extra parametres for browser commandline.
         :param loop: Event loop.
+
+        :param loadstyles: Whether CSS styles must be loaded. It is need in order to get QR image. (Only for Firefox)
+        :type loadstyles: bool
+        :param interval: Polling responses interval in seconds. Default 0.5 seconds. (Only for Firefox)
+        :type interval: float
         """
-        super(Whalesong, self).__init__(WhalesongDriver(profile=profile,
-                                                        loadstyles=loadstyles,
-                                                        headless=headless,
-                                                        extra_params=extra_params,
-                                                        loop=loop))
+
+        if driver is None:
+            from .driver_firefox import WhalesongDriver
+            driver = WhalesongDriver(profile=profile,
+                                     autostart=autostart,
+                                     headless=headless,
+                                     extra_options=extra_options,
+                                     loop=loop,
+                                     **kwargs)
+
+        super(Whalesong, self).__init__(driver)
 
         self._submanagers['storage'] = StorageManager(self._driver, manager_path='storage')
         self._submanagers['stream'] = StreamManager(self._driver, manager_path='stream')
@@ -63,51 +79,25 @@ class Whalesong(BaseManager):
         """
         return self._driver.loop
 
-    async def start(self, interval: float = 0.5):
+    async def start(self):
         """
         Start Whalesong service.
-
-        :param interval: Polling interval
         """
-        if self._fut_running:
-            return
-
-        self._fut_running = Future()
 
         await self._driver.start_driver()
         await self._driver.connect()
-
-        self._fut_polling = ensure_future(self._polling(interval), loop=self.loop)
 
     async def stop(self):
         """
         Stop Whalesong service.
         """
-        self._fut_running.set_result(None)
-        await self.wait_until_stop()
+        await self._driver.close()
 
     async def wait_until_stop(self):
         """
-        Wait until Whalesong service stop.
+        Wait until Whalesong service is stopped.
         """
-        await self._fut_polling
-
-    async def _polling(self, interval):
-        try:
-            while not self._fut_running.done():
-                await self._driver.poll()
-                await sleep(interval)
-        finally:
-            if not self._fut_running.done():
-                self._fut_running.set_result(None)
-            await wait([self._driver.cancel_iterators(),
-                        self._driver.cancel_monitors()])
-            self._driver.result_manager.cancel_all()
-
-            try:
-                await self._driver.close()
-            except ConnectionRefusedError:
-                pass
+        await self._driver.whai_until_stop()
 
     async def screenshot(self) -> BytesIO:
         """
