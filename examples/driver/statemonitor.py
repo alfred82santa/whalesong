@@ -1,10 +1,9 @@
-from asyncio import ensure_future, sleep, wait
+from asyncio import ensure_future, wait
 
 from os import path
 
-from whalesong.driver import WhalesongDriver
+from whalesong.driver_firefox import WhalesongDriver
 from whalesong.results import MonitorResult
-
 
 OUTPUT_DIR = path.join(path.dirname(__file__), '..', 'output')
 
@@ -13,8 +12,9 @@ class StatusMonitor:
 
     def __init__(self, print_fn=print, loop=None):
         self._print_fn = print_fn
-        self._driver = WhalesongDriver(profile=path.join(path.dirname(
-            __file__), '..', 'profile'), loadstyles=True, loop=loop)
+        self._driver = WhalesongDriver(profile=path.join(path.dirname(__file__), '..', 'profile'),
+                                       loadstyles=True,
+                                       loop=loop)
 
     def echo(self, txt):
         self._print_fn(txt)
@@ -45,7 +45,7 @@ class StatusMonitor:
     async def monitor_stream(self):
         self.echo('Monitor stream')
         async for evt in self._driver.execute_command('stream|monitorField',
-                                                      {'field': 'stream'},
+                                                      params={'field': 'stream'},
                                                       result_class=MonitorResult):
             self.echo('Stream value: {}'.format(evt['value']))
             img = await self._driver.screenshot()
@@ -109,9 +109,7 @@ class StatusMonitor:
                 ensure_future(self.monitor_storage())]
 
         try:
-            while True:
-                await self._driver.poll()
-                await sleep(0.5)
+            await self._driver.whai_until_stop()
         finally:
             await self._driver.cancel_iterators()
             self._driver.result_manager.cancel_all()

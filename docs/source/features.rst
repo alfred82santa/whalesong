@@ -5,13 +5,15 @@ Features
 * Non blocking driver. It can do more than one thing at same time.
 * Monitor feature. Python code could react to Javascript event.
 * Iterator feature. Large item list are passed to Python as async iterators.
-* Persistent Firefox profile.
+* Persistent browser profile.
 * Easy way to build new features.
 * AmpersandJS/BackboneJS models and collection monitor.
 * AmpersandJS/BackboneJS field monitor.
 * Monitor localStorage.
 * Take screenshots (page and css elements).
 * Powered by AsyncIO.
+* Firefox backend.
+* Chromium backend.
 
 -----------------
 Whatsapp features

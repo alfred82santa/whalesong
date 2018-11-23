@@ -2,7 +2,7 @@ from typing import Any, ClassVar, Dict, Generic, List, Type, TypeVar, Union, cas
 
 from functools import partial
 
-from ..driver import WhalesongDriver
+from ..driver import BaseWhalesongDriver
 from ..errors import ManagerNotFound
 from ..models import BaseModel
 from ..results import IteratorResult, MonitorResult, Result
@@ -15,7 +15,7 @@ class BaseManager:
     Base manager.
     """
 
-    def __init__(self, driver: WhalesongDriver, manager_path: str = ''):
+    def __init__(self, driver: BaseWhalesongDriver, manager_path: str = ''):
         """
 
         :param driver: Whalesong driver
