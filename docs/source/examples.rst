@@ -109,17 +109,6 @@ It stores files and thumbnails from media messages.
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/getmessages.py
 
 
-Get stickers
-============
-
-It fetch all sticker packs installed. It fetch all sticker for each sticker pack. And, finally, it downloads
-all sticker images.
-
-.. code-block:: bash
-
-    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getstickers.py
-
-
 Minibot
 =======
 
@@ -238,3 +227,25 @@ Example
 
     /sticker Cuppy
 
+
+Get stickers
+============
+
+It fetch all sticker packs installed. It fetch all sticker for each sticker pack. And, finally, it downloads
+all sticker images.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getstickers.py
+
+
+
+Monitor presences
+=================
+
+It monitors user presences. It prints any change on them.
+
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/presencemonitor.py

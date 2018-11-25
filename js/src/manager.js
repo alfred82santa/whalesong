@@ -21,11 +21,17 @@ export class ResultManager {
   }
 
   setResult(exId, type, params) {
-    this._results.push({
+    let data = {
       'exId': exId,
       'type': type,
       'params': params || {}
-    });
+    }
+
+    if (window.whalesongPushResult !== undefined) {
+      window.whalesongPushResult(data);
+    } else {
+      this._results.push(data);
+    }
   }
 
   setFinalResult(exId, params) {
@@ -43,7 +49,6 @@ export class ResultManager {
   getResults() {
     let results = this._results;
     this._results = [];
-    console.log(results);
     return results;
   }
 }
@@ -286,7 +291,7 @@ export default class MainManager extends CommandManager {
       console.log(exId, command, result)
       this.resultManager.setFinalResult(exId, result);
     } catch (err) {
-      console.exception(err);
+      console.error(err);
       if ((err instanceof Error) || (err instanceof BaseError)) {
         this.resultManager.setErrorResult(exId, {
           'name': err.name,

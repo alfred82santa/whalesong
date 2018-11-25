@@ -5,6 +5,7 @@ from io import BytesIO
 
 from . import BaseCollectionManager, BaseModelManager
 from .message import MediaMixin, MessageTypes, download_media
+from ..driver import BaseWhalesongDriver
 from ..models import BaseModel
 from ..results import Result
 
@@ -87,7 +88,7 @@ class StickerPackManager(BaseModelManager[StickerPack]):
 
     MODEL_CLASS = StickerPack
 
-    def __init__(self, driver, manager_path=''):
+    def __init__(self, driver: BaseWhalesongDriver, manager_path: str = ''):
         super(StickerPackManager, self).__init__(driver=driver, manager_path=manager_path)
 
         self.add_submanager('stickers', StickerCollectionManager(

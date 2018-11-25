@@ -3,6 +3,7 @@ from asyncio import ensure_future
 from os import path
 
 from whalesong import Whalesong
+from whalesong.managers.stream import Stream
 
 
 class GetContacts:
@@ -33,7 +34,7 @@ class GetContacts:
         async for evt in self._driver.stream.monitor_field('stream'):
             self.echo('Stream value: {}'.format(evt['value']))
 
-            if evt['value'] == 'CONNECTED':
+            if evt['value'] == Stream.Stream.CONNECTED:
                 if contact_it is None:
                     contact_it = self._driver.contacts.get_items()
                     ensure_future(self.list_contacts(contact_it))

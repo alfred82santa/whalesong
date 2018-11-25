@@ -1,6 +1,6 @@
+import binascii
 from typing import Dict, Type, cast
 
-import binascii
 from axolotl.kdf.hkdfv3 import HKDFv3
 from axolotl.util.byteutil import ByteUtil
 from base64 import b64decode
@@ -15,6 +15,7 @@ from io import BytesIO
 from . import BaseCollectionManager, BaseModelManager
 from .chat import Chat
 from .contact import Contact
+from ..driver import BaseWhalesongDriver
 from ..models import Base64Field, BaseModel
 from ..results import MonitorResult, Result
 
@@ -91,11 +92,10 @@ class MessageMetaclass(CamelCaseMeta):
         try:
             t = data['type']
         except (TypeError, KeyError):
-            print(data)
             try:
                 t = kwargs['type']
             except KeyError:
-                raise RuntimeError('Widget with no type')
+                raise RuntimeError('Message with no type')
 
         try:
             return cls.__message_classes__[t](data=data, *args, **kwargs)
@@ -636,7 +636,7 @@ class MessageInfoManager(BaseModelManager[MessageInfo]):
 
     MODEL_CLASS = MessageInfo
 
-    def __init__(self, driver, manager_path=''):
+    def __init__(self, driver: BaseWhalesongDriver, manager_path: str = ''):
         super(MessageInfoManager, self).__init__(driver=driver, manager_path=manager_path)
 
         self.add_submanager('delivery', MessageAckCollectionManager(driver=self._driver,
@@ -662,7 +662,7 @@ class MessageManager(BaseModelManager[BaseMessage]):
 
     MODEL_CLASS = BaseMessage
 
-    def __init__(self, driver, manager_path=''):
+    def __init__(self, driver: BaseWhalesongDriver, manager_path: str = ''):
         super(MessageManager, self).__init__(driver=driver, manager_path=manager_path)
 
         self.add_submanager('info', MessageInfoManager(driver=self._driver,
@@ -713,7 +713,7 @@ class MessageCollectionManager(BaseCollectionManager[MessageManager]):
         return await download_media(self._driver, model)
 
 
-async def download_media(driver, model: MediaMixin) -> BytesIO:
+async def download_media(driver: BaseWhalesongDriver, model: MediaMixin) -> BytesIO:
     """
     Download message's attached media file. It will decrypt media file using key on message object.
 

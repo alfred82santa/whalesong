@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from base64 import b64decode, b64encode
 from dirty_models import BaseModel as DirtyBaseModel, StringIdField
-from dirty_models.fields import BytesField
+from dirty_models.fields import BytesField, DateTimeField as BaseDateTimeField
 from dirty_models.models import CamelCaseMeta
 from dirty_models.utils import JSONEncoder as BaseJSONEncoder, ModelFormatterIter as BaseModelFormatterIter
 
@@ -14,6 +16,17 @@ class Base64Field(BytesField):
         if isinstance(value, str):
             return b64decode(value.encode())
         return super(Base64Field, self).convert_value(value)
+
+
+class DateTimeField(BaseDateTimeField):
+    """
+    Date time field that allow timestamps in microseconds.
+    """
+
+    def convert_value(self, value):
+        if isinstance(value, int) and value > datetime.max:
+            return datetime.fromtimestamp(value / 1000, tz=self.default_timezone)
+        return super(DateTimeField, self).convert_value(value)
 
 
 class BaseModel(DirtyBaseModel, metaclass=CamelCaseMeta):

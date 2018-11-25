@@ -37,8 +37,9 @@ Whatsapp features
 * Send VCard messages.
 * Send Media (image/video/pdf) messages.
 * Send seen to chats.
-* Create groups
-* Manage groups (add/kick/promote/demote people)
-* Auto load link previews
+* Create groups.
+* Manage groups (add/kick/promote/demote people).
+* Auto load link previews.
 * Allow to check whether a contact is registered on Whatsapp.
 * Load and send stickers (even with a quoted message).
+* Presence monitor.

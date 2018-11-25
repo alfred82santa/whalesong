@@ -7,6 +7,7 @@ from random import choice
 
 from whalesong import Whalesong
 from whalesong.managers.message import MessageTypes
+from whalesong.managers.stream import Stream
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output')
 
@@ -46,7 +47,7 @@ class Minibot:
         async for evt in self._driver.stream.monitor_field('stream'):
             self.echo('Stream value: {}'.format(evt['value']))
 
-            if evt['value'] == 'CONNECTED':
+            if evt['value'] == Stream.Stream.CONNECTED:
                 if new_message_monitor is None:
                     new_message_monitor = self._driver.messages.monitor_new()
                     ensure_future(self.monitor_new_messages(new_message_monitor))

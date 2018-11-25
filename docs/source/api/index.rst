@@ -18,6 +18,7 @@ API reference
    sticker_pack
    conn
    stream
+   presence
    storage
    errors
    firefox_profile

@@ -31,6 +31,9 @@ import {
 import {
   StickerPackCollectionManager
 } from './stickerPack.js';
+import {
+  PresenceCollectionManager
+} from './presence.js';
 
 
 
@@ -61,7 +64,6 @@ function getRequirementsDefs() {
       'build': function(mainManager, artifacts) {
         let manager = new ChatCollectionManager(
           artifacts['store'].Chat,
-          artifacts['store'].Contact,
           artifacts['mediaCollectionClass'],
           artifacts['createPeerForContact']
         );
@@ -136,7 +138,6 @@ function getRequirementsDefs() {
         return manager;
       }
     },
-
     'stickerManager': {
       'requirements': ['store'],
       'build': function(mainManager, artifacts) {
@@ -144,6 +145,16 @@ function getRequirementsDefs() {
           artifacts['store'].StickerPack
         );
         mainManager.addSubmanager('stickerPacks', manager);
+        return manager;
+      }
+    },
+    'presenceManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new PresenceCollectionManager(
+          artifacts['store'].Presence
+        );
+        mainManager.addSubmanager('presences', manager);
         return manager;
       }
     },
