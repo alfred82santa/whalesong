@@ -45,6 +45,8 @@ export class ChatManager extends ModelManager {
     try {
       this.addSubmanager('metadata', new GroupMetadataManager(this.model.groupMetadata));
     } catch (err) {}
+
+    this.addSubmanager('presence', manager.getSubmanager('presences').getSubmanager(this.model.id._serialized));
   }
 
   async _sendMessage(send_fn, check_fn) {
@@ -138,7 +140,7 @@ export class ChatManager extends ModelManager {
     phoneNumber,
     quotedMsgId
   }) {
-    let contact = new this.contacts._model({
+    let contact = new manager.getSubmanager('contacts').collection._model({
       id: phoneNumber + '@c.us',
       name: contactName
     });
@@ -151,7 +153,7 @@ export class ChatManager extends ModelManager {
     contactId,
     quotedMsgId
   }) {
-    let contact = this.contacts.get(contactId);
+    let contact = manager.getSubmanager('contacts').collection.get(contactId);
     if (!contact) {
       throw ModelNotFound(`Contact with ID "${contactId}" not found`);
     }
@@ -259,10 +261,8 @@ export class ChatCollectionManager extends CollectionManager {
     return ChatManager;
   }
 
-  constructor(collection, contactCollection, mediaCollectionClass, createPeerForContact) {
+  constructor(collection, mediaCollectionClass, createPeerForContact) {
     super(collection);
-
-    ChatManager.prototype.contacts = contactCollection;
 
     ChatManager.prototype.buildMediaCollection = function() {
       return new mediaCollectionClass();
@@ -308,6 +308,6 @@ export class ChatCollectionManager extends CollectionManager {
       name,
       picture,
       picture,
-      contactIds.map((item) => this.contacts.get(item)).filter(Boolean));
+      contactIds.map((item) => manager.getSubmanager('contacts').collection.get(item)).filter(Boolean));
   }
 }

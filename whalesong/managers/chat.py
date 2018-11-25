@@ -1,15 +1,16 @@
-from typing import Any, Awaitable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from base64 import b64encode
 from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, StringIdField
 from io import BytesIO
 
-from whalesong.managers.group_metadata import GroupMetadataManager
-from whalesong.results import Result
 from . import BaseCollectionManager, BaseModelManager
 from .contact import Contact
-from .group_metadata import GroupMetadata
+from .group_metadata import GroupMetadata, GroupMetadataManager
+from .presence import PresenceManager
+from ..driver import BaseWhalesongDriver
 from ..models import BaseModel
+from ..results import Result
 
 
 class Chat(BaseModel):
@@ -165,7 +166,7 @@ class ChatManager(BaseModelManager[Chat]):
     """
     MODEL_CLASS = Chat
 
-    def __init__(self, driver, manager_path=''):
+    def __init__(self, driver: BaseWhalesongDriver, manager_path: str = ''):
         super(ChatManager, self).__init__(driver=driver, manager_path=manager_path)
 
         from .message import MessageCollectionManager
@@ -178,10 +179,13 @@ class ChatManager(BaseModelManager[Chat]):
         self.add_submanager('metadata', GroupMetadataManager(driver=self._driver,
                                                              manager_path=self._build_command('metadata')))
 
+        self.add_submanager('presence', PresenceManager(driver=self._driver,
+                                                        manager_path=self._build_command('presence')))
+
     def send_text(self, text: str,
                   quoted_msg_id: Optional[str] = None,
                   mentions: Optional[List[str]] = None,
-                  link_desc=None) -> Awaitable[str]:
+                  link_desc=None) -> Result[str]:
         """
         Send text message to current chat.
 

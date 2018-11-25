@@ -10,6 +10,15 @@
    driver's API. It should not affect anyone. But be aware.
 
 
+.. warning::
+
+   **NEW VERSION 0.7.0 (Work in progress)**
+
+   Stream model now uses enumerations. It means that if you check stream states
+   you must be aware that they are not a string anymore, now they are enumerations. Look at
+   :class:`documentation <whalesong.managers.stream.Stream>`.
+
+
 =========
 Whalesong
 =========
@@ -73,7 +82,7 @@ Using Firefox
 
 .. code-block:: bash
 
-   $ pip install whalesong[firefox]
+   $ pip3 install whalesong[firefox]
 
 
 .. _using_chromium:
@@ -85,7 +94,7 @@ Using Chronium
 
 .. code-block:: bash
 
-   $ pip install whalesong[chromium]
+   $ pip3 install whalesong[chromium]
 
 
 If you choose Chromium backend, you should execute this after installation:
@@ -140,6 +149,7 @@ Whatsapp features
 * Auto load link previews
 * Allow to check whether a contact is registered on Whatsapp.
 * Load and send stickers (even with a quoted message).
+* Presence monitor.
 
 ---------
 Changelog
@@ -200,7 +210,7 @@ Contras
   own protocol called `Marionette <https://firefox-source-docs.mozilla.org/testing/marionette/marionette/Intro.html>`_.
   So Geckodriver is used as proxy between Webdriver protocol and Marionette protocol.
 
-* As Webdriver is a synchronous protocol. Whalesong must to poll continuously to Firefox in order to get new events.
+* As Webdriver is a synchronous protocol. Whalesong must poll continuously to Firefox in order to get new events.
   There is no way to make Firefox notify Whalesong proactively. It means, Whalesong is polling for new results
   continuously, with an interval (by default 0.5 seconds).
 
@@ -245,6 +255,7 @@ Pros
 * No extra processes (No more Geckodriver).
 * Application mode. No tabs, no URL field.
 * No huge libraries (No more Selenium).
+* No more threads in order to communicate with synchronous libraries.
 
 Contras
 =======
@@ -253,7 +264,7 @@ Contras
 * Currently Pypperter has a bug. It makes to loose connection after 20 seconds. It is resolved in
   miyakogi/pyppeteer/#160 but is not approved yet (some test errors).
 
-* It use a patched Chromium version from Puppetter. Whalesong needs this patch because it use `Runtime.addBinding`
+* It uses a patched Chromium version from Puppetter. Whalesong needs this patch because it use `Runtime.addBinding`
   command. It is not available in regular stable version. So, you must `download it <using_chromium>`_ before
   use the backend.
 

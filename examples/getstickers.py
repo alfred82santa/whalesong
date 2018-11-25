@@ -4,6 +4,7 @@ from asyncio import ensure_future
 from os import mkdir, path
 
 from whalesong import Whalesong
+from whalesong.managers.stream import Stream
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output', 'media')
 
@@ -44,7 +45,7 @@ class GetStickers:
         async for evt in self._driver.stream.monitor_field('stream'):
             self.echo('Stream value: {}'.format(evt['value']))
 
-            if evt['value'] == 'CONNECTED':
+            if evt['value'] == Stream.Stream.CONNECTED:
                 ensure_future(self.fetch_sticker_packs())
 
     async def fetch_sticker_packs(self):

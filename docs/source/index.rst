@@ -18,6 +18,14 @@ Currently WhatsappWeb is implemented
    driver's API. It should not affect anyone. But be aware.
 
 
+.. warning::
+
+   **NEW VERSION 0.7.0 (Work in progress)**
+
+   Stream model now uses enumerations. It means that if you check stream states
+   you must be aware that they are not a string anymore, now they are enumerations. Look at
+   :class:`documentation <whalesong.managers.stream.Stream>`.
+
 -------------------
 Binary Requirements
 -------------------
@@ -68,7 +76,7 @@ Using Firefox
 
 .. code-block:: bash
 
-   $ pip install whalesong[firefox]
+   $ pip3 install whalesong[firefox]
 
 
 .. _using_chromium:
@@ -80,7 +88,7 @@ Using Chronium
 
 .. code-block:: bash
 
-   $ pip install whalesong[chromium]
+   $ pip3 install whalesong[chromium]
 
 
 If you choose Chromium backend, you should execute this after installation:

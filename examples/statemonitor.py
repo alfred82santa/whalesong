@@ -3,6 +3,7 @@ from asyncio import ensure_future
 from os import path
 
 from whalesong import Whalesong
+from whalesong.managers.stream import Stream
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output')
 
@@ -53,10 +54,10 @@ class StatusMonitor:
         async for evt in self._driver.stream.monitor_field('state'):
             self.echo(evt)
             self.echo('State value: {}'.format(evt['value']))
-            if evt['value'] == 'UNPAIRED_IDLE':
+            if evt['value'] == Stream.State.UNPAIRED_IDLE:
                 self.echo('Refreshing QR')
                 await self._driver.stream.poke()
-            elif evt['value'] == 'CONFLICT':
+            elif evt['value'] == Stream.State.CONFLICT:
                 self.echo('Taking over...')
                 await self._driver.stream.takeover()
 

@@ -5,6 +5,7 @@ from os import mkdir, path
 
 from whalesong import Whalesong
 from whalesong.managers.message import LocationMessage, MediaFrameMixin, MediaMixin, TextMessage, StickerMessage
+from whalesong.managers.stream import Stream
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output', 'media')
 
@@ -45,7 +46,7 @@ class GetMessages:
         async for evt in self._driver.stream.monitor_field('stream'):
             self.echo('Stream value: {}'.format(evt['value']))
 
-            if evt['value'] == 'CONNECTED':
+            if evt['value'] == Stream.Stream.CONNECTED:
                 if messages_it is None:
                     messages_it = self._driver.messages.get_items()
                     ensure_future(self.list_messages(messages_it))

@@ -117,7 +117,6 @@ export class CollectionManager extends CommandManager {
       try {
         return new(this.constructor.getModelManagerClass())(this.loadItem(name));
       } catch (err2) {
-        console.log(name, err2);
         throw err;
       }
     }

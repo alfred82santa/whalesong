@@ -100,6 +100,21 @@ class BaseModelManager(BaseManager, Generic[MODEL_TYPE]):
     def get_monitor_result_class(cls) -> MonitorResult[MODEL_TYPE]:
         return cast(MonitorResult[MODEL_TYPE], partial(MonitorResult, fn_map=cls.map_model))
 
+    @classmethod
+    def get_field_monitor_result_class(cls, field) -> MonitorResult[Dict[str, Any]]:
+        def map(evt):
+            field_obj = cls.MODEL_CLASS.get_field_obj(field)
+
+            if evt['value'] is not None:
+                try:
+                    evt['value'] = field_obj.use_value(evt['value'])
+                except (ValueError, TypeError):
+                    pass
+
+            return evt
+
+        return cast(MonitorResult[Dict[str, Any]], partial(MonitorResult, fn_map=map))
+
     def get_model(self) -> Result[MODEL_TYPE]:
         """
         Get model object
@@ -127,7 +142,7 @@ class BaseModelManager(BaseManager, Generic[MODEL_TYPE]):
         """
         return self._execute_command('monitorField',
                                      {'field': field},
-                                     result_class=MonitorResult)
+                                     result_class=self.get_field_monitor_result_class(field))
 
 
 MODEL_MANAGER_TYPE = TypeVar('MODEL_MANAGER_TYPE', bound=BaseModelManager)

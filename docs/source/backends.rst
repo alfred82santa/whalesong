@@ -39,7 +39,7 @@ Contras
   own protocol called `Marionette <https://firefox-source-docs.mozilla.org/testing/marionette/marionette/Intro.html>`_.
   So Geckodriver is used as proxy between Webdriver protocol and Marionette protocol.
 
-* As Webdriver is a synchronous protocol. Whalesong must to poll continuously to Firefox in order to get new events.
+* As Webdriver is a synchronous protocol. Whalesong must poll continuously to Firefox in order to get new events.
   There is no way to make Firefox notify Whalesong proactively. It means, Whalesong is polling for new results
   continuously, with an interval (by default 0.5 seconds).
 

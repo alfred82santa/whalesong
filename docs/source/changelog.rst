@@ -3,6 +3,17 @@ Changelog
 =========
 
 -------------
+Version 0.7.0
+-------------
+
+* Added support for Chromium.
+* Added support for backends that are able to push results.
+* Defined Connection model.
+* Defined Stream model and enumerations.
+* Added Presence manager.
+* Added new example: `presencemonitor.py`. It monitor user presences.
+
+-------------
 Version 0.6.0
 -------------
 
@@ -32,7 +43,8 @@ Version 0.6.0
 
 * Added new command to `minibot.py` example: `/sticker`.
 
-* Added new example: `getstickers.py`. it downloads all stickers registered.
+* Added new example: `getstickers.py`. It downloads all stickers registered.
+
 
 -------------
 Version 0.5.3

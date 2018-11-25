@@ -31,19 +31,18 @@ export class StickerManager extends ModelManager {
       await this.model.downloadMedia();
 
       let chatManager = manager.getSubmanager('chats').getSubmanager(chatId);
-
-      if (quotedMsgId) {
-        chatManager.model.composeQuotedMsg = chatManager.model.msgs.get(quotedMsgId);
-      }
-
-      return await chatManager._sendMessage(
-        () => this.model.sendToChat(chatManager.model),
-        (item) => item.type === 'sticker' && item.filehash === this.model.filehash
-      );
     } catch (err) {
-      console.log(err);
       throw new ModelNotFound(`Chat with ID "${chatId}" not found`);
     }
+
+    if (quotedMsgId) {
+      chatManager.model.composeQuotedMsg = chatManager.model.msgs.get(quotedMsgId);
+    }
+
+    return await chatManager._sendMessage(
+      () => this.model.sendToChat(chatManager.model),
+      (item) => item.type === 'sticker' && item.filehash === this.model.filehash
+    );
   }
 }
 
@@ -61,15 +60,10 @@ export class StickerCollectionManager extends CollectionManager {
 
 export class StickerPackManager extends ModelManager {
 
-  getSubmanager(name) {
-    try {
-      return super.getSubmanager(name);
-    } catch (err) {
-      if (name === 'stickers') {
-        return new StickerCollectionManager(this.model.stickers);
-      }
-      throw err;
-    }
+  constructor(model) {
+    super(model);
+
+    this.addSubmanager('stickers', new StickerCollectionManager(this.model.stickers));
   }
 }
 

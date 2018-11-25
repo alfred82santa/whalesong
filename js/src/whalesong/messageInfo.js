@@ -35,19 +35,12 @@ export class MessageInfoManager extends ModelManager {
     });
   }
 
-  getSubmanager(name) {
-    try {
-      return super.getSubmanager(name);
-    } catch (err) {
-      switch (name) {
-        case 'read':
-        case 'delivery':
-        case 'played':
-          return new MessageAckCollectionManager(this.model[name]);
-        default:
-          throw err;
-      }
-    }
+  constructor(model) {
+    super(model);
+
+    this.addSubmanager('read', new MessageAckCollectionManager(this.model.read));
+    this.addSubmanager('delivery', new MessageAckCollectionManager(this.model.delivery));
+    this.addSubmanager('played', new MessageAckCollectionManager(this.model.played));
   }
 }
 
