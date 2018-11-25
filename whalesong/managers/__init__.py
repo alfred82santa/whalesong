@@ -103,9 +103,8 @@ class BaseModelManager(BaseManager, Generic[MODEL_TYPE]):
     @classmethod
     def get_field_monitor_result_class(cls, field) -> MonitorResult[Dict[str, Any]]:
         def map(evt):
-            field_obj = cls.MODEL_CLASS.get_field_obj(field)
-
             if evt['value'] is not None:
+                field_obj = cls.MODEL_CLASS.get_field_obj(field)
                 try:
                     evt['value'] = field_obj.use_value(evt['value'])
                 except (ValueError, TypeError):

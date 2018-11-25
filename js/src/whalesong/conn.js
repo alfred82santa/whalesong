@@ -7,7 +7,9 @@ import {
 
 export class ConnManager extends ModelManager {
   @command
-  async updatePushname({name}) {
+  async updatePushname({
+    name
+  }) {
     await this.model.updatePushname(name);
   }
 

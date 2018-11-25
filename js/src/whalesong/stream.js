@@ -14,7 +14,7 @@ export class StreamManager extends ModelManager {
       canSend: item.canSend,
       hasSynced: item.hasSynced,
       isIncognito: item.isIncognito,
-//      lastPhoneMessage: item.lastPhoneMessage,
+      //      lastPhoneMessage: item.lastPhoneMessage,
       launchGeneration: item.launchGeneration,
       launched: item.launched,
       retryTimestamp: item.retryTimestamp,
