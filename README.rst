@@ -150,6 +150,7 @@ Whatsapp features
 * Allow to check whether a contact is registered on Whatsapp.
 * Load and send stickers (even with a quoted message).
 * Presence monitor.
+* Profile and group's picture management.
 
 ---------
 Changelog

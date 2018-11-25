@@ -34,7 +34,9 @@ import {
 import {
   PresenceCollectionManager
 } from './presence.js';
-
+import {
+  ProfilePicThumbCollectionManager
+} from './profilePicThumb.js';
 
 
 function getArtifactsDefs() {
@@ -92,9 +94,9 @@ function getRequirementsDefs() {
       }
     },
     'contactManager': {
-      'requirements': ['store', 'conn'],
+      'requirements': ['store'],
       'build': function(mainManager, artifacts) {
-        let manager = new ContactCollectionManager(artifacts['store'].Contact, artifacts['conn']);
+        let manager = new ContactCollectionManager(artifacts['store'].Contact);
         mainManager.addSubmanager('contacts', manager);
         return manager;
       }
@@ -158,6 +160,16 @@ function getRequirementsDefs() {
         return manager;
       }
     },
+    'profilePicThumbManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new ProfilePicThumbCollectionManager(
+          artifacts['store'].ProfilePicThumb
+        );
+        mainManager.addSubmanager('profilePicThumbs', manager);
+        return manager;
+      }
+    }
   };
 }
 

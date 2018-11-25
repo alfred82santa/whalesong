@@ -261,7 +261,12 @@ export default class MainManager extends CommandManager {
           });
           continue;
         }
-        this.executeCommand(executionsObj['exId'], executionsObj['command'], executionsObj['params'] || {});
+        try {
+          this.executeCommand(executionsObj['exId'], executionsObj['command'], executionsObj['params'] || {});
+        } catch (err) {
+          console.error(err, executionsObj);
+          throw err;
+        }
       }
     }
 
@@ -291,7 +296,7 @@ export default class MainManager extends CommandManager {
       console.log(exId, command, result)
       this.resultManager.setFinalResult(exId, result);
     } catch (err) {
-      console.error(err);
+      console.error(err, command, params);
       if ((err instanceof Error) || (err instanceof BaseError)) {
         this.resultManager.setErrorResult(exId, {
           'name': err.name,

@@ -2,6 +2,8 @@ from dirty_models import ArrayField, BooleanField, ModelField, StringIdField
 from vobject import vCard
 
 from . import BaseCollectionManager, BaseModelManager
+from .profile_pic_thumb import ProfilePictureManager
+from .. import BaseWhalesongDriver
 from ..models import BaseModel
 from ..results import Result
 
@@ -166,9 +168,23 @@ class Contact(BaseModel):
 class ContactManager(BaseModelManager[Contact]):
     """
     Contact manager. It allows manage a contact.
+
+    .. attribute:: profile_pic_thumb
+
+        :class:`~whalesong.managers.profile_pic_thumb.ProfilePictureManager`
+
+        Contact's picture thumb manager.
     """
 
     MODEL_CLASS = Contact
+
+    def __init__(self, driver: BaseWhalesongDriver, manager_path: str = ''):
+        super(ContactManager, self).__init__(driver=driver, manager_path=manager_path)
+
+        self.add_submanager('profile_pic_thumb', ProfilePictureManager(
+            driver=self._driver,
+            manager_path=self._build_command('profilePicThumb')
+        ))
 
     def block(self) -> Result[None]:
         """

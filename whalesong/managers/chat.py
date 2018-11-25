@@ -5,7 +5,7 @@ from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, 
 from io import BytesIO
 
 from . import BaseCollectionManager, BaseModelManager
-from .contact import Contact
+from .contact import Contact, ContactManager
 from .group_metadata import GroupMetadata, GroupMetadataManager
 from .presence import PresenceManager
 from ..driver import BaseWhalesongDriver
@@ -163,6 +163,12 @@ class ChatManager(BaseModelManager[Chat]):
 
         Chat's group metadata manager.
 
+    .. attribute:: contact
+
+        :class:`~whalesong.managers.contact.ContactManager`
+
+        Chat's contact manager.
+
     """
     MODEL_CLASS = Chat
 
@@ -181,6 +187,9 @@ class ChatManager(BaseModelManager[Chat]):
 
         self.add_submanager('presence', PresenceManager(driver=self._driver,
                                                         manager_path=self._build_command('presence')))
+
+        self.add_submanager('contact', ContactManager(driver=self._driver,
+                                                      manager_path=self._build_command('contact')))
 
     def send_text(self, text: str,
                   quoted_msg_id: Optional[str] = None,
@@ -402,7 +411,8 @@ class ChatCollectionManager(BaseCollectionManager):
                                      {'contactId': contact_id},
                                      result_class=self.get_item_result_class())
 
-    def create_group(self, name: str, contact_ids: List[str], picture: BytesIO = None) -> Result[Chat]:
+    def create_group(self, name: str, contact_ids: List[str],
+                     picture: BytesIO = None, picture_preview: BytesIO = None) -> Result[Chat]:
         """
         Create a new chat group.
 
@@ -416,5 +426,8 @@ class ChatCollectionManager(BaseCollectionManager):
 
         if picture:
             params['picture'] = b64encode(picture.read()).decode()
+
+            if picture_preview:
+                params['picturePreview'] = b64encode(picture_preview.read()).decode()
 
         return self._execute_command('createGroup', params)

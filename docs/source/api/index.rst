@@ -19,6 +19,7 @@ API reference
    conn
    stream
    presence
+   profile_picture
    storage
    errors
    firefox_profile

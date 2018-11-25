@@ -9,9 +9,13 @@ Version 0.7.0
 * Added support for Chromium.
 * Added support for backends that are able to push results.
 * Defined Connection model.
+* Added new connection's method `updatePushname`.
 * Defined Stream model and enumerations.
 * Added Presence manager.
 * Added new example: `presencemonitor.py`. It monitor user presences.
+* Simplified some code.
+* Fields' value are mapped on monitors.
+* Profile and group's picture management.
 
 -------------
 Version 0.6.0

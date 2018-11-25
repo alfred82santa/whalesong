@@ -42,5 +42,5 @@ Managers
 Models
 ------
 
-.. automodule:: whalesong.managers.sticker_pack
+.. automodule:: whalesong.managers.presence
    :exclude-members: PresenceCollectionManager,PresenceManager,ChatStateCollectionManager,ChatStateManager
