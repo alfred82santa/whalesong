@@ -24,7 +24,7 @@ class DateTimeField(BaseDateTimeField):
     """
 
     def convert_value(self, value):
-        if isinstance(value, int) and value > datetime.max:
+        if isinstance(value, int) and value > datetime.max.timestamp():
             return datetime.fromtimestamp(value / 1000, tz=self.default_timezone)
         return super(DateTimeField, self).convert_value(value)
 

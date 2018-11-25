@@ -15,6 +15,7 @@ Version 0.7.0
 * Added new example: `presencemonitor.py`. It monitor user presences.
 * Simplified some code.
 * Fields' value are mapped on monitors.
+* Profile and group's picture management.
 
 -------------
 Version 0.6.0

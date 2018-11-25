@@ -47,6 +47,7 @@ export class ChatManager extends ModelManager {
     } catch (err) {}
 
     this.addSubmanager('presence', manager.getSubmanager('presences').getSubmanager(this.model.id._serialized));
+    this.addSubmanager('contact', manager.getSubmanager('contacts').getSubmanager(this.model.contact.id._serialized));
   }
 
   async _sendMessage(send_fn, check_fn) {
@@ -299,14 +300,19 @@ export class ChatCollectionManager extends CollectionManager {
   async createGroup({
     name,
     contactIds,
+    picturePreview,
     picture
   }) {
+    if (picturePreview) {
+      picturePreview = 'data:image/jpeg;base64,' + picturePreview;
+    }
+
     if (picture) {
       picture = 'data:image/jpeg;base64,' + picture;
     }
     return await this.collection.createGroup(
       name,
-      picture,
+      picturePreview,
       picture,
       contactIds.map((item) => manager.getSubmanager('contacts').collection.get(item)).filter(Boolean));
   }

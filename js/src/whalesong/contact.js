@@ -5,11 +5,15 @@ import {
   CollectionManager,
   ModelManager
 } from './common.js';
+import {
+  ProfilePicThumbManager
+} from './profilePicThumb.js';
 
 export class ContactManager extends ModelManager {
 
   static mapModel(item) {
     return Object.assign(ModelManager.mapModel(item), {
+      id: item.id._serialized,
       formattedName: item.formattedName,
       isHighLevelVerified: item.isHighLevelVerified,
       isMe: item.isMe,
@@ -18,11 +22,24 @@ export class ContactManager extends ModelManager {
       isUser: item.isUser,
       isVerified: item.isVerified,
       isWAContact: item.isWAContact,
-      profilePicThumbObj: item.profilePicThumb ? item.profilePicThumb.toJSON() : {},
+      profilePicThumbObj: item.profilePicThumb ? ProfilePicThumbManager.mapModel(item.profilePicThumb) : {},
       statusMute: item.statusMute,
       userhash: item.userhash,
       userid: item.userid
     });
+  }
+
+  constructor(model) {
+    super(model);
+
+    if (model.profilePicThumb) {
+      this.addSubmanager(
+        'profilePicThumb',
+        manager.getSubmanager('profilePicThumbs').getSubmanager(
+          this.model.id._serialized
+        )
+      );
+    }
   }
 
   @command
@@ -42,11 +59,6 @@ export class ContactCollectionManager extends CollectionManager {
     return ContactManager;
   }
 
-  constructor(collection, conn) {
-    super(collection);
-    this.conn = conn;
-  }
-
   @command
   async resyncContacts() {
     return this.collection.resyncContacts();
@@ -54,6 +66,6 @@ export class ContactCollectionManager extends CollectionManager {
 
   @command
   async getMe() {
-    return this.mapItem(await this.collection.find(this.conn.me));
+    return this.mapItem(await this.collection.find(manager.getSubmanager('conn').me));
   }
 }
