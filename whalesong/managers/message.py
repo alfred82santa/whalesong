@@ -686,6 +686,26 @@ class MessageManager(BaseModelManager[BaseMessage]):
         """
         return self._execute_command('fetchInfo', result_class=MessageInfoManager.get_model_result_class())
 
+    def can_star(self) -> Result[bool]:
+        """
+        Check whether message could be starred.
+
+        :return: Whether message could be starred.
+        """
+        return self._execute_command('canStar')
+
+    def star(self) -> Result[bool]:
+        """
+        Star message.
+        """
+        return self._execute_command('star')
+
+    def unstar(self) -> Result[bool]:
+        """
+        Unstar message.
+        """
+        return self._execute_command('unstar')
+
 
 class MessageCollectionManager(BaseCollectionManager[MessageManager]):
     """

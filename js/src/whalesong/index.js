@@ -37,6 +37,9 @@ import {
 import {
   ProfilePicThumbCollectionManager
 } from './profilePicThumb.js';
+import {
+  StatusCollectionManager
+} from './status.js';
 
 
 function getArtifactsDefs() {
@@ -167,6 +170,16 @@ function getRequirementsDefs() {
           artifacts['store'].ProfilePicThumb
         );
         mainManager.addSubmanager('profilePicThumbs', manager);
+        return manager;
+      }
+    },
+    'statusManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new StatusCollectionManager(
+          artifacts['store'].Status
+        );
+        mainManager.addSubmanager('status', manager);
         return manager;
       }
     }

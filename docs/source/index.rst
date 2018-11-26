@@ -9,7 +9,7 @@ Currently WhatsappWeb is implemented
 
 .. warning::
 
-   **NEW VERSION 0.7.0 (Work in progress)**
+   **NEW VERSION 0.7.0**
 
    With new version some new requirements have been defined and some API change have been
    committed.
@@ -20,7 +20,7 @@ Currently WhatsappWeb is implemented
 
 .. warning::
 
-   **NEW VERSION 0.7.0 (Work in progress)**
+   **NEW VERSION 0.7.**
 
    Stream model now uses enumerations. It means that if you check stream states
    you must be aware that they are not a string anymore, now they are enumerations. Look at

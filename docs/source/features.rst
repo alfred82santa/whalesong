@@ -44,3 +44,8 @@ Whatsapp features
 * Load and send stickers (even with a quoted message).
 * Presence monitor.
 * Profile and group's picture management.
+* (Un)Pin and (un)archive chats.
+* Report spam.
+* (Un)Star messages.
+* Status management.
+* Pushname management.

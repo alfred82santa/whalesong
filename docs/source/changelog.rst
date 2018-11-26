@@ -17,6 +17,18 @@ Version 0.7.0
 * Fields' value are mapped on monitors.
 * Profile and group's picture management.
 
+* New chat methods: `pin`, `unpin`, `archive`, `unarchive`,
+  `set_group_description`, `star_messages`, `unstar_messages`, `send_not_spam`,
+  `send_spam_report`, `can_archive`, `can_send` and `can_pin`.
+
+* New chat collection method: `forward_messages_to_chats`.
+
+* New message methods: `can_star`, `star` and `unstar`.
+
+* Status (old one) management.
+
+* New commands in `minibot.py` example: `/status` and `/pushname`.
+
 -------------
 Version 0.6.0
 -------------

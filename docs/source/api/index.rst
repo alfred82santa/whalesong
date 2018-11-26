@@ -20,6 +20,7 @@ API reference
    stream
    presence
    profile_picture
+   status
    storage
    errors
    firefox_profile

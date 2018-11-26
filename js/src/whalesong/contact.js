@@ -8,6 +8,9 @@ import {
 import {
   ProfilePicThumbManager
 } from './profilePicThumb.js';
+import {
+  StatusManager
+} from './status.js';
 
 export class ContactManager extends ModelManager {
 
@@ -22,10 +25,11 @@ export class ContactManager extends ModelManager {
       isUser: item.isUser,
       isVerified: item.isVerified,
       isWAContact: item.isWAContact,
-      profilePicThumbObj: item.profilePicThumb ? ProfilePicThumbManager.mapModel(item.profilePicThumb) : {},
+      profilePicThumbObj: item.profilePicThumb ? ProfilePicThumbManager.mapModel(item.profilePicThumb) : null,
       statusMute: item.statusMute,
       userhash: item.userhash,
-      userid: item.userid
+      userid: item.userid,
+      status: item.status ? StatusManager.mapModel(item.status) : null
     });
   }
 

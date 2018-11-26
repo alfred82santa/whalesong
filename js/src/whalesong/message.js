@@ -41,6 +41,29 @@ export class MessageManager extends ModelManager {
     this.addSubmanager('msgInfo', manager.getSubmanager('messageInfos').getSubmanager(this.model.id._serialized));
     return result;
   }
+
+  @command
+  async canStar() {
+    return this.model.canStar();
+  }
+
+  @command
+  async star() {
+    return await manager.getSubmanager('chats')
+      .getSubmanager(this.model.chat.id)
+      .sendStarMsgs({
+        'messageIds': [this.model.id]
+      });
+  }
+
+  @command
+  async unstar() {
+    return await manager.getSubmanager('chats')
+      .getSubmanager(this.model.chat.id)
+      .sendUnstarMsgs({
+        'messageIds': [this.model.id]
+      });
+  }
 }
 
 export class MessageCollectionManager extends CollectionManager {

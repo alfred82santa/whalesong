@@ -75,6 +75,11 @@ class Minibot:
                         ensure_future(self.make_exists(message))
                     elif message.body.startswith('/sticker '):
                         ensure_future(self.make_sticker(message))
+                    elif message.body.startswith('/status '):
+                        ensure_future(self.make_status(message))
+                    elif message.body.startswith('/pushname '):
+                        ensure_future(self.make_pushname(message))
+
             except Exception as ex:
                 self.echo('Ignoring message {} because error : {}'.format(message.id, ex))
 
@@ -204,6 +209,16 @@ class Minibot:
                 content_type,
                 caption=sticker_pack.name
             )))
+
+    async def make_status(self, message):
+        new_status = message.body[len('/status '):].strip()
+        await self._driver.status.set_my_status(new_status=new_status)
+        self.echo(f'Set status: {new_status}')
+
+    async def make_pushname(self, message):
+        new_pushname = message.body[len('/pushname '):].strip()
+        await self._driver.conn.update_pushname(name=new_pushname)
+        self.echo(f'Set pushname: {new_pushname}')
 
     async def start(self):
         await self._driver.start()
