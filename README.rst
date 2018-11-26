@@ -1,7 +1,7 @@
 
 .. warning::
 
-   **NEW VERSION 0.7.0 (Work in progress)**
+   **NEW VERSION 0.7.0**
 
    With new version some new requirements have been defined and some API change have been
    committed.
@@ -12,7 +12,7 @@
 
 .. warning::
 
-   **NEW VERSION 0.7.0 (Work in progress)**
+   **NEW VERSION 0.7.0**
 
    Stream model now uses enumerations. It means that if you check stream states
    you must be aware that they are not a string anymore, now they are enumerations. Look at
@@ -151,6 +151,11 @@ Whatsapp features
 * Load and send stickers (even with a quoted message).
 * Presence monitor.
 * Profile and group's picture management.
+* (Un)Pin and (un)archive chats.
+* Report spam.
+* (Un)Star messages.
+* Status management.
+* Pushname management.
 
 ---------
 Changelog

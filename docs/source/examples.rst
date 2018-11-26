@@ -227,6 +227,33 @@ Example
 
     /sticker Cuppy
 
+Set bot status
+--------------
+
+When a contact sends `/status [newStatus]`, it will change its own status to `[newStatus]`.
+
+
+Example
+.......
+
+.. code-block:: text
+
+    /status I'm a bot
+
+
+Set bot pushname
+----------------
+
+When a contact sends `/pushname [name]`, it will change its own pushname to `[name]`.
+
+
+Example
+.......
+
+.. code-block:: text
+
+    /pushname I'm a bot
+
 
 Get stickers
 ============

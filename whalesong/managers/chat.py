@@ -380,6 +380,114 @@ class ChatManager(BaseModelManager[Chat]):
 
         return self._execute_command('markPaused')
 
+    def can_archive(self) -> Result[bool]:
+        """
+        Check whether chat could be archived.
+
+        :return: Whether chat could be archived.
+        """
+
+        return self._execute_command('canArchive')
+
+    def can_send(self) -> Result[bool]:
+        """
+        Check whether current user could send message in chat.
+
+        :return: Whether current user could send message in chat.
+        """
+
+        return self._execute_command('canSend')
+
+    def can_pin(self) -> Result[bool]:
+        """
+        Check whether chat could be pinned.
+
+        :return: Whether chat could be pinned.
+        """
+
+        return self._execute_command('canPin')
+
+    def archive(self) -> Result[bool]:
+        """
+        Archive chat.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('setArchive', {'archive': True})
+
+    def unarchive(self) -> Result[bool]:
+        """
+        Unarchive chat.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('setArchive', {'archive': False})
+
+    def pin(self) -> Result[bool]:
+        """
+        Pin chat.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('setPin', {'pin': True})
+
+    def unpin(self) -> Result[bool]:
+        """
+        Unpin chat.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('setPin', {'pin': False})
+
+    def set_group_description(self, description) -> Result[bool]:
+        """
+        Set group description.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('setGroupDesc', {'description': description})
+
+    def star_messages(self, message_ids) -> Result[bool]:
+        """
+        Star messages.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('sendStarMsgs', {'messageIds': message_ids})
+
+    def unstar_messages(self, message_ids) -> Result[bool]:
+        """
+        Unstar messages.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('sendUnstarMsgs', {'messageIds': message_ids})
+
+    def send_not_spam(self) -> Result[bool]:
+        """
+        Send not spam report.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('sendNotSpam')
+
+    def send_spam_report(self) -> Result[bool]:
+        """
+        Send spam report.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('sendSpamReport')
+
 
 class ChatCollectionManager(BaseCollectionManager):
     MODEL_MANAGER_CLASS = ChatManager
@@ -431,3 +539,12 @@ class ChatCollectionManager(BaseCollectionManager):
                 params['picturePreview'] = b64encode(picture_preview.read()).decode()
 
         return self._execute_command('createGroup', params)
+
+    def forward_messages_to_chats(self, message_ids, chat_ids) -> Result[dict]:
+        """
+        Forward messages.
+
+        :return: Operation result.
+        """
+
+        return self._execute_command('forwardMessagesToChats', {'messageIds': message_ids, 'chatIds': chat_ids})

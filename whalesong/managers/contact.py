@@ -2,29 +2,11 @@ from dirty_models import ArrayField, BooleanField, ModelField, StringIdField
 from vobject import vCard
 
 from . import BaseCollectionManager, BaseModelManager
-from .profile_pic_thumb import ProfilePictureManager
+from .profile_pic_thumb import ProfilePicture, ProfilePictureManager
+from .status import Status
 from .. import BaseWhalesongDriver
 from ..models import BaseModel
 from ..results import Result
-
-
-class ProfilePicture(BaseModel):
-    eurl = StringIdField()
-    """
-    Url to contact picture.
-    """
-
-    raw = StringIdField()
-    """
-    ¿?
-    """
-
-    tag = StringIdField()
-    """
-    ¿?
-    
-    .. note:: I guess it is used to know when contact picture changed.
-    """
 
 
 class Contact(BaseModel):
@@ -76,6 +58,11 @@ class Contact(BaseModel):
     profile_pic_thumb_obj = ModelField(model_class=ProfilePicture)
     """
     Contact picture.
+    """
+
+    status = ModelField(model_class=Status)
+    """
+    Contact status.
     """
 
     is_user = BooleanField(default=True)

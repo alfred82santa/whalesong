@@ -254,6 +254,103 @@ export class ChatManager extends ModelManager {
   async markPaused() {
     this.model.markPaused();
   }
+
+  @command
+  async canSend() {
+    return this.model.canSend();
+  }
+
+  @command
+  async canArchive() {
+    return this.model.canArchive();
+  }
+
+  @command
+  async canPin() {
+    return this.model.canPin();
+  }
+
+  @command
+  async setArchive({
+    archive
+  }) {
+    let result = await this.model.setArchive(archive);
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async setPin({
+    pin
+  }) {
+    let result = await this.model.setPin(pin);
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async setGroupDesc({
+    description
+  }) {
+    let result = await this.model.setGroupDesc(description);
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async sendStarMsgs({
+    messageIds
+  }) {
+    let result = await this.model.sendStarMsgs(messageIds);
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async sendUnstarMsgs({
+    messageIds
+  }) {
+    let result = await this.model.sendUnstarMsgs(messageIds);
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async sendNotSpam() {
+    let result = await this.model.sendNotSpam();
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+  @command
+  async sendSpamReport() {
+    let result = await this.model.sendSpamReport();
+
+    if (result.status === 200) {
+      return true;
+    }
+    return false;
+  }
+
+
 }
 
 export class ChatCollectionManager extends CollectionManager {
@@ -315,5 +412,16 @@ export class ChatCollectionManager extends CollectionManager {
       picturePreview,
       picture,
       contactIds.map((item) => manager.getSubmanager('contacts').collection.get(item)).filter(Boolean));
+  }
+
+  @command
+  async forwardMessagesToChats({
+    messageIds,
+    chatIds
+  }) {
+    let messages = messageIds.map((id) => manager.getSubmanager('messages').loadItem(id));
+    let chats = chatIds.map((id) => this.loadItem(id));
+
+    return await this.collection.forwardMessagesToChats(messages, chats);
   }
 }
