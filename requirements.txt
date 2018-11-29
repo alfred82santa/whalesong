@@ -5,3 +5,4 @@ python-axolotl
 cryptography
 vobject
 pyppeteer
+websockets<7.0

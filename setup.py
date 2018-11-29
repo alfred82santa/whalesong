@@ -76,6 +76,7 @@ setup(
     ],
     extras_require={
         'firefox':  ['selenium>=3.4.3'],
-        'chromium': ['pyppeteer'],
+        'chromium': ['pyppeteer',
+                     'websockets<7.0'],
     }
 )

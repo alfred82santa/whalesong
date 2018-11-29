@@ -15,7 +15,7 @@ from .managers.stream import StreamManager
 from .managers.wap import WapManager
 from .results import MonitorResult, Result
 
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 
 class Whalesong(BaseManager):

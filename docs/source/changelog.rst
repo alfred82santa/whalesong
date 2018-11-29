@@ -3,6 +3,14 @@ Changelog
 =========
 
 -------------
+Version 0.7.1
+-------------
+
+* Fixed Chromium driver.
+* Forced Websockets 6.0
+* Added new example `presencemonitor-chromium.py`. It is same than `presencemonitor.py` but using Chromium.
+
+-------------
 Version 0.7.0
 -------------
 
