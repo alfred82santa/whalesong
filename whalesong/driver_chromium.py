@@ -102,5 +102,5 @@ class WhalesongDriver(BaseWhalesongDriver):
             f'(function() {{window.manager.executeCommand("{result_id}", "{command}", {dumps(params)})}})()'
         )
 
-    async def _iternal_close(self):
+    async def _internal_close(self):
         await self.driver.close()
