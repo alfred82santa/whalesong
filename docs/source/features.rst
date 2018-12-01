@@ -49,3 +49,4 @@ Whatsapp features
 * (Un)Star messages.
 * Status management.
 * Pushname management.
+* Display information management.

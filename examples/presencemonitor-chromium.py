@@ -14,7 +14,7 @@ class PresenceMonitor:
 
         self._driver = Whalesong(
             driver=WhalesongDriver(profile=path.join(path.dirname(__file__), 'profile-chromium'),
-                                   headless=False,
+                                   headless=True,
                                    loop=loop),
             loop=loop
         )
@@ -38,12 +38,14 @@ class PresenceMonitor:
             self.echo('Stream value: {}'.format(evt['value']))
 
             if evt['value'] == Stream.Stream.CONNECTED:
+                self._driver.display_info.set_available_permanent()
+
                 if chat_it is None:
                     chat_it = self._driver.chats.get_items()
                     ensure_future(self.start_monitor_presences(chat_it))
             else:
                 if chat_it is not None:
-                    self._driver.cancel_iterators()
+                    await self._driver.cancel_iterators()
                     chat_it = None
 
     async def start_monitor_presences(self, it):
@@ -57,7 +59,7 @@ class PresenceMonitor:
     async def monitor_chat(self, chat):
         if chat.is_group:
             self.echo(f'Chat `{chat.name}` is group')
-            await self._driver.chats[chat.id].presence.update()
+            await self._driver.chats[chat.id].presence.subscribe()
 
             async for chat_state in self._driver.chats[chat.id].presence.chat_states.get_items():
                 ensure_future(self.monitor_chat_state(

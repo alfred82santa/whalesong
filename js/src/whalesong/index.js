@@ -40,6 +40,9 @@ import {
 import {
   StatusCollectionManager
 } from './status.js';
+import {
+  DisplayInfoManager
+} from './displayInfo.js';
 
 
 function getArtifactsDefs() {
@@ -51,6 +54,7 @@ function getArtifactsDefs() {
     'uiController': (module) => module.default && module.default.focusNextChat ? module.default : null,
     'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null,
     'createPeerForContact': (module) => (module.default && module.default.prototype && module.default.prototype.isServer && module.default.prototype.isUser) ? module.default : null,
+    'displayInfo': (module) => (module.default && module.default.markAvailable && module.default.unobscure) ? module.default : null,
   }
 }
 
@@ -182,8 +186,18 @@ function getRequirementsDefs() {
         mainManager.addSubmanager('status', manager);
         return manager;
       }
+    },
+    'displayInfoManager': {
+      'requirements': ['displayInfo'],
+      'build': function(mainManager, artifacts) {
+        let manager = new DisplayInfoManager(
+          artifacts['displayInfo']
+        );
+        mainManager.addSubmanager('displayInfo', manager);
+        return manager;
+      }
     }
-  };
+  }
 }
 
 export default function createManagers(mainManager) {

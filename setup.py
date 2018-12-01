@@ -68,7 +68,6 @@ setup(
                                  'firefox_profile_template/*.json']},
     install_requires=[
         'dirty-models>=0.11',
-        'selenium>=3.4.3',
         'python-axolotl',
         'cryptography',
         'aiohttp>=3.0',

@@ -2,13 +2,14 @@ from asyncio import AbstractEventLoop
 
 from io import BytesIO
 
-from whalesong.managers.status import StatusCollectionManager
 from .driver import BaseWhalesongDriver
 from .managers import BaseManager
 from .managers.chat import ChatCollectionManager
 from .managers.conn import ConnManager
 from .managers.contact import ContactCollectionManager
+from .managers.display_info import DisplayInfoManager
 from .managers.message import MessageCollectionManager
+from .managers.status import StatusCollectionManager
 from .managers.sticker_pack import StickerPack, StickerPackCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
@@ -69,6 +70,7 @@ class Whalesong(BaseManager):
         self._submanagers['wap'] = WapManager(self._driver, manager_path='wap')
         self._submanagers['sticker_packs'] = StickerPackCollectionManager(self._driver, manager_path='stickerPacks')
         self._submanagers['status'] = StatusCollectionManager(self._driver, manager_path='status')
+        self._submanagers['display_info'] = DisplayInfoManager(self._driver, manager_path='displayInfo')
 
         self._fut_running = None
 

@@ -3,6 +3,26 @@ Changelog
 =========
 
 -------------
+Version 0.7.2
+-------------
+
+* Capability to manager display information. It allows to mark current user as available in other
+  to get presences from other users.
+
+  There are some limitations. Look at :class:`documentation <whalesong.managers.presence.PresenceCollectionManager>`.
+
+* Minor fixes.
+
+* Remove some debug messages.
+
+* Fix issues with presence.
+
+* Added manual ping-pong for Chromium backend.
+
+* Modified `presencemonitor-chromium.py` and `presencemonitor.py` examples in order to get presences
+  permanently.
+
+-------------
 Version 0.7.1
 -------------
 

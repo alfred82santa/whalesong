@@ -14,11 +14,6 @@ export class ChatStateManager extends ModelManager {
       id: item.id._serialized ? item.id._serialized : item.id,
     });
   }
-
-  @command
-  async subscribe() {
-    return this.mapModel(await this.model.subscribe());
-  }
 }
 
 export class ChatStateCollectionManager extends CollectionManager {
@@ -50,8 +45,9 @@ export class PresenceManager extends ModelManager {
   }
 
   @command
-  async update() {
-    return this.constructor.mapModel(await this.model.update());
+  async subscribe() {
+    manager.getSubmanager('wap').model.subscribePresence(this.model.id);
+    return this.constructor.mapModel(await this.model.subscribe());
   }
 }
 

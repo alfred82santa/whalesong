@@ -21,6 +21,7 @@ API reference
    presence
    profile_picture
    status
+   display_info
    storage
    errors
    firefox_profile

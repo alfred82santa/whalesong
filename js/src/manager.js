@@ -317,4 +317,9 @@ export default class MainManager extends CommandManager {
   }) {
     return this.monitorManager.removeMonitor(monitorId);
   }
+
+  @command
+  async ping() {
+    return 'pong';
+  }
 }
