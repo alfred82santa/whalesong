@@ -126,12 +126,10 @@ class BaseWhalesongDriver(ABC):
         pass
 
     def process_result_sync(self, result):
-        print(f'Sync process result: {result}')
         ensure_future(self.process_result(result), loop=self.loop)
         return True
 
     async def process_result(self, result):
-        print(f'Process result: {result}')
         try:
             if result['type'] == 'FINAL':
                 await self.result_manager.set_final_result(result['exId'], result['params'])

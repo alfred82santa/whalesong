@@ -1,4 +1,21 @@
 
+.. |badge-python-versions| image:: https://img.shields.io/pypi/pyversions/whalesong.svg
+   :alt: Python versions
+
+
+.. |badge-version| image:: https://img.shields.io/pypi/v/whalesong.svg
+   :alt: Last version
+   :target: https://pypi.org/project/whalesong/
+
+.. |badge-license| image:: https://img.shields.io/pypi/l/whalesong.svg
+   :alt: License
+
+
+.. |badge-status| image:: https://img.shields.io/pypi/status/whalesong.svg
+   :alt: Status
+
+|badge-status| |badge-license| |badge-version| |badge-python-versions|
+
 .. warning::
 
    **NEW VERSION 0.7.0**
@@ -156,6 +173,7 @@ Whatsapp features
 * (Un)Star messages.
 * Status management.
 * Pushname management.
+* Display information management.
 
 ---------
 Changelog

@@ -40,7 +40,7 @@ class GetContacts:
                     ensure_future(self.list_contacts(contact_it))
             else:
                 if contact_it is not None:
-                    self._driver.cancel_iterators()
+                    await self._driver.cancel_iterators()
                     contact_it = None
 
     async def list_contacts(self, it):

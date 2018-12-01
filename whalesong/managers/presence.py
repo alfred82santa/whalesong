@@ -74,14 +74,26 @@ class PresenceManager(BaseModelManager[Presence]):
         self.add_submanager('chat_state', ChatStateManager(driver=self._driver,
                                                            manager_path=self._build_command('chatState')))
 
-    def update(self) -> Result[Presence]:
-        return self._execute_command('update',
+    def subscribe(self) -> Result[Presence]:
+        return self._execute_command('subscribe',
                                      result_class=self.get_model_result_class())
 
 
 class PresenceCollectionManager(BaseCollectionManager[PresenceManager]):
     """
     Presence collection manager.
+
+    .. note::
+
+       Be aware Whatsapp has some limitations about presence announcement.
+
+       * You must be available in order to receive presence announcements.
+         Look at :meth:`display information <whalesong.managers.display_info.DisplayInfoManager.mark_available>`.
+
+       * After a while, other peer must see Whalesong user available in order to send presence announcement. But
+         if it is not available Whalesong user is not going to announce its presence. So, presence announcements
+         are made after first message.
+
     """
 
     MODEL_MANAGER_CLASS = PresenceManager

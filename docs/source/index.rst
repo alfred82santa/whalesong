@@ -1,5 +1,34 @@
 :tocdepth: 4
 
+.. |badge-issues| image:: https://img.shields.io/github/issues/alfred82santa/whalesong.svg
+   :alt: GitHub issues
+   :target: https://github.com/alfred82santa/whalesong/issues
+
+.. |badge-forks| image:: https://img.shields.io/github/forks/alfred82santa/whalesong.svg
+   :alt: GitHub forks
+   :target: https://github.com/alfred82santa/whalesong/network
+
+.. |badge-stars| image:: https://img.shields.io/github/stars/alfred82santa/whalesong.svg
+   :alt: GitHub stars
+   :target: https://github.com/alfred82santa/whalesong/stargazers
+
+.. |badge-python-versions| image:: https://img.shields.io/pypi/pyversions/whalesong.svg
+   :alt: Python versions
+
+
+.. |badge-version| image:: https://img.shields.io/pypi/v/whalesong.svg
+   :alt: Last version
+   :target: https://pypi.org/project/whalesong/
+
+.. |badge-license| image:: https://img.shields.io/pypi/l/whalesong.svg
+   :alt: License
+
+
+.. |badge-status| image:: https://img.shields.io/pypi/status/whalesong.svg
+   :alt: Status
+
+|badge-status| |badge-license| |badge-version| |badge-python-versions| |badge-stars| |badge-forks| |badge-issues|
+
 =========
 Whalesong
 =========

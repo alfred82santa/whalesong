@@ -1,4 +1,4 @@
-from asyncio import AbstractEventLoop
+from asyncio import AbstractEventLoop, Future, Task, ensure_future, sleep
 from json import dumps
 from logging import Logger
 from pathlib import Path
@@ -64,6 +64,8 @@ class WhalesongDriver(BaseWhalesongDriver):
             chromium_args.extend(DEFAULT_CHROMIUM_ARGS)
             self.options['args'] = chromium_args
 
+        self._fut_keep_alive: Future = None
+
     async def _internal_start_driver(self):
         self.driver = await launch(
             **self.options)
@@ -81,9 +83,13 @@ class WhalesongDriver(BaseWhalesongDriver):
         await self.refresh()
 
     async def refresh(self):
+        if self._fut_keep_alive is not None:
+            self._fut_keep_alive.cancel()
+
         await self.page.goto(self._URL)
         self.result_manager.cancel_all()
         await self.run_scriptlet()
+        self._fut_keep_alive = ensure_future(self._keep_alive())
 
     async def _internal_run_scriptlet(self, script):
         await self.page.evaluate(script)
@@ -102,5 +108,16 @@ class WhalesongDriver(BaseWhalesongDriver):
             f'(function() {{window.manager.executeCommand("{result_id}", "{command}", {dumps(params)})}})()'
         )
 
+    async def _keep_alive(self, interval=10):
+        while not Task.current_task().cancelled():
+            await sleep(interval)
+            try:
+                if await self.execute_command('ping') != 'pong':
+                    # TODO
+                    break
+            except Exception as ex:
+                self.logger.warning(ex)
+
     async def _internal_close(self):
+        self._fut_keep_alive.cancel()
         await self.driver.close()

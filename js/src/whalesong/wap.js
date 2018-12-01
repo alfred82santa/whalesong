@@ -31,4 +31,11 @@ export class WapManager extends ModelManager {
 
     return result;
   }
+
+  @command
+  async subscribePresence({
+    id
+  }) {
+    return await this.model.subscribePresence(id)
+  }
 }
