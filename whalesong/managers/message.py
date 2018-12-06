@@ -7,7 +7,7 @@ from base64 import b64decode
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from dirty_models import ArrayField, BooleanField, DateTimeField, EnumField, FloatField, IntegerField, ModelField, \
-    StringIdField
+    StringIdField, TimedeltaField
 from dirty_models.models import CamelCaseMeta
 from enum import Enum
 from io import BytesIO
@@ -493,16 +493,29 @@ class LocationMessage(QuotedMessageMixin, MentionsMixin, BaseMessage):
 
     body = Base64Field()
 
+    is_live = BooleanField(default=False)
+
     lat = FloatField()
     lng = FloatField()
+
     loc = StringIdField()
-    is_live = BooleanField(default=False)
     accuracy = IntegerField()
     speed = IntegerField()
     degrees = FloatField()
     comment = StringIdField()
-    sequence = IntegerField()
-    share_duration = IntegerField()
+    sequence = DateTimeField()
+    share_duration = TimedeltaField()
+    duration = TimedeltaField()
+
+    text = StringIdField()
+
+    final_thumbnail = Base64Field()
+    final_lat = FloatField()
+    final_lng = FloatField()
+    final_accuracy = IntegerField()
+    final_speed = IntegerField()
+    final_degrees = FloatField()
+    final_time_offset = TimedeltaField()
 
 
 class PaymentMessage(BaseMessage):

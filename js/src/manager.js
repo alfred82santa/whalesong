@@ -299,7 +299,7 @@ export default class MainManager extends CommandManager {
       console.error(err, command, params);
       if ((err instanceof Error) || (err instanceof BaseError)) {
         this.resultManager.setErrorResult(exId, {
-          'name': err.name,
+          'name': err.displayName || err.name,
           'message': err.message,
           'params': err.params || {}
         });

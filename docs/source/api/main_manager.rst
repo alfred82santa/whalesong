@@ -52,3 +52,24 @@ Whalesong Service
         :class:`~whalesong.managers.sticker_pack.StickerPackCollectionManager`
 
         Manager for sticker pack collection.
+
+
+    .. attribute:: status
+
+        :class:`~whalesong.managers.status.StatusCollectionManager`
+
+        Manager for status collection.
+
+
+    .. attribute:: display_info
+
+        :class:`~whalesong.managers.display_info.DisplayInfoManager`
+
+        Manager for display information.
+
+
+    .. attribute:: live_locations
+
+        :class:`~whalesong.managers.live_location.LiveLocationCollectionManager`
+
+        Manager for live locations collection.

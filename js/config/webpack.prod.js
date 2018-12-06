@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
 
 /*
  * SplitChunksPlugin is enabled by default and replaced
@@ -49,6 +50,14 @@ module.exports = {
 	},
 
 	optimization: {
-	    minimizer: []
+	    minimizer: [
+	        new TerserPlugin({
+	            test: /\.js(\?.*)?$/i,
+	            terserOptions: {
+	                keep_classnames: true,
+                    keep_fnames: true
+	            }
+	        })
+	    ]
 	}
 };
