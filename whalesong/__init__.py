@@ -8,6 +8,7 @@ from .managers.chat import ChatCollectionManager
 from .managers.conn import ConnManager
 from .managers.contact import ContactCollectionManager
 from .managers.display_info import DisplayInfoManager
+from .managers.live_location import LiveLocationCollectionManager
 from .managers.message import MessageCollectionManager
 from .managers.status import StatusCollectionManager
 from .managers.sticker_pack import StickerPack, StickerPackCollectionManager
@@ -16,7 +17,7 @@ from .managers.stream import StreamManager
 from .managers.wap import WapManager
 from .results import MonitorResult, Result
 
-__version__ = '0.7.2'
+__version__ = '0.8.0'
 
 
 class Whalesong(BaseManager):
@@ -71,6 +72,7 @@ class Whalesong(BaseManager):
         self._submanagers['sticker_packs'] = StickerPackCollectionManager(self._driver, manager_path='stickerPacks')
         self._submanagers['status'] = StatusCollectionManager(self._driver, manager_path='status')
         self._submanagers['display_info'] = DisplayInfoManager(self._driver, manager_path='displayInfo')
+        self._submanagers['live_locations'] = LiveLocationCollectionManager(self._driver, manager_path='liveLocations')
 
         self._fut_running = None
 

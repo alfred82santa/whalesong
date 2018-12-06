@@ -43,6 +43,9 @@ import {
 import {
   DisplayInfoManager
 } from './displayInfo.js';
+import {
+  LiveLocationCollectionManager
+} from './liveLocation.js';
 
 
 function getArtifactsDefs() {
@@ -196,7 +199,15 @@ function getRequirementsDefs() {
         mainManager.addSubmanager('displayInfo', manager);
         return manager;
       }
-    }
+    },
+    'liveLocationManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new LiveLocationCollectionManager(artifacts['store'].LiveLocation);
+        mainManager.addSubmanager('liveLocations', manager);
+        return manager;
+      }
+    },
   }
 }
 

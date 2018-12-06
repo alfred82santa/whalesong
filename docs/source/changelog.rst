@@ -2,11 +2,17 @@
 Changelog
 =========
 
+--------------------------------
+Version 0.8.0 (Work in progress)
+--------------------------------
+
+* Live locations management.
+
 -------------
 Version 0.7.2
 -------------
 
-* Capability to manager display information. It allows to mark current user as available in other
+* Capability to manage display information. It allows to mark current user as available in other
   to get presences from other users.
 
   There are some limitations. Look at :class:`documentation <whalesong.managers.presence.PresenceCollectionManager>`.

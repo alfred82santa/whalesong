@@ -21,6 +21,7 @@ API reference
    presence
    profile_picture
    status
+   live_location
    display_info
    storage
    errors
