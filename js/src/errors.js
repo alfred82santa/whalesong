@@ -24,3 +24,5 @@ export class ValueError extends BaseError {}
 export class StopIterator extends BaseError {};
 
 export class StopMonitor extends BaseError {};
+
+export class OperationNotAllowed extends BaseError {};

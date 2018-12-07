@@ -196,6 +196,17 @@ class BaseCollectionManager(BaseManager, Generic[MODEL_MANAGER_TYPE]):
                                      {'id': item_id},
                                      result_class=self.get_item_result_class())
 
+    def find_item_by_id(self, item_id: str) -> Result[MODEL_TYPE]:
+        """
+        Find model by identifier. If item is not in collection it will try to load it.
+
+        :param item_id: Model identifier.
+        :return: Model object.
+        """
+        return self._execute_command('findItemById',
+                                     {'id': item_id},
+                                     result_class=self.get_item_result_class())
+
     def remove_item_by_id(self, item_id: str) -> Result[None]:
         """
         Remove item by identifier.

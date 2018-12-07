@@ -110,6 +110,14 @@ export class CollectionManager extends CommandManager {
     return item;
   }
 
+  async findItem(id) {
+    let item = this.collection.find(id);
+    if (!item) {
+      throw new ModelNotFound(`Item with ID "${id}" not found`);
+    }
+    return item;
+  }
+
   getSubmanager(name) {
     try {
       return super.getSubmanager(name);
@@ -143,6 +151,13 @@ export class CollectionManager extends CommandManager {
     id
   }) {
     return this.mapItem(this.loadItem(id));
+  }
+
+  @command
+  async findItemById({
+    id
+  }) {
+    return this.mapItem(await this.findItem(id));
   }
 
   @command

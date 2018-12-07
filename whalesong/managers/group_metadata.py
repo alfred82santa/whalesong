@@ -143,5 +143,5 @@ class GroupMetadataManager(BaseModelManager[GroupMetadata]):
         return self._execute_command('revokeGroupInvite')
 
 
-class GroupMetadataCollectionManager(BaseCollectionManager):
+class GroupMetadataCollectionManager(BaseCollectionManager[GroupMetadataManager]):
     MODEL_MANAGER_CLASS = GroupMetadataManager

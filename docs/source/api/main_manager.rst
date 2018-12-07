@@ -73,3 +73,10 @@ Whalesong Service
         :class:`~whalesong.managers.live_location.LiveLocationCollectionManager`
 
         Manager for live locations collection.
+
+
+    .. attribute:: mutes
+
+        :class:`~whalesong.managers.mute.MuteCollectionManager`
+
+        Manager for mutes collection.

@@ -22,6 +22,7 @@ API reference
    profile_picture
    status
    live_location
+   mute
    display_info
    storage
    errors

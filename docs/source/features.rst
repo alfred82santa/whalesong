@@ -51,3 +51,4 @@ Whatsapp features
 * Pushname management.
 * Display information management.
 * Live location management.
+* Mutes management.

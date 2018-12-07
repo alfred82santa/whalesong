@@ -10,6 +10,7 @@ from .managers.contact import ContactCollectionManager
 from .managers.display_info import DisplayInfoManager
 from .managers.live_location import LiveLocationCollectionManager
 from .managers.message import MessageCollectionManager
+from .managers.mute import MuteCollectionManager
 from .managers.status import StatusCollectionManager
 from .managers.sticker_pack import StickerPack, StickerPackCollectionManager
 from .managers.storage import StorageManager
@@ -73,6 +74,7 @@ class Whalesong(BaseManager):
         self._submanagers['status'] = StatusCollectionManager(self._driver, manager_path='status')
         self._submanagers['display_info'] = DisplayInfoManager(self._driver, manager_path='displayInfo')
         self._submanagers['live_locations'] = LiveLocationCollectionManager(self._driver, manager_path='liveLocations')
+        self._submanagers['mutes'] = MuteCollectionManager(self._driver, manager_path='mutes')
 
         self._fut_running = None
 

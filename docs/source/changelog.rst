@@ -7,6 +7,7 @@ Version 0.8.0 (Work in progress)
 --------------------------------
 
 * Live locations management.
+* Mutes management.
 
 -------------
 Version 0.7.2

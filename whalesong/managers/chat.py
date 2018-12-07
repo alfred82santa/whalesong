@@ -7,6 +7,8 @@ from io import BytesIO
 from . import BaseCollectionManager, BaseModelManager
 from .contact import Contact, ContactManager
 from .group_metadata import GroupMetadata, GroupMetadataManager
+from .live_location import LiveLocation, LiveLocationManager
+from .mute import Mute, MuteManager
 from .presence import PresenceManager
 from ..driver import BaseWhalesongDriver
 from ..models import BaseModel
@@ -105,6 +107,11 @@ class Chat(BaseModel):
     Whether it was notified as spam chat.
     """
 
+    mute = ModelField(model_class=Mute)
+    """
+    Mute information.
+    """
+
 
 class MsgLoadState(BaseModel):
     context_loaded = BooleanField(default=False)
@@ -169,6 +176,13 @@ class ChatManager(BaseModelManager[Chat]):
 
         Chat's contact manager.
 
+    .. attribute:: live_location
+
+        :class:`~whalesong.managers.live_location.LiveLocationManager`
+
+        Live location manager. You should call to :meth:`~whalesong.managers.chat.ChatManager.find_live_location`
+        before use it.
+
     """
     MODEL_CLASS = Chat
 
@@ -190,6 +204,12 @@ class ChatManager(BaseModelManager[Chat]):
 
         self.add_submanager('contact', ContactManager(driver=self._driver,
                                                       manager_path=self._build_command('contact')))
+
+        self.add_submanager('live_location', LiveLocationManager(driver=self._driver,
+                                                                 manager_path=self._build_command('liveLocation')))
+
+        self.add_submanager('mute', MuteManager(driver=self._driver,
+                                                manager_path=self._build_command('mute')))
 
     def send_text(self, text: str,
                   quoted_msg_id: Optional[str] = None,
@@ -487,6 +507,15 @@ class ChatManager(BaseModelManager[Chat]):
         """
 
         return self._execute_command('sendSpamReport')
+
+    def find_live_location(self) -> Result[LiveLocation]:
+        """
+        It find chat's live location. If it does not exist it will be created.
+
+        :return: Live location.
+        """
+        return self._execute_command('findLiveLocation',
+                                     result_class=LiveLocationManager.get_model_result_class())
 
 
 class ChatCollectionManager(BaseCollectionManager):
