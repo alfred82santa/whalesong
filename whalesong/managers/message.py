@@ -719,6 +719,20 @@ class MessageManager(BaseModelManager[BaseMessage]):
         """
         return self._execute_command('unstar')
 
+    def can_revoke(self) -> Result[bool]:
+        """
+        Check whether message could be revoked (deleted for other).
+
+        :return: Whether message could be revoked.
+        """
+        return self._execute_command('canRevoke')
+
+    def revoke(self, clear_media: bool = True) -> Result[str]:
+        """
+        Revoke message.
+        """
+        return self._execute_command('revoke', {'clearMedia': clear_media})
+
 
 class MessageCollectionManager(BaseCollectionManager[MessageManager]):
     """

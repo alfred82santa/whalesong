@@ -7,7 +7,6 @@ from io import BytesIO
 from . import BaseCollectionManager, BaseModelManager
 from .contact import Contact, ContactManager
 from .group_metadata import GroupMetadata, GroupMetadataManager
-from .live_location import LiveLocation, LiveLocationManager
 from .mute import Mute, MuteManager
 from .presence import PresenceManager
 from ..driver import BaseWhalesongDriver
@@ -205,6 +204,7 @@ class ChatManager(BaseModelManager[Chat]):
         self.add_submanager('contact', ContactManager(driver=self._driver,
                                                       manager_path=self._build_command('contact')))
 
+        from .live_location import LiveLocationManager
         self.add_submanager('live_location', LiveLocationManager(driver=self._driver,
                                                                  manager_path=self._build_command('liveLocation')))
 
@@ -508,12 +508,15 @@ class ChatManager(BaseModelManager[Chat]):
 
         return self._execute_command('sendSpamReport')
 
+    from .live_location import LiveLocation
+
     def find_live_location(self) -> Result[LiveLocation]:
         """
         It find chat's live location. If it does not exist it will be created.
 
         :return: Live location.
         """
+        from .live_location import LiveLocationManager
         return self._execute_command('findLiveLocation',
                                      result_class=LiveLocationManager.get_model_result_class())
 
