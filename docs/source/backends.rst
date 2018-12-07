@@ -9,7 +9,7 @@ an interface to manage webviews and that is what Whalesong use to manage applica
 depending on browser, but there is a standard interface called
 `WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_. Firsts Whalesong versions use to use a
 `Selenium <https://www.seleniumhq.org/>`_ library in order to communicate with Firefox browser.
-This backend is the default one for now, **but it will deprecated in next versions and removed in version 1.0**.
+This backend is the default one for now, **but it will be deprecated in next versions and removed in version 1.0**.
 
 ---------------
 Firefox backend
@@ -31,7 +31,7 @@ Pros
 Contras
 .......
 
-* Selenium is a huge library. It is wonderful for what it was created, but not for Whalsong.
+* Selenium is a huge library. It is wonderful for what it was created, but not for Whalesong.
 * Selenium is a synchronous library. It is a problem, because Whalesong is an asynchronous
   library. It means, Whalesong creates a thread pool to communicate with Selenium.
 
@@ -71,7 +71,7 @@ Chromium backend
 ----------------
 
 It is the new one. It is implemented using `Pyppetter <https://github.com/miyakogi/pyppeteer>`_ which is inspired
-on `Puppetter <https://pptr.dev/>`_ (a `node` library to control Chromium headless, mainly, for testing). It use
+on `Puppetter <https://pptr.dev/>`_ (a `node` library to control Chromium headless, mainly, for testing). It uses
 `Devtools protocol <https://chromedevtools.github.io/devtools-protocol/>`_ in order to communicate with the browser.
 It is an asynchronous protocol over websocket.
 
@@ -91,9 +91,10 @@ Contras
 
 * It is Chromium. It uses Blink: over-vitaminized Webkit render. A memory eater.
 * Currently Pypperter has a bug. It makes to loose connection after 20 seconds. It is resolved in
-  miyakogi/pyppeteer/#160 but is not approved yet (some test errors).
+  `miyakogi/pyppeteer/#160 <https://github.com/miyakogi/pyppeteer/pull/160>`_ but is not
+  approved yet (some test errors).
 
-* It use a patched Chromium version from Puppetter. Whalesong needs this patch because it use `Runtime.addBinding`
+* It use a patched Chromium version from Puppetter. Whalesong needs this patch because it uses `Runtime.addBinding`
   command. It is not available in regular stable version. So, you must `download it <using_chromium>`_ before
   use the backend.
 
@@ -116,9 +117,9 @@ In order to use Chromium backend you must inject Chromium driver to Whalesong se
    driver = WhalesongDriver(profile='/path/to/your/chromium/profile')
    whaleapp = Whalesong(driver=driver)
 
-..............
+--------------
 Other backends
-..............
+--------------
 
 No, there are no other backends. But I'm thinking about other possibilities:
 

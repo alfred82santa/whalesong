@@ -13,12 +13,21 @@ import {
   ContactManager
 } from './contact.js';
 import {
+  PresenceManager
+} from './presence.js';
+import {
   GroupMetadataManager
 } from './groupMetadata.js';
 import {
   SendMessageFail,
   ModelNotFound
 } from './errors.js';
+import {
+  MuteManager
+} from './mute.js';
+import {
+  LiveLocationManager
+} from './liveLocation.js';
 import b64toblob from 'b64-to-blob';
 
 
@@ -34,7 +43,9 @@ export class ChatManager extends ModelManager {
       contact: item.contact ? ContactManager.mapModel(item.contact) : null,
       groupMetadata: item.groupMetadata ? GroupMetadataManager.mapModel(item.groupMetadata) : null,
       lastReceivedKey: item.lastReceivedKey ? item.lastReceivedKey._serialized : null,
-      msgs: null
+      msgs: null,
+      mute: MuteManager.mapModel(item.mute)
+      liveLocationQueried: item.liveLocationQueried
     });
   }
 
@@ -46,8 +57,13 @@ export class ChatManager extends ModelManager {
       this.addSubmanager('metadata', new GroupMetadataManager(this.model.groupMetadata));
     } catch (err) {}
 
-    this.addSubmanager('presence', manager.getSubmanager('presences').getSubmanager(this.model.id._serialized));
-    this.addSubmanager('contact', manager.getSubmanager('contacts').getSubmanager(this.model.contact.id._serialized));
+    this.addSubmanager('presence', new PresenceManager(this.model.presence));
+    this.addSubmanager('contact', new ContactManager(this.model.contact));
+    this.addSubmanager('mute', new MuteManager(this.model.mute));
+
+    if (this.model.liveLocation) {
+      this.addSubmanager('liveLocation', new LiveLocationManager(this.model.liveLocation));
+    }
   }
 
   async _sendMessage(send_fn, check_fn) {
@@ -350,7 +366,15 @@ export class ChatManager extends ModelManager {
     return false;
   }
 
+  @command
+  async findLiveLocation() {
+    if (!this.model.liveLocation) {
+      await manager.getSubmanager('liveLocations').findItem(this.model.id);
+      this.addSubmanager('liveLocation', new LiveLocationManager(this.model.liveLocation));
+    }
 
+    return LiveLocationManager.mapModel(this.model.liveLocation);
+  }
 }
 
 export class ChatCollectionManager extends CollectionManager {

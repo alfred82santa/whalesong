@@ -175,6 +175,7 @@ Whatsapp features
 * Pushname management.
 * Display information management.
 * Live location management.
+* Mutes management.
 
 ---------
 Changelog
@@ -207,7 +208,7 @@ an interface to manage webviews and that is what Whalesong use to manage applica
 depending on browser, but there is a standard interface called
 `WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_. Firsts Whalesong versions use to use a
 `Selenium <https://www.seleniumhq.org/>`_ library in order to communicate with Firefox browser.
-This backend is the default one for now, **but it will deprecated in next versions and removed in version 1.0**.
+This backend is the default one for now, **but it will be deprecated in next versions and removed in version 1.0**.
 
 ...............
 Firefox backend
@@ -268,7 +269,7 @@ Chromium backend
 ................
 
 It is the new one. It is implemented using `Pyppetter <https://github.com/miyakogi/pyppeteer>`_ which is inspired
-on `Puppetter <https://pptr.dev/>`_ (a `node` library to control Chromium headless, mainly, for testing). It use
+on `Puppetter <https://pptr.dev/>`_ (a `node` library to control Chromium headless, mainly, for testing). It uses
 `Devtools protocol <https://chromedevtools.github.io/devtools-protocol/>`_ in order to communicate with the browser.
 It is an asynchronous protocol over websocket.
 
@@ -287,9 +288,10 @@ Contras
 
 * It is Chromium. It uses Blink: over-vitaminized Webkit render. A memory eater.
 * Currently Pypperter has a bug. It makes to loose connection after 20 seconds. It is resolved in
-  miyakogi/pyppeteer/#160 but is not approved yet (some test errors).
+  `miyakogi/pyppeteer/#160 <https://github.com/miyakogi/pyppeteer/pull/160>`_ but is not approved
+  yet (some test errors).
 
-* It uses a patched Chromium version from Puppetter. Whalesong needs this patch because it use `Runtime.addBinding`
+* It uses a patched Chromium version from Puppetter. Whalesong needs this patch because it uses `Runtime.addBinding`
   command. It is not available in regular stable version. So, you must `download it <using_chromium>`_ before
   use the backend.
 

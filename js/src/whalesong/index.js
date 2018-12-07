@@ -46,6 +46,9 @@ import {
 import {
   LiveLocationCollectionManager
 } from './liveLocation.js';
+import {
+  MuteCollectionManager
+} from './mute.js';
 
 
 function getArtifactsDefs() {
@@ -205,6 +208,14 @@ function getRequirementsDefs() {
       'build': function(mainManager, artifacts) {
         let manager = new LiveLocationCollectionManager(artifacts['store'].LiveLocation);
         mainManager.addSubmanager('liveLocations', manager);
+        return manager;
+      }
+    },
+    'muteManager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new MuteCollectionManager(artifacts['store'].Mute);
+        mainManager.addSubmanager('mutes', manager);
         return manager;
       }
     },
