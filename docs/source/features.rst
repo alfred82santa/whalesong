@@ -52,3 +52,4 @@ Whatsapp features
 * Display information management.
 * Live location management.
 * Mutes management.
+* It's able to revoke messages (delete messages for others)

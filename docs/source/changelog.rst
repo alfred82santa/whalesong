@@ -2,12 +2,14 @@
 Changelog
 =========
 
---------------------------------
-Version 0.8.0 (Work in progress)
---------------------------------
+-------------
+Version 0.8.0
+-------------
 
 * Live locations management.
 * Mutes management.
+* Revoke messages. Delete messages for others.
+* Minimized scriptlet.
 
 -------------
 Version 0.7.2

@@ -44,7 +44,7 @@ export class ChatManager extends ModelManager {
       groupMetadata: item.groupMetadata ? GroupMetadataManager.mapModel(item.groupMetadata) : null,
       lastReceivedKey: item.lastReceivedKey ? item.lastReceivedKey._serialized : null,
       msgs: null,
-      mute: MuteManager.mapModel(item.mute)
+      mute: MuteManager.mapModel(item.mute),
       liveLocationQueried: item.liveLocationQueried
     });
   }

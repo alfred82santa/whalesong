@@ -64,17 +64,24 @@ export class MessageManager extends ModelManager {
         'messageIds': [this.model.id]
       });
   }
+
+  @command
+  async canRevoke() {
+    return this.model.canRevoke();
+  }
+
+  @command
+  async revoke({
+    clearMedia
+  }) {
+    return await this.model.sendRevoke(clearMedia);
+  }
 }
 
 export class MessageCollectionManager extends CollectionManager {
 
   static getModelManagerClass() {
     return MessageManager;
-  }
-
-  constructor(collection) {
-    super();
-    this.collection = collection;
   }
 
   @monitor
