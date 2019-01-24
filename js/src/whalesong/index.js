@@ -55,7 +55,6 @@ function getArtifactsDefs() {
   return {
     'conn': (module) => module.default && typeof module.default == "object" && 'ref' in module.default && 'refTTL' in module.default ? module.default : null,
     'store': (module) => module.Chat && module.Msg ? module : null,
-    'wap': (module) => module.queryExist ? module : null,
     'stream': (module) => module.default && typeof module.default == "object" && 'stream' in module.default && 'socket' in module.default ? module.default : null,
     'uiController': (module) => module.default && module.default.focusNextChat ? module.default : null,
     'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null,
@@ -224,12 +223,12 @@ function getRequirementsDefs() {
 
 export default function createManagers(mainManager) {
   function discoveryModules(modules) {
-    var artifactsDefs = getArtifactsDefs();
-    var requirementsDefs = getRequirementsDefs();
+    const artifactsDefs = getArtifactsDefs();
+    const requirementsDefs = getRequirementsDefs();
 
-    var artifacts = {}
+    const artifacts = {};
 
-    function checkRequiements() {
+    function checkRequirements() {
       let recheck = true;
 
       while (recheck) {
@@ -242,7 +241,7 @@ export default function createManagers(mainManager) {
             if (!(item in artifacts)) {
               canBuild = false;
             }
-          })
+          });
 
           if (canBuild) {
             artifacts[reqIdx] = req.build(mainManager, artifacts);
@@ -252,6 +251,13 @@ export default function createManagers(mainManager) {
           }
         }
       }
+    }
+
+
+    function wapQuery() {
+      webpackJsonp([], { "dgfhfgbdeb": (x, y, z) => artifacts['wap'] = z('"dgfhfgbdeb"') }, "dgfhfgbdeb");
+      console.log("Got wapQuery? " + !!artifacts['wap']);
+      checkRequirements();
     }
 
 
@@ -266,6 +272,9 @@ export default function createManagers(mainManager) {
       }
     }
 
+    // Building WapQuery first because of modules that depends on it
+    wapQuery();
+
     for (let idx in modules) {
       if ((typeof modules[idx] === "object") && modules[idx]) {
         let first = Object.values(modules[idx])[0];
@@ -278,11 +287,11 @@ export default function createManagers(mainManager) {
             }
 
             if (checkArtifacts(module)) {
-              checkRequiements();
+              checkRequirements();
             }
 
             if ((artifactsDefs.length == 0) || (requirementsDefs.length == 0)) {
-              return;
+              break;
             }
           }
         }
