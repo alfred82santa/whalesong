@@ -3,6 +3,14 @@ Changelog
 =========
 
 -------------
+Version 0.8.1
+-------------
+
+* Fixed Wap object discovery. Thx to @jabolina.
+* Fixed screenshot method.
+* Added Chromium version of some examples.
+
+-------------
 Version 0.8.0
 -------------
 

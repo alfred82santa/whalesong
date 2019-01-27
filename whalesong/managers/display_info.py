@@ -1,11 +1,10 @@
 from asyncio import CancelledError, Future, Task, ensure_future, sleep
-from datetime import datetime
-
-from dirty_models import BooleanField, EnumField, IntegerField
 from enum import Enum
 
-from whalesong import BaseWhalesongDriver
+from dirty_models import BooleanField, EnumField, IntegerField
+
 from . import BaseModelManager
+from ..driver import BaseWhalesongDriver
 from ..models import BaseModel
 from ..results import Result
 

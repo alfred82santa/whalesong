@@ -1,6 +1,7 @@
 from base64 import b64encode
-from dirty_models import StringIdField
 from io import BytesIO
+
+from dirty_models import StringIdField
 
 from . import BaseCollectionManager, BaseModelManager
 from ..models import BaseModel
@@ -21,7 +22,7 @@ class ProfilePicture(BaseModel):
     tag = StringIdField()
     """
     ¿?
-    
+
     .. note:: I guess it is used to know when contact picture changed.
     """
 

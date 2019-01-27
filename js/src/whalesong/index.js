@@ -55,7 +55,7 @@ function getArtifactsDefs() {
   return {
     'conn': (module) => module.default && typeof module.default == "object" && 'ref' in module.default && 'refTTL' in module.default ? module.default : null,
     'store': (module) => module.Chat && module.Msg ? module : null,
-    'wap': (module) => (module.queryExist) ? module : ((module.default && module.default.queryExist) ? module.default : null),
+    'wap': (module) => module.default && module.default.queryExist ? module.default : null,
     'stream': (module) => module.default && typeof module.default == "object" && 'stream' in module.default && 'socket' in module.default ? module.default : null,
     'uiController': (module) => module.default && module.default.focusNextChat ? module.default : null,
     'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null,
