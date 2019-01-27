@@ -69,7 +69,7 @@ class BaseWhalesongDriver(ABC):
         pass
 
     async def screenshot(self) -> BytesIO:
-        return BytesIO(await self._internal_run_scriptlet())
+        return BytesIO(await self._internal_screenshot())
 
     @abstractmethod
     async def _internal_screenshot(self):

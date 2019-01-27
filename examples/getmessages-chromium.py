@@ -4,6 +4,7 @@ from asyncio import ensure_future
 from os import mkdir, path
 
 from whalesong import Whalesong
+from whalesong.driver_chromium import WhalesongDriver
 from whalesong.managers.message import LocationMessage, MediaFrameMixin, MediaMixin, TextMessage, StickerMessage
 from whalesong.managers.stream import Stream
 
@@ -15,8 +16,9 @@ class GetMessages:
     def __init__(self, print_fn=print, loop=None):
         self._print_fn = print_fn
         self._driver = Whalesong(
-            profile=path.join(path.dirname(__file__), 'profile'),
-            loadstyles=True,
+            driver=WhalesongDriver(profile=path.join(path.dirname(__file__), 'profile-chromium'),
+                                   headless=True,
+                                   loop=loop),
             loop=loop
         )
 
