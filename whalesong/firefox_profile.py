@@ -1,6 +1,7 @@
-from os import path, remove, mkdir, makedirs
-from selenium.webdriver import FirefoxProfile as BaseFirefoxProfile
+from os import makedirs, path, remove
 from shutil import copyfile
+
+from selenium.webdriver import FirefoxProfile as BaseFirefoxProfile
 
 TEMPLATE_DIR = path.join(path.dirname(__file__), 'firefox_profile_template')
 

@@ -1,11 +1,11 @@
+from abc import ABC, abstractmethod
 from asyncio import AbstractEventLoop, Future, ensure_future, get_event_loop
+from io import BytesIO
 from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any, Dict, Optional, Type, overload
 
-from abc import ABC, abstractmethod
 from aiohttp import ClientSession
-from io import BytesIO
 
 from .results import IteratorResult, MonitorResult, Result, ResultManager
 

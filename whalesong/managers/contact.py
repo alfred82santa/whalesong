@@ -22,7 +22,7 @@ class Contact(BaseModel):
 
     pushname = StringIdField()
     """
-    Contact defined name. It is set by contact on its whatsapp application. 
+    Contact defined name. It is set by contact on its whatsapp application.
     """
 
     short_name = StringIdField()

@@ -1,8 +1,8 @@
 from dirty_models import ArrayField, BooleanField, IntegerField, ModelField, StringIdField
 
-from ..results import Result
 from . import BaseModelManager
 from ..models import BaseModel
+from ..results import Result
 
 
 class PhoneDescription(BaseModel):
@@ -90,7 +90,7 @@ class Conn(BaseModel):
 
     battery = IntegerField()
     """
-    Phone battery level, in percentage. 
+    Phone battery level, in percentage.
     """
 
     plugged = BooleanField()
@@ -115,7 +115,7 @@ class Conn(BaseModel):
 
     is_24h = BooleanField(alias=['is24h'])
     """
-    Whether time must be in 24h format. 
+    Whether time must be in 24h format.
     """
 
     platform = StringIdField()

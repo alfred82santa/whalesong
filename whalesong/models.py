@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from base64 import b64decode, b64encode
+
 from dirty_models import BaseModel as DirtyBaseModel, StringIdField
 from dirty_models.fields import BytesField, DateTimeField as BaseDateTimeField
 from dirty_models.models import CamelCaseMeta

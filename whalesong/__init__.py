@@ -1,5 +1,4 @@
 from asyncio import AbstractEventLoop
-
 from io import BytesIO
 
 from .driver import BaseWhalesongDriver
@@ -12,13 +11,13 @@ from .managers.live_location import LiveLocationCollectionManager
 from .managers.message import MessageCollectionManager
 from .managers.mute import MuteCollectionManager
 from .managers.status import StatusCollectionManager
-from .managers.sticker_pack import StickerPack, StickerPackCollectionManager
+from .managers.sticker_pack import StickerPackCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
 from .managers.wap import WapManager
 from .results import MonitorResult, Result
 
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class Whalesong(BaseManager):

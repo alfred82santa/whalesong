@@ -46,13 +46,13 @@ class Chat(BaseModel):
 
     change_number_new_jid = StringIdField()
     """
-    Information about peer's new jabber id (user identifier). 
+    Information about peer's new jabber id (user identifier).
     It happens when a peer change its phone number.
     """
 
     change_number_old_jid = StringIdField()
     """
-    Information about peer's old phone numberjabber id (user identifier). 
+    Information about peer's old phone numberjabber id (user identifier).
     It happens when a peer change its phone number.
     """
 
