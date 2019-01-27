@@ -120,9 +120,14 @@ class GetMessages:
 
         media_data = await self._driver.messages.download_media(message)
 
-        ext = mimetypes.guess_extension(message.mimetype, strict=False)
+        mimetype = message.mimetype
 
-        await self._store_media('{}{}'.format(message.id, ext), media_data.read())
+        if ';' in mimetype:
+            mimetype, _ = mimetype.split(';', 1)
+
+        ext = mimetypes.guess_extension(mimetype, strict=False)
+
+        await self._store_media('{}{}'.format(message.id, ext or '.bin'), media_data.read())
 
     async def store_thumbnail(self, message_id, image_data):
         await self._store_media('{}_thumb.jpg'.format(message_id), image_data)
