@@ -3,6 +3,12 @@ Changelog
 =========
 
 -------------
+Version 0.8.2
+-------------
+
+* Fixed QR screenshot on Firefox.
+
+-------------
 Version 0.8.1
 -------------
 

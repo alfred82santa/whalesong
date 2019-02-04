@@ -113,7 +113,7 @@ class WhalesongDriver(BaseWhalesongDriver):
         return await self._run_async(take_screenshot)
 
     async def _internal_get_element(self, css_selector: str):
-        await self._run_async(self.driver.find_element_by_css_selector, css_selector)
+        return await self._run_async(self.driver.find_element_by_css_selector, css_selector)
 
     async def _execute_command(self, result_id, command, params):
         self._pendant.append({'exId': result_id,
