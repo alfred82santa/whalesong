@@ -21,16 +21,16 @@ help:
 
 requirements:
 	@echo "Installing ${PACKAGE_NAME} requirements..."
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 	cd js && $(MAKE) requirements
 
 requirements-test: requirements
 	@echo "Installing ${PACKAGE_NAME} tests requirements..."
-	pip install -r requirements-test.txt
+	pip3 install -r requirements-test.txt
 
 requirements-docs: requirements
 	@echo "Installing ${PACKAGE_NAME} docs requirements..."
-	pip install -r requirements-docs.txt
+	pip3 install -r requirements-docs.txt
 
 run-tests:
 	@echo "Running tests..."
