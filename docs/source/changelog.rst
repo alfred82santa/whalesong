@@ -2,6 +2,13 @@
 Changelog
 =========
 
+--------------------------------
+Version 0.8.3 (Work in progress)
+--------------------------------
+
+* Fixed requirements installation out of virtual enviorment. Thx to @Theblood.
+* Enabled media codecs on Firefox profile template.
+
 -------------
 Version 0.8.2
 -------------
