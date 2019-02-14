@@ -145,6 +145,20 @@ Table of contents
    changelog
 
 
+----------------
+Related projects
+----------------
+
+............
+whalesong-js
+------------
+
+Port of Whalesong to Node.js.
+
+**Author:** `@jabolina <https://github.com/jabolina>`_
+
+**Repository:** https://github.com/jabolina/whalesong-js
+
 ------------------
 Indices and tables
 ------------------

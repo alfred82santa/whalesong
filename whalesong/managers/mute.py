@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from dirty_models import BooleanField, DateTimeField
+from dirty_models import BooleanField
 
 from . import BaseCollectionManager, BaseModelManager
-from ..models import BaseModel
+from ..models import BaseModel, DateTimeField
 from ..results import Result
 
 

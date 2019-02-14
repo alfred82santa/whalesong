@@ -1,8 +1,8 @@
+from base64 import b64encode
+from io import BytesIO
 from typing import Any, Dict, List, Optional
 
-from base64 import b64encode
-from dirty_models import BooleanField, DateTimeField, IntegerField, ModelField, StringIdField
-from io import BytesIO
+from dirty_models import BooleanField, IntegerField, ModelField, StringIdField
 
 from . import BaseCollectionManager, BaseModelManager
 from .contact import Contact, ContactManager
@@ -10,7 +10,7 @@ from .group_metadata import GroupMetadata, GroupMetadataManager
 from .mute import Mute, MuteManager
 from .presence import PresenceManager
 from ..driver import BaseWhalesongDriver
-from ..models import BaseModel
+from ..models import BaseModel, DateTimeField
 from ..results import Result
 
 

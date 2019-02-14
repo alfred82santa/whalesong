@@ -1,22 +1,22 @@
 import binascii
+from base64 import b64decode
+from enum import Enum
+from io import BytesIO
 from typing import Dict, Type, cast
 
 from axolotl.kdf.hkdfv3 import HKDFv3
 from axolotl.util.byteutil import ByteUtil
-from base64 import b64decode
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from dirty_models import ArrayField, BooleanField, DateTimeField, EnumField, FloatField, IntegerField, ModelField, \
+from dirty_models import ArrayField, BooleanField, EnumField, FloatField, IntegerField, ModelField, \
     StringIdField, TimedeltaField
 from dirty_models.models import CamelCaseMeta
-from enum import Enum
-from io import BytesIO
 
 from . import BaseCollectionManager, BaseModelManager
 from .chat import Chat
 from .contact import Contact
 from ..driver import BaseWhalesongDriver
-from ..models import Base64Field, BaseModel
+from ..models import Base64Field, BaseModel, DateTimeField
 from ..results import MonitorResult, Result
 
 
@@ -503,7 +503,7 @@ class LocationMessage(QuotedMessageMixin, MentionsMixin, BaseMessage):
     speed = IntegerField()
     degrees = FloatField()
     comment = StringIdField()
-    sequence = DateTimeField()
+    sequence = IntegerField()
     share_duration = TimedeltaField()
     duration = TimedeltaField()
 
