@@ -363,6 +363,20 @@ Examples
 
 See `documentation <https://whalesong.readthedocs.io/en/latest/examples.html>`_
 
+----------------
+Related projects
+----------------
+
+............
+whalesong-js
+------------
+
+Port of Whalesong to Node.js.
+
+**Author:** `@jabolina <https://github.com/jabolina>`_
+
+**Repository:** https://github.com/jabolina/whalesong-js
+
 
 -----
 Legal

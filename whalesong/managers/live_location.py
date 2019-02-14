@@ -1,5 +1,6 @@
 from dirty_models import ArrayField, FloatField, IntegerField, ModelField, StringIdField, TimedeltaField
 
+from whalesong.managers.contact import Contact
 from . import BaseCollectionManager, BaseModelManager
 from .message import BaseMessage
 from ..models import BaseModel, DateTimeField
@@ -49,6 +50,11 @@ class Participant(BaseModel):
     msg = ModelField(model_class=BaseMessage)
     """
     Message used to start live location.
+    """
+
+    contact = ModelField(model_class=Contact)
+    """
+    Live location owner.
     """
 
     sequence = IntegerField()

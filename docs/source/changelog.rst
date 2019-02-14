@@ -2,12 +2,15 @@
 Changelog
 =========
 
---------------------------------
-Version 0.8.3 (Work in progress)
---------------------------------
+-------------
+Version 0.8.3
+-------------
 
 * Fixed requirements installation out of virtual enviorment. Thx to @Theblood.
 * Enabled media codecs on Firefox profile template.
+* Fixed problems with live location. `Issue #73 <https://github.com/alfred82santa/whalesong/issues/73>`_
+* Fixed problem monitoring models.
+* Added new examples: `getlivelocations-chromium.py` and `getlivelocations.py`
 
 -------------
 Version 0.8.2

@@ -1,9 +1,10 @@
-from dirty_models import ArrayField, BooleanField, DateTimeField, EnumField, ModelField
 from enum import Enum
+
+from dirty_models import ArrayField, BooleanField, EnumField, ModelField
 
 from . import BaseCollectionManager, BaseModelManager
 from ..driver import BaseWhalesongDriver
-from ..models import BaseModel
+from ..models import BaseModel, DateTimeField
 from ..results import Result
 
 

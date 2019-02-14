@@ -1,9 +1,9 @@
 from typing import List
 
-from dirty_models import ArrayField, BooleanField, DateTimeField, ModelField, StringField, StringIdField
+from dirty_models import ArrayField, BooleanField, ModelField, StringField, StringIdField
 
 from . import BaseCollectionManager, BaseModelManager
-from ..models import BaseModel
+from ..models import BaseModel, DateTimeField
 from ..results import Result
 
 

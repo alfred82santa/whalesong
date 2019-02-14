@@ -34,6 +34,17 @@ export class FieldMonitor extends BaseFieldMonitor {
   }
 }
 
+export class ModelMonitor extends Monitor {
+
+  mapEventResult(...args) {
+    let item = this.mapFn(args[0]);
+    if (!item) {
+      return null;
+    }
+    return item;
+  }
+}
+
 
 export class CollectionItemMonitor extends Monitor {
 
@@ -76,7 +87,7 @@ export class ModelManager extends CommandManager {
 
   @monitor
   async monitorModel() {
-    return new CollectionItemMonitor(this.model, 'change', (item) => this.constructor.mapModel(item));
+    return new ModelMonitor(this.model, 'change', (item) => this.constructor.mapModel(item));
   }
 
   @monitor
