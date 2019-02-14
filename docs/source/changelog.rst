@@ -3,7 +3,7 @@ Changelog
 =========
 
 -------------
-Version 0.8.3
+Version 0.8.4
 -------------
 
 * Fixed requirements installation out of virtual enviorment. Thx to @Theblood.
