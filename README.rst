@@ -369,7 +369,7 @@ Related projects
 
 ............
 whalesong-js
-------------
+............
 
 Port of Whalesong to Node.js.
 
