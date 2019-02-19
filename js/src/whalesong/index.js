@@ -49,6 +49,9 @@ import {
 import {
   MuteCollectionManager
 } from './mute.js';
+import {
+  StatusV3CollectionManager
+} from './statusV3.js';
 
 
 function getArtifactsDefs() {
@@ -66,6 +69,16 @@ function getArtifactsDefs() {
 
 function getRequirementsDefs() {
   return {
+    'statusV3Manager': {
+      'requirements': ['store'],
+      'build': function(mainManager, artifacts) {
+        let manager = new StatusV3CollectionManager(
+          artifacts['store'].StatusV3,
+        );
+        mainManager.addSubmanager('statusV3', manager);
+        return manager;
+      }
+    },
     'connManager': {
       'requirements': ['conn'],
       'build': function(mainManager, artifacts) {

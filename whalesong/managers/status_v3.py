@@ -5,7 +5,7 @@ from . import BaseModelManager, BaseCollectionManager
 from .contact import Contact, ContactManager
 from ..models import BaseModel, DateTimeField
 from ..driver import BaseWhalesongDriver
-from ..results import Result
+from ..results import Result, IteratorResult
 
 
 class StatusV3(BaseModel):
@@ -99,20 +99,20 @@ class StatusV3CollectionManager(BaseCollectionManager):
     """
     MODEL_MANAGER_CLASS = StatusV3Manager
 
-    def get_statuses(self, read_status) -> Result[List[StatusV3]]:
+    def get_statuses(self, unread_status) -> Result[StatusV3]:
         """
         Get the read or unread StatusV3 collection
 
-        :param read_status: List read or unread statuses
+        :param unread_status: List read or unread statuses
         :return: List of StatusV3
         """
         params = {
-            'unread': read_status
+            'unread': unread_status
         }
 
-        return self._execute_command('getStatus', params)
+        return self._execute_command('getStatus', params, result_class=self.get_iterator_result_class())
 
-    def sync(self) -> Result[List[StatusV3]]:
+    def sync(self) -> IteratorResult[StatusV3]:
         """
         Sync Statuses and return all
 

@@ -14,6 +14,7 @@ from .managers.status import StatusCollectionManager
 from .managers.sticker_pack import StickerPackCollectionManager
 from .managers.storage import StorageManager
 from .managers.stream import StreamManager
+from .managers.status_v3 import StatusV3CollectionManager
 from .managers.wap import WapManager
 from .results import MonitorResult, Result
 
@@ -74,7 +75,7 @@ class Whalesong(BaseManager):
         self._submanagers['display_info'] = DisplayInfoManager(self._driver, manager_path='displayInfo')
         self._submanagers['live_locations'] = LiveLocationCollectionManager(self._driver, manager_path='liveLocations')
         self._submanagers['mutes'] = MuteCollectionManager(self._driver, manager_path='mutes')
-
+        self._submanagers['status_v3'] = StatusV3CollectionManager(self._driver, manager_path='statusV3')
         self._fut_running = None
 
     @property

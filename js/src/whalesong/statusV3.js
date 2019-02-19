@@ -1,5 +1,11 @@
-import { command } from "../manager";
+import { command, Iterator } from "../manager";
 import { CollectionManager, ModelManager } from "./common";
+import {
+  MessageCollectionManager
+} from "./message";
+import {
+  ContactManager
+} from './contact.js';
 
 export class StatusV3Manager extends ModelManager {
   static mapModel(item) {
@@ -16,22 +22,13 @@ export class StatusV3Manager extends ModelManager {
     });
   }
 
-  /*
-  {
-    fromMe: false
-    id: "AFC0FBE1007851F741B0024EAB0F32E8"
-    remote: {
-      server: "broadcast"
-      user: "status"
-      _serialized: "status@broadcast"
-    }
-    _serialized: "false_status@broadcast_AFC0FBE1007851F741B0024EAB0F32E8"
-  }, {
-    server: "c.us"
-    user: "553496562348"
-    _serialized: "553496562348@c.us"
+  constructor(model) {
+    super(model);
+
+    this.addSubmanager('msgs', new MessageCollectionManager(model.msgs));
+    this.addSubmanager('contact', new ContactManager(this.model.contact));
   }
-  */
+
   @command
   async sendReadStatus({
     readMessage,
@@ -47,20 +44,35 @@ export class StatusV3Manager extends ModelManager {
 }
 
 export class StatusV3CollectionManager extends CollectionManager {
+  static getModelManagerClass() {
+    return StatusV3Manager;
+  }
+
+  transformToIterator(items, mapFn) {
+    return new Iterator(
+      (partialResult) => items.forEach(
+        item => partialResult(
+          mapFn(item)
+        )
+      )
+    );
+  }
+
   @command
   async getStatus({
     unread
   }) {
-    return await this.collection.getUnexpired(unread);
+    const statuses = await this.collection.getUnexpired(unread);
+    return this.transformToIterator(statuses, StatusV3Manager.mapModel);
   }
 
   @command
   async sync() {
-    return this.collection.sync();
+    return await this.collection.sync();
   }
 
   @command
   async getMyStatus() {
-    return this.collection.getMyStatus();
+    return await this.collection.getMyStatus();
   }
 }
