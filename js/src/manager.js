@@ -132,6 +132,16 @@ export class Iterator {
     this.fn = fn;
   }
 
+  static fromArray(arr, mapFn) {
+    return new Iterator(
+      partialResult => arr.forEach(
+        item => partialResult(
+          mapFn(item)
+        )
+      )
+    );
+  }
+
   async iter(partialResult) {
     await Promise.resolve(this.fn((item) => partialResult({
       'item': item

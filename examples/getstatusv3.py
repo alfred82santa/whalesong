@@ -45,7 +45,8 @@ class GetStatuses:
 
             if evt['value'] == Stream.Stream.CONNECTED:
                 if statuses_it is None:
-                    statuses_it = self._driver.status_v3.get_statuses(is_unread=True)
+                    await self._driver.status_v3.sync()
+                    statuses_it = self._driver.status_v3.get_unexpired(is_unread=True)
                     ensure_future(self.list_unread_statuses(statuses_it))
 
             else:

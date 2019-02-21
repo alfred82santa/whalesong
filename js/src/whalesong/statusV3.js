@@ -1,7 +1,6 @@
 import { command, Iterator } from "../manager";
 import { CollectionManager, ModelManager } from "./common";
 import {
-  MessageManager,
   MessageCollectionManager
 } from "./message";
 import {
@@ -14,11 +13,6 @@ export class StatusV3Manager extends ModelManager {
       id: item.id._serialized,
       contact: item.contact ? ContactManager.mapModel(item.contact) : null,
       msgs: null,
-      expireTs: item.expireTs,
-      hasUnread: item.hasUnread,
-      lastReceivedKey: item.lastReceivedKey ? item.lastReceivedKey._serialized : null,
-      totalCount: item.totalCount,
-      unreadCount: item.unreadCount,
       readKeys: item.readKeys
     });
   }
@@ -40,10 +34,6 @@ export class StatusV3Manager extends ModelManager {
     );
   }
 
-  @command
-  async loadMore() {
-    return this.model.loadMore();
-  }
 }
 
 export class StatusV3CollectionManager extends CollectionManager {
@@ -51,27 +41,17 @@ export class StatusV3CollectionManager extends CollectionManager {
     return StatusV3Manager;
   }
 
-  transformToIterator(items, mapFn) {
-    return new Iterator(
-      (partialResult) => items.forEach(
-        item => partialResult(
-          mapFn(item)
-        )
-      )
-    );
-  }
-
   @command
-  async getStatus({
+  async getUnexpired({
     unread
   }) {
     const statuses = await this.collection.getUnexpired(unread);
-    return this.transformToIterator(statuses, StatusV3Manager.mapModel);
+    return Iterator.fromArray(statuses, StatusV3Manager.mapModel);
   }
 
   @command
   async sync() {
-    return await this.collection.sync();
+    await this.collection.sync();
   }
 
   @command
