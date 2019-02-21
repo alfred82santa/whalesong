@@ -59,7 +59,7 @@ class StatusV3Manager(BaseModelManager[StatusV3]):
         self.add_submanager('contact', ContactManager(driver=self._driver,
                                                       manager_path=self._build_command('contact')))
 
-    async def send_read_status(self, message_id) -> Result[bool]:
+    def send_read_status(self, message_id) -> Result[bool]:
         """
         Mark a statusV3 as read.
 

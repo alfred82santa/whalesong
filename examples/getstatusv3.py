@@ -5,6 +5,7 @@ from os import mkdir, path
 
 from whalesong import Whalesong
 from whalesong.managers.stream import Stream
+from whalesong.managers.message import MediaFrameMixin, MediaMixin, StickerMessage
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output', 'media')
 
@@ -41,10 +42,10 @@ class GetStatuses:
 
         async for evt in self._driver.stream.monitor_field('stream'):
             self.echo('Stream value: {}'.format(evt['value']))
- 
+
             if evt['value'] == Stream.Stream.CONNECTED:
                 if statuses_it is None:
-                    statuses_it = self._driver.status_v3.get_items()
+                    statuses_it = self._driver.status_v3.get_statuses(is_unread=True)
                     ensure_future(self.list_statuses(statuses_it))
 
             else:
@@ -52,12 +53,16 @@ class GetStatuses:
                     statuses_it = None
                     await self._driver.cancel_iterators()
 
-    async def list_statuses(self, it):
+    async def list_unread_statuses(self, it):
         self.echo('List statuses')
 
         async for status in it:
+            print('Seeing all statuses from [{}]'.format(status.id))
             async for msg in self._driver.status_v3[status.id].get_submanager('msgs').get_items():
                 await self._driver.status_v3[status.id].send_read_status(msg.id)
+                if isinstance(msg, MediaMixin):
+                    self.echo('Saving status media from [{}]'.format(status.id))
+                    await self.download_media(msg)
 
     async def start(self):
         await self._driver.start()
@@ -66,6 +71,32 @@ class GetStatuses:
         ensure_future(self.monitor_stream())
 
         await self._driver.wait_until_stop()
+
+    async def download_media(self, message):
+        if isinstance(message, MediaFrameMixin) and not isinstance(message, StickerMessage):
+            await self.store_thumbnail(message.id, message.body)
+
+        media_data = await self._driver.messages.download_media(message)
+
+        mimetype = message.mimetype
+
+        if ';' in mimetype:
+            mimetype, _ = mimetype.split(';', 1)
+
+        ext = mimetypes.guess_extension(mimetype, strict=False)
+
+        await self._store_media('{}{}'.format(message.id, ext or '.bin'), media_data.read())
+
+    async def store_thumbnail(self, message_id, image_data):
+        await self._store_media('{}_thumb.jpg'.format(message_id), image_data)
+
+    async def _store_media(self, filename, filedata):
+        filepath = path.join(OUTPUT_DIR, filename)
+
+        self.echo('Storing file {}'.format(filepath))
+
+        with open(filepath, 'wb') as f:
+            f.write(filedata)
 
 
 if __name__ == '__main__':
