@@ -1,12 +1,11 @@
 from typing import Any, Dict, List, Optional
-from dirty_models import ModelField, IntegerField, StringIdField
+from dirty_models import ModelField, HashMapField, ArrayField, IntegerField, StringIdField
 
 from . import BaseModelManager, BaseCollectionManager
 from .contact import Contact, ContactManager
 from ..models import BaseModel, DateTimeField
 from ..driver import BaseWhalesongDriver
 from ..results import Result, IteratorResult
-
 
 class StatusV3(BaseModel):
     """
@@ -18,7 +17,7 @@ class StatusV3(BaseModel):
     Unread statuses
     """
 
-    expire_ts = DateTimeField()
+    expire_ts = DateTimeField(alias=['expireTs'])
     """
     Status expiration date
     """
@@ -32,6 +31,8 @@ class StatusV3(BaseModel):
     """
     Last encryption key received (¿?).
     """
+
+    read_keys = HashMapField()
 
 
 class StatusV3Manager(BaseModelManager[StatusV3]):
@@ -53,35 +54,19 @@ class StatusV3Manager(BaseModelManager[StatusV3]):
 
         from .message import MessageCollectionManager
         self.add_submanager('msgs', MessageCollectionManager(driver=self._driver,
-                                                             manager_path=self._build_command('args')))
+                                                             manager_path=self._build_command('msgs')))
 
         self.add_submanager('contact', ContactManager(driver=self._driver,
                                                       manager_path=self._build_command('contact')))
 
-    def send_read_status(self, status_serialized_id, user_serialized_id) -> Result[bool]:
+    async def send_read_status(self, message_id) -> Result[bool]:
         """
         Mark a statusV3 as read.
 
-        :param status_serialized_id: StatusV3 serialized ID to be marked
-        :param user_serialized_id: User that owns the statusV3
+        :param message_id: Message serialized ID to be marked
         """
-        serialized_remote = status_serialized_id.split('_')[len(status_serialized_id.split('_')) - 2]
-        params: Dict[str, Any] = {
-            'readMessage': {
-                'fromMe': False,
-                'id': status_serialized_id.split('_')[len(status_serialized_id.split('_')) - 1],
-                'remote': {
-                    'server': serialized_remote.split('@')[1],
-                    'user': serialized_remote.split('@')[0],
-                    '_serialized': serialized_remote
-                },
-                '_serialized': status_serialized_id
-            },
-            'fromUser': {
-                'server': user_serialized_id.split('@')[1],
-                'user': user_serialized_id.split('@')[0],
-                '_serialized': user_serialized_id
-            }
+        params = {
+            'messageId': message_id,
         }
 
         return self._execute_command('sendReadStatus', params)
@@ -99,15 +84,15 @@ class StatusV3CollectionManager(BaseCollectionManager):
     """
     MODEL_MANAGER_CLASS = StatusV3Manager
 
-    def get_statuses(self, unread_status) -> Result[StatusV3]:
+    def get_statuses(self, is_unread) -> Result[StatusV3]:
         """
         Get the read or unread StatusV3 collection
 
-        :param unread_status: List read or unread statuses
+        :param is_unread: List read or unread statuses
         :return: List of StatusV3
         """
         params = {
-            'unread': unread_status
+            'unread': is_unread
         }
 
         return self._execute_command('getStatus', params, result_class=self.get_iterator_result_class())

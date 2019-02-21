@@ -1,6 +1,7 @@
 import { command, Iterator } from "../manager";
 import { CollectionManager, ModelManager } from "./common";
 import {
+  MessageManager,
   MessageCollectionManager
 } from "./message";
 import {
@@ -31,10 +32,12 @@ export class StatusV3Manager extends ModelManager {
 
   @command
   async sendReadStatus({
-    readMessage,
-    fromUser,
+    messageId,
   }) {
-    return await this.model.sendReadStatus(readMessage, fromUser);
+    return await this.model.sendReadStatus(
+      this.getSubmanager('msgs').loadItem(messageId).id,
+      this.model.id
+    );
   }
 
   @command

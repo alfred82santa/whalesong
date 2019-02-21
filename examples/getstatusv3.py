@@ -41,10 +41,10 @@ class GetStatuses:
 
         async for evt in self._driver.stream.monitor_field('stream'):
             self.echo('Stream value: {}'.format(evt['value']))
-
+ 
             if evt['value'] == Stream.Stream.CONNECTED:
                 if statuses_it is None:
-                    statuses_it = self._driver.status_v3.get_statuses(True)
+                    statuses_it = self._driver.status_v3.get_items()
                     ensure_future(self.list_statuses(statuses_it))
 
             else:
@@ -55,9 +55,9 @@ class GetStatuses:
     async def list_statuses(self, it):
         self.echo('List statuses')
 
-        print(it)
         async for status in it:
-            self.echo('StatusV3:  {}'.format(status))
+            async for msg in self._driver.status_v3[status.id].get_submanager('msgs').get_items():
+                await self._driver.status_v3[status.id].send_read_status(msg.id)
 
     async def start(self):
         await self._driver.start()
