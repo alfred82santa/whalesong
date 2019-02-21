@@ -4,6 +4,7 @@ from asyncio import ensure_future
 from os import mkdir, path
 
 from whalesong import Whalesong
+from whalesong.driver_chromium import WhalesongDriver
 from whalesong.managers.stream import Stream
 from whalesong.managers.message import MediaFrameMixin, MediaMixin, StickerMessage
 
@@ -14,8 +15,9 @@ class GetStatuses:
     def __init__(self, print_fn=print, loop=None):
         self._print_fn = print_fn
         self._driver = Whalesong(
-            profile=path.join(path.dirname(__file__), 'profile'),
-            loadstyles=True,
+            driver=WhalesongDriver(profile=path.join(path.dirname(__file__), 'profile-chromium'),
+                                   headless=False,
+                                   loop=loop),
             loop=loop
         )
 
@@ -45,7 +47,8 @@ class GetStatuses:
 
             if evt['value'] == Stream.Stream.CONNECTED:
                 if statuses_it is None:
-                    statuses_it = self._driver.status_v3.get_statuses(is_unread=True)
+                    await self._driver.status_v3.sync()
+                    statuses_it = self._driver.status_v3.get_statuses(is_unread=False)
                     ensure_future(self.list_unread_statuses(statuses_it))
 
             else:
