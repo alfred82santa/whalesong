@@ -172,8 +172,4 @@ class WhalesongDriver(BaseWhalesongDriver):
             await wait([self.cancel_iterators(),
                         self.cancel_monitors()])
             self.result_manager.cancel_all()
-
-            try:
-                await self.close()
-            except ConnectionRefusedError:
-                pass
+            ensure_future(self.close())
