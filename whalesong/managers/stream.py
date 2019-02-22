@@ -159,3 +159,10 @@ class StreamManager(BaseModelManager[Stream]):
         """
 
         return self._execute_command('takeover')
+
+    def logout(self) -> Result[None]:
+        """
+        Logs out of currently logged in session
+        """
+
+        return self._execute_command('logout')
