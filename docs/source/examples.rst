@@ -276,3 +276,12 @@ It monitors user presences. It prints any change on them.
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/presencemonitor.py
+
+Get statuses
+============
+
+It will get all unread statuses, download the media content to the `output` folder and send a read command.
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getstatusv3.py
