@@ -38,8 +38,9 @@ class BaseWhalesongDriver(ABC):
             ensure_future(self.start_driver(), loop=self.loop)
 
     async def start_driver(self):
-        if self._fut_stop is None:
-            self._fut_stop = Future()
+        if self._fut_stop is not None:
+            await self._fut_stop
+            self._fut_stop = None
 
         if self._fut_start:
             await self._fut_start
@@ -141,8 +142,18 @@ class BaseWhalesongDriver(ABC):
             self.logger.exception(ex)
 
     async def close(self):
-        await self._internal_close()
-        self._fut_stop.set_result(None)
+        if self._fut_start is not None:
+            await self._fut_start
+        else:
+            return  # Not started
+
+        if self._fut_stop:
+            await self._fut_stop
+            return
+
+        self._fut_start = None
+        self._fut_stop = ensure_future(self._internal_close())
+        await self._fut_stop
 
     @abstractmethod
     async def _internal_close(self):
