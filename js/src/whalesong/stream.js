@@ -33,4 +33,9 @@ export class StreamManager extends ModelManager {
   async takeover() {
     this.model.takeover();
   }
+
+  @command
+  async logout(){
+    this.model.logout()
+  }
 }
