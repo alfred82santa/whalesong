@@ -151,9 +151,9 @@ class BaseWhalesongDriver(ABC):
             await self._fut_stop
             return
 
-        self._fut_start = None
         self._fut_stop = ensure_future(self._internal_close())
         await self._fut_stop
+        self._fut_start = None
 
     @abstractmethod
     async def _internal_close(self):
