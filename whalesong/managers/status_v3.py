@@ -60,7 +60,7 @@ class StatusV3Manager(BaseModelManager[StatusV3]):
         self.add_submanager('contact', ContactManager(driver=self._driver,
                                                       manager_path=self._build_command('contact')))
 
-    def send_read_status(self, message_id) -> Result[bool]:
+    def send_read_status(self, message_id: str) -> Result[bool]:
         """
         Mark a statusV3 as read.
 
@@ -79,15 +79,15 @@ class StatusV3CollectionManager(BaseCollectionManager):
     """
     MODEL_MANAGER_CLASS = StatusV3Manager
 
-    def get_unexpired(self, is_unread) -> IteratorResult[StatusV3]:
+    def get_unexpired(self, unread: bool = True) -> IteratorResult[StatusV3]:
         """
         Get the read or unread StatusV3 collection
 
-        :param is_unread: List read or unread statuses
+        :param unread: List read or unread statuses
         :return: List of StatusV3
         """
         params = {
-            'unread': is_unread
+            'unread': unread
         }
 
         return self._execute_command('getUnexpired', params, result_class=self.get_iterator_result_class())
