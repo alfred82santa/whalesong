@@ -27,4 +27,5 @@ API reference
    storage
    errors
    firefox_profile
+   status_v3
 
