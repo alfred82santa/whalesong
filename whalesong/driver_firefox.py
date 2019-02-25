@@ -1,3 +1,4 @@
+import socket
 from asyncio import AbstractEventLoop, Future, ensure_future, sleep, wait
 from concurrent.futures import ThreadPoolExecutor
 from json import dumps
@@ -31,6 +32,8 @@ class WhalesongDriver(BaseWhalesongDriver):
                                               loop=loop)
 
         self._profile = FirefoxProfile(profile_directory=str(Path(profile).resolve()) if profile else None)
+        self._marionette_port = self.free_port()
+        self._profile.set_preference('marionette.port', self._marionette_port)
         if not loadstyles:
             # Disable CSS
             self._profile.set_preference('permissions.default.stylesheet', 2)
@@ -54,6 +57,17 @@ class WhalesongDriver(BaseWhalesongDriver):
         self._fut_polling: Future = None
 
         self.interval = interval
+
+    def free_port(self):
+        """
+        Determines a free port using sockets.
+        """
+        free_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        free_socket.bind(('0.0.0.0', 0))
+        free_socket.listen(5)
+        port = free_socket.getsockname()[1]
+        free_socket.close()
+        return port
 
     async def _run_async(self, method: Callable, *args, **kwargs) -> Any:
         self.logger.debug('Running async method {}'.format(method.__name__))
@@ -79,7 +93,7 @@ class WhalesongDriver(BaseWhalesongDriver):
 
         driver = webdriver.Firefox(capabilities=capabilities,
                                    options=options,
-                                   service_args=['--marionette-port', '2828'],
+                                   service_args=['--marionette-port', str(self._marionette_port)],
                                    **self.options['extra_params'])
 
         driver.set_script_timeout(500)
