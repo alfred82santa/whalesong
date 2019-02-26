@@ -35,7 +35,7 @@ export class StreamManager extends ModelManager {
   }
 
   @command
-  async logout(){
+  async logout() {
     this.model.logout()
   }
 }
