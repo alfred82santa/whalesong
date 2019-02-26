@@ -1,7 +1,6 @@
-from asyncio import ensure_future, sleep
-from random import randint
-
+from asyncio import ensure_future, get_event_loop
 from os import path
+from signal import SIGINT, SIGTERM
 
 from whalesong import Whalesong
 from whalesong.managers.stream import Stream
@@ -89,6 +88,10 @@ class PresenceMonitor:
 
     async def start(self):
         await self._driver.start()
+
+        loop = get_event_loop()
+        loop.add_signal_handler(SIGINT, lambda *args: ensure_future(self._driver.stop()))
+        loop.add_signal_handler(SIGTERM, lambda *args: ensure_future(self._driver.stop()))
 
         ensure_future(self.check_stream()),
         ensure_future(self.monitor_stream())

@@ -1,8 +1,9 @@
-from asyncio import ensure_future
+from asyncio import ensure_future, get_event_loop
 from os import path
+from signal import SIGINT, SIGTERM
 
-from whalesong.driver_chromium import WhalesongDriver
 from whalesong import Whalesong
+from whalesong.driver_chromium import WhalesongDriver
 from whalesong.managers.stream import Stream
 
 OUTPUT_DIR = path.join(path.dirname(__file__), 'output')
@@ -89,6 +90,10 @@ class StatusMonitor:
 
     async def start(self):
         await self._driver.start()
+
+        loop = get_event_loop()
+        loop.add_signal_handler(SIGINT, lambda *args: ensure_future(self._driver.stop()))
+        loop.add_signal_handler(SIGTERM, lambda *args: ensure_future(self._driver.stop()))
 
         ensure_future(self.check_stream())
         ensure_future(self.check_conn())
