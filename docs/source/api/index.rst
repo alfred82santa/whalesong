@@ -24,8 +24,9 @@ API reference
    live_location
    mute
    display_info
+   status_v3
    storage
    errors
    firefox_profile
-   status_v3
+
 

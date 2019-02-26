@@ -177,6 +177,7 @@ Whatsapp features
 * Live location management.
 * Mutes management.
 * It's able to revoke messages (delete messages for others).
+* List and manage WhatsApp Status version 3 (Stories).
 
 ---------
 Changelog
@@ -207,7 +208,7 @@ Browser backends
 Whalesong use a browser backend in order to execute a WebApp (currently only WhatsAppWeb). All backends have
 an interface to manage webviews and that is what Whalesong use to manage applications. That interface change
 depending on browser, but there is a standard interface called
-`WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_. Firsts Whalesong versions use to use a
+`WebDriver <https://developer.mozilla.org/en-US/docs/Web/WebDriver>`_. Firsts Whalesong versions used to use a
 `Selenium <https://www.seleniumhq.org/>`_ library in order to communicate with Firefox browser.
 This backend is the default one for now, **but it will be deprecated in next versions and removed in version 1.0**.
 
@@ -215,7 +216,7 @@ This backend is the default one for now, **but it will be deprecated in next ver
 Firefox backend
 ...............
 
-It was the first backend developed. It use `Selenium <https://www.seleniumhq.org/>`_ library and
+It was the first backend developed. It uses `Selenium <https://www.seleniumhq.org/>`_ library and
 `Geckodriver <https://firefox-source-docs.mozilla.org/testing/geckodriver/geckodriver/>`_ to communicate with
 Firefox process. It is the most tested (the most, but not well).
 

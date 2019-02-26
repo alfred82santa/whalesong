@@ -80,3 +80,9 @@ Whalesong Service
         :class:`~whalesong.managers.mute.MuteCollectionManager`
 
         Manager for mutes collection.
+
+    .. attribute:: status_v3
+
+        :class:`~whalesong.managers.status_v3.StatusV3CollectionManager`
+
+        Manager for statuses version 3 (Stories) collection.

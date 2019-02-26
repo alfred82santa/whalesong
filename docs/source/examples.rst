@@ -72,9 +72,21 @@ if you open a new session in other browser.
 On the other hand, if session is not started, it will renew QR automatically when it expires.
 It will save QR image each time it changes.
 
+
+Firefox backend
+---------------
+
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/statemonitor.py
+
+
+Chromium backend
+----------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/statemonitor-chromium.py
 
 Get contacts
 ============
@@ -104,9 +116,22 @@ It monitors message acknowledgments and prints them, as well.
 
 It stores files and thumbnails from media messages.
 
+
+Firefox backend
+---------------
+
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/getmessages.py
+
+
+Chromium backend
+----------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getmessages-chromium.py
+
 
 
 Minibot
@@ -114,9 +139,19 @@ Minibot
 
 Mini bot to test features.
 
+Firefox backend
+---------------
+
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot.py
+
+Chromium backend
+----------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/minibot-chromimum.py
 
 Minibot implements some test features:
 
@@ -273,15 +308,56 @@ Monitor presences
 It monitors user presences. It prints any change on them.
 
 
+Firefox backend
+---------------
+
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/presencemonitor.py
+
+Chromium backend
+----------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/presencemonitor-chromium.py
+
 
 Get statuses
 ============
 
 It will get all unread statuses, download the media content to the `output` folder and send a read command.
 
+Firefox backend
+---------------
+
 .. code-block:: bash
 
     $ PYTHONPATH=.:$PYTHONPATH python3 examples/getstatusv3.py
+
+Chromium backend
+----------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getstatusv3-chromium.py
+
+
+Get live locations
+==================
+
+It will get all active live locations and will monitor them.
+
+Firefox backend
+---------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getlivelocations.py
+
+Chromium backend
+----------------
+
+.. code-block:: bash
+
+    $ PYTHONPATH=.:$PYTHONPATH python3 examples/getlivelocations-chromium.py
