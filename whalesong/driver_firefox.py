@@ -32,8 +32,7 @@ class WhalesongDriver(BaseWhalesongDriver):
                                               loop=loop)
 
         self._profile = FirefoxProfile(profile_directory=str(Path(profile).resolve()) if profile else None)
-        self._marionette_port = self.free_port()
-        self._profile.set_preference('marionette.port', self._marionette_port)
+
         if not loadstyles:
             # Disable CSS
             self._profile.set_preference('permissions.default.stylesheet', 2)
@@ -87,9 +86,11 @@ class WhalesongDriver(BaseWhalesongDriver):
         if self.options['headless']:
             options.headless = True
 
-        if self._profile:
-            options.add_argument('-profile')
-            options.add_argument(self._profile.profile_dir)
+        self._marionette_port = self.free_port()
+        self._profile.set_preference('marionette.port', self._marionette_port)
+        self._profile.update_preferences()
+        options.add_argument('-profile')
+        options.add_argument(self._profile.profile_dir)
 
         driver = webdriver.Firefox(capabilities=capabilities,
                                    options=options,
