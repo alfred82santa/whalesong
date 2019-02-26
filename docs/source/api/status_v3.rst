@@ -27,5 +27,5 @@ Managers
 Models
 ------
 
-.. automodule: whalesong.managers.status_v3
+.. automodule:: whalesong.managers.status_v3
    :exclude-members: StatusV3CollectionManager, StatusV3Manager
