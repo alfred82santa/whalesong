@@ -105,7 +105,7 @@ class Whalesong(BaseManager):
         """
         Wait until Whalesong service is stopped.
         """
-        await self._driver.whai_until_stop()
+        await self._driver.wait_until_stop()
 
     async def screenshot(self) -> BytesIO:
         """

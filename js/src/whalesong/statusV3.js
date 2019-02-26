@@ -1,5 +1,11 @@
-import { command, Iterator } from "../manager";
-import { CollectionManager, ModelManager } from "./common";
+import {
+  command,
+  Iterator
+} from "../manager";
+import {
+  CollectionManager,
+  ModelManager
+} from "./common";
 import {
   MessageCollectionManager
 } from "./message";

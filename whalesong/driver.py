@@ -21,6 +21,7 @@ class BaseWhalesongDriver(ABC):
                  loop: Optional[AbstractEventLoop] = None):
         self._fut_start: Future = None
         self._fut_stop: Future = None
+        self._fut_running: Future = None
         self.loop = loop or get_event_loop()
         self.logger = logger or getLogger('whalesong.driver')
         self.result_manager = ResultManager()
@@ -41,6 +42,8 @@ class BaseWhalesongDriver(ABC):
         if self._fut_stop is not None:
             await self._fut_stop
             self._fut_stop = None
+
+        self._fut_running = Future()
 
         if self._fut_start:
             await self._fut_start
@@ -154,6 +157,7 @@ class BaseWhalesongDriver(ABC):
         self._fut_stop = ensure_future(self._internal_close())
         await self._fut_stop
         self._fut_start = None
+        self._fut_running.set_result(None)
 
     @abstractmethod
     async def _internal_close(self):
@@ -172,8 +176,8 @@ class BaseWhalesongDriver(ABC):
             async with session.get(url) as resp:
                 return BytesIO(await resp.read())
 
-    async def whai_until_stop(self):
-        if self._fut_stop is None:
+    async def wait_until_stop(self):
+        if self._fut_running is None:
             raise RuntimeError('Driver not started')
 
-        await self._fut_stop
+        await self._fut_running
