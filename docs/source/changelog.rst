@@ -2,6 +2,13 @@
 Changelog
 =========
 
+
+--------------------------------
+Version 0.9.1 (Work in progress)
+--------------------------------
+
+* Fix `Issue #106 <https://github.com/alfred82santa/whalesong/issues/106>`_
+
 -------------
 Version 0.9.0
 -------------

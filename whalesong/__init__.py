@@ -18,7 +18,7 @@ from .managers.status_v3 import StatusV3CollectionManager
 from .managers.wap import WapManager
 from .results import MonitorResult, Result
 
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 
 class Whalesong(BaseManager):

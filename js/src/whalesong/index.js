@@ -305,5 +305,5 @@ export default function createManagers(mainManager) {
 
   webpackJsonp([], {
     'whalesong': (x, y, z) => discoveryModules(z)
-  }, 'whalesong');
+  }, ['whalesong']);
 }
