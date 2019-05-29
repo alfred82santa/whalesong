@@ -129,12 +129,16 @@ export class CollectionManager extends CommandManager {
     return item;
   }
 
+  buildModelManager(item) {
+    return new(this.constructor.getModelManagerClass())(item);
+  }
+
   getSubmanager(name) {
     try {
       return super.getSubmanager(name);
     } catch (err) {
       try {
-        return new(this.constructor.getModelManagerClass())(this.loadItem(name));
+        return this.buildModelManager(this.loadItem(name));
       } catch (err2) {
         throw err;
       }

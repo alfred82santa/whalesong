@@ -27,10 +27,11 @@ export class StickerManager extends ModelManager {
     chatId,
     quotedMsgId
   }) {
+    let chatManager;
     try {
       await this.model.downloadMedia();
 
-      let chatManager = manager.getSubmanager('chats').getSubmanager(chatId);
+      chatManager = manager.getSubmanager('chats').getSubmanager(chatId);
     } catch (err) {
       throw new ModelNotFound(`Chat with ID "${chatId}" not found`);
     }

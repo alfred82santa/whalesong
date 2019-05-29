@@ -62,8 +62,12 @@ function getArtifactsDefs() {
     'stream': (module) => module.default && typeof module.default == "object" && 'stream' in module.default && 'socket' in module.default ? module.default : null,
     'uiController': (module) => module.default && module.default.focusNextChat ? module.default : null,
     'mediaCollectionClass': (module) => (module.prototype && module.prototype.processFiles !== undefined) || (module.default && module.default.prototype && module.default.prototype.processFiles !== undefined) ? module.default ? module.default : module : null,
-    'createPeerForContact': (module) => (module.default && module.default.prototype && module.default.prototype.isServer && module.default.prototype.isUser) ? module.default : null,
+    'numberToWid': (module) => (module.numberToWid) ? module.numberToWid : null,
     'displayInfo': (module) => (module.default && module.default.markAvailable && module.default.unobscure) ? module.default : null,
+    'sendTextMsgToChat': (module) => (module.sendTextMsgToChat) ? module.sendTextMsgToChat : null,
+    'seenManagement': (module) => (module.sendSeen) ? module : null,
+    'setPushname': (module) => (module.setPushname) ? module.setPushname : null,
+    'setMyStatus': (module) => (module.setMyStatus) ? module.setMyStatus : null,
   }
 }
 
@@ -80,20 +84,28 @@ function getRequirementsDefs() {
       }
     },
     'connManager': {
-      'requirements': ['conn'],
+      'requirements': ['conn', 'setPushname'],
       'build': function(mainManager, artifacts) {
-        let manager = new ConnManager(artifacts['conn']);
+        let manager = new ConnManager(artifacts['conn'], artifacts['setPushname']);
         mainManager.addSubmanager('conn', manager);
         return manager;
       }
     },
     'chatManager': {
-      'requirements': ['store', 'mediaCollectionClass', 'createPeerForContact'],
+      'requirements': [
+        'store',
+        'mediaCollectionClass',
+        'numberToWid',
+        'sendTextMsgToChat',
+        'seenManagement'
+      ],
       'build': function(mainManager, artifacts) {
         let manager = new ChatCollectionManager(
           artifacts['store'].Chat,
           artifacts['mediaCollectionClass'],
-          artifacts['createPeerForContact']
+          artifacts['numberToWid'],
+          artifacts['sendTextMsgToChat'],
+          artifacts['seenManagement']
         );
         mainManager.addSubmanager('chats', manager);
         return manager;
@@ -197,10 +209,11 @@ function getRequirementsDefs() {
       }
     },
     'statusManager': {
-      'requirements': ['store'],
+      'requirements': ['store', 'setMyStatus'],
       'build': function(mainManager, artifacts) {
         let manager = new StatusCollectionManager(
-          artifacts['store'].Status
+          artifacts['store'].Status,
+          artifacts['setMyStatus']
         );
         mainManager.addSubmanager('status', manager);
         return manager;
@@ -305,5 +318,5 @@ export default function createManagers(mainManager) {
 
   webpackJsonp([], {
     'whalesong': (x, y, z) => discoveryModules(z)
-  }, 'whalesong');
+  }, ['whalesong']);
 }

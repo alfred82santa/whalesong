@@ -21,11 +21,17 @@ export class StatusCollectionManager extends CollectionManager {
     return StatusManager;
   }
 
+  constructor(model, setMyStatus) {
+    super(model);
+
+    this._setMyStatus = setMyStatus;
+  }
+
   @command
   async setMyStatus({
     status
   }) {
-    let result = this.collection.setMyStatus(status);
+    let result = this._setMyStatus(status);
 
     if (result.status === 200) {
       return true;
