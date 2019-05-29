@@ -49,8 +49,12 @@ export class ChatManager extends ModelManager {
     });
   }
 
-  constructor(model) {
+  constructor(model, sendTextMsgToChat, seenManagement) {
     super(model);
+
+    this._sendTextMsgToChat = sendTextMsgToChat;
+    this._seenManagement = seenManagement;
+
     this.addSubmanager('msgs', new MessageCollectionManager(model.msgs));
     this.addSubmanager('msgLoadState', new MsgLoadStateManager(model.msgs.msgLoadState));
     try {
@@ -133,8 +137,10 @@ export class ChatManager extends ModelManager {
 
     let chat = this.model;
 
+
+
     return await this._sendMessage(
-      () => this.model.sendMessage(text, extraData),
+      () => console.log(this._sendTextMsgToChat(this.model, text, extraData)),
       (item) => item.body === text && item.type === 'chat'
     );
   }
@@ -157,8 +163,8 @@ export class ChatManager extends ModelManager {
     phoneNumber,
     quotedMsgId
   }) {
-    let contact = new manager.getSubmanager('contacts').collection._model({
-      id: phoneNumber + '@c.us',
+    let contact = new(manager.getSubmanager('contacts').collection._model)({
+      id: manager.getSubmanager('chats').createContactId(phoneNumber + '@c.us'),
       name: contactName
     });
 
@@ -234,7 +240,7 @@ export class ChatManager extends ModelManager {
 
   @command
   async sendSeen() {
-    return await this.model.sendSeen();
+    return await this._seenManagement.sendSeen(this.model);
   }
 
   @command
@@ -383,16 +389,27 @@ export class ChatCollectionManager extends CollectionManager {
     return ChatManager;
   }
 
-  constructor(collection, mediaCollectionClass, createPeerForContact) {
+  constructor(collection, mediaCollectionClass, numberToWid, sendTextMsgToChat, seenManagement) {
     super(collection);
 
     ChatManager.prototype.buildMediaCollection = function() {
       return new mediaCollectionClass();
     }
 
-    this.createPeerForContact = function(contactId) {
-      return new createPeerForContact(contactId);
+    this.createContactId = function(contactId) {
+      return numberToWid(contactId);
     }
+
+    this.sendTextMsgToChat = sendTextMsgToChat;
+    this.seenManagement = seenManagement;
+  }
+
+  buildModelManager(item) {
+    return new(this.constructor.getModelManagerClass())(
+      item,
+      this.sendTextMsgToChat,
+      this.seenManagement
+    );
   }
 
 
@@ -407,7 +424,7 @@ export class ChatCollectionManager extends CollectionManager {
   }) {
     let result = this.collection.get(contactId);
     if (!result) {
-      result = await this.collection.find(this.createPeerForContact(contactId));
+      result = await this.collection.find(this.createContactId(contactId));
     }
     return this.constructor.getModelManagerClass().mapModel(result);
   }
